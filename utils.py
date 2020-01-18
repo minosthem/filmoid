@@ -1,6 +1,7 @@
 import os
 from os.path import join, exists
-
+import pandas as pd
+import pickle
 import yaml
 
 properties_folder = join(os.getcwd(), "properties")
@@ -30,8 +31,24 @@ def get_filenames(prop):
     for file in prop["filenames"]:
         filename = file + prop["dataset-file-extention"]
         files[file] = join(dataset_path, filename)
-    if prop["dataset"] == "latest":
-        for file in prop["extrafiles"]:
-            filename = file + prop["dataset-file-extention"]
-            files[file] = join(dataset_path, filename)
     return files
+
+
+def load_glove_file(properties):
+    glove_file_path = join(os.getcwd(), "resources", properties["embeddings_file"])
+    return pd.read_csv(glove_file_path, delimiter=" ", header=None)
+
+
+def check_file_exists(directory, filename):
+    path = join(os.getcwd(), directory, filename)
+    return True if exists(path) else False
+
+
+def write_to_pickle(object, directory, filename):
+    path = join(os.getcwd(), directory, filename)
+    pickle.dump(object, path)
+
+
+def load_from_pickle(directory, file):
+    path = join(os.getcwd(), directory, file)
+    return pickle.load(path)

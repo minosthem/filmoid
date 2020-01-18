@@ -1,6 +1,8 @@
 dataset: "small" # possible values: small, latest
 filenames: ["links", "movies", "ratings", "tags"]
-extrafiles: ["genome-scores", "genome-tags"]
 dataset-file-extention: ".csv"
 methods: ["collaborative", "content-based"]
 models: ["kmeans", "knn", "rf", "dnn"]
+embeddings_file: "glove.6B.50d.txt"
+aggregation: "avg" # possible values: avg, max
+classification: binary # possible values: binary, multi ==> multi == classes 1-5
