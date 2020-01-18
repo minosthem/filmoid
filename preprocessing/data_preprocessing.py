@@ -119,12 +119,15 @@ def preprocess_text(movies_df, tags_df, movie_id, user_id):
     """
     m = movies_df[movies_df["movieId"] == movie_id]
     tags = tags_df[tags_df["userId"] == user_id and tags_df["movieId"] == movie_id]
-    movie_title = m["title"]
-    movie_genres = m["genres"]
-    tag = tags["tag"] if not tags.empty else ""
+    movie_title = m.iloc[0]["title"]
+    movie_genres = m.iloc[0]["genres"]
+    movie_text = movie_title + " " + movie_genres
+    if not tags.empty:
+        tags = tags["tag"]
+        for index, row in tags.iterrows():
+            movie_text = movie_text + " " + row["tag"]
     # preprocessing title, genres, tags ==> remove symbols, numbers
     tokenizer = RegexpTokenizer(r'\w+')
-    movie_text = movie_title + " " + movie_genres + " " + tag
     return tokenizer.tokenize(movie_text)
 
 

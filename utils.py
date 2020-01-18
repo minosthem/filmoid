@@ -60,16 +60,16 @@ def check_file_exists(directory, filename):
     return True if exists(path) else False
 
 
-def write_to_pickle(object, directory, filename):
+def write_to_pickle(obj, directory, filename):
     """
 
-    :param object:
+    :param obj:
     :param directory:
     :param filename:
     :return:
     """
     path = join(os.getcwd(), directory, filename)
-    pickle.dump(object, path)
+    pickle.dump(obj, path)
 
 
 def load_from_pickle(directory, file):
