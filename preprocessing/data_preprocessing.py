@@ -9,6 +9,11 @@ users_ratings_pickle = "users_ratings.pickle"
 
 
 def read_csv(files):
+    """
+
+    :param files:
+    :return:
+    """
     datasets = {}
     for name, file in files.items():
         datasets[name] = pd.read_csv(file)
@@ -16,6 +21,11 @@ def read_csv(files):
 
 
 def preprocessing_collaborative(datasets):
+    """
+
+    :param datasets:
+    :return:
+    """
     users_ratings = [[]]
 
     if utils.check_file_exists(output_folder, users_ratings_pickle):
@@ -24,7 +34,7 @@ def preprocessing_collaborative(datasets):
         ratings_df = datasets["ratings"]
         movies_df = datasets["movies"]
         user_ids = []
-        movie_ids = movies_df["movieId"]
+        movie_ids = movies_df["movieId"].values.tolist()
 
         for index, row in ratings_df.iterrows():
             user_id = row["userId"]
@@ -34,14 +44,23 @@ def preprocessing_collaborative(datasets):
                 user_vector = []
                 for movie_id in movie_ids:
                     rating_row = user_ratings[user_ratings["movieId"] == movie_id]
-                    user_vector.append(rating_row["rating"]) if not rating_row.empty() \
-                        else user_vector.append(0)
+                    if not rating_row.empty:
+                        rating_row = rating_row["rating"].values.tolist()
+                        user_vector.append(rating_row[0])
+                    else:
+                        user_vector.append(0.0)
                 users_ratings.append(user_vector)
         utils.write_to_pickle(users_ratings, output_folder, users_ratings_pickle)
     return users_ratings
 
 
 def preprocessing_content_based(properties, datasets):
+    """
+
+    :param properties:
+    :param datasets:
+    :return:
+    """
     input_data = [[]]
     ratings = []
 
@@ -71,11 +90,18 @@ def preprocessing_content_based(properties, datasets):
 
 
 def text_to_glove(properties, glove_df, word_list):
+    """
+
+    :param properties:
+    :param glove_df:
+    :param word_list:
+    :return:
+    """
     embeddings = [[]]
     for word in word_list:
         row = glove_df[glove_df.iloc[:, 0] == word]
-        if not row.empty():
-            vector = row[, 1:]
+        if not row.empty:
+            vector = row.iloc[:, 1:]
             vector = vector.values.tolist()
             embeddings.append(vector)
     return [sum(col) / len(col) for col in zip(*embeddings)] if properties["aggregation"] == "avg" \
@@ -83,11 +109,19 @@ def text_to_glove(properties, glove_df, word_list):
 
 
 def preprocess_text(movies_df, tags_df, movie_id, user_id):
+    """
+
+    :param movies_df:
+    :param tags_df:
+    :param movie_id:
+    :param user_id:
+    :return:
+    """
     m = movies_df[movies_df["movieId"] == movie_id]
     tags = tags_df[tags_df["userId"] == user_id and tags_df["movieId"] == movie_id]
     movie_title = m["title"]
     movie_genres = m["genres"]
-    tag = tags["tag"] if not tags.empty() else ""
+    tag = tags["tag"] if not tags.empty else ""
     # preprocessing title, genres, tags ==> remove symbols, numbers
     tokenizer = RegexpTokenizer(r'\w+')
     movie_text = movie_title + " " + movie_genres + " " + tag
@@ -95,6 +129,12 @@ def preprocess_text(movies_df, tags_df, movie_id, user_id):
 
 
 def preprocess_rating(properties, rating):
+    """
+
+    :param properties:
+    :param rating:
+    :return:
+    """
     if properties["classification"] == "binary":
         return 0 if rating > 3 else 1
     else:

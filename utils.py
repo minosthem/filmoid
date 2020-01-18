@@ -24,6 +24,11 @@ def load_properties():
 
 
 def get_filenames(prop):
+    """
+
+    :param prop:
+    :return:
+    """
     files = {}
     base_path = join(os.getcwd(), datasets_folder)
     dataset_path = join(base_path, ml_latest_small_folder) if prop["dataset"] == "small" \
@@ -35,20 +40,44 @@ def get_filenames(prop):
 
 
 def load_glove_file(properties):
+    """
+
+    :param properties:
+    :return:
+    """
     glove_file_path = join(os.getcwd(), "resources", properties["embeddings_file"])
     return pd.read_csv(glove_file_path, delimiter=" ", header=None)
 
 
 def check_file_exists(directory, filename):
+    """
+
+    :param directory:
+    :param filename:
+    :return:
+    """
     path = join(os.getcwd(), directory, filename)
     return True if exists(path) else False
 
 
 def write_to_pickle(object, directory, filename):
+    """
+
+    :param object:
+    :param directory:
+    :param filename:
+    :return:
+    """
     path = join(os.getcwd(), directory, filename)
     pickle.dump(object, path)
 
 
 def load_from_pickle(directory, file):
+    """
+
+    :param directory:
+    :param file:
+    :return:
+    """
     path = join(os.getcwd(), directory, file)
     return pickle.load(path)
