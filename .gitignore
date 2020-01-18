@@ -1,0 +1,7 @@
+properties/properties.yaml
+.idea
+__pycache__/
+models/__pycache__/
+preprocessing/__pycache__/
+output/
+Datasets/

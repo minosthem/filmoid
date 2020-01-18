@@ -1,0 +1,6 @@
+dataset: "small" # possible values: small, latest
+filenames: ["links", "movies", "ratings", "tags"]
+extrafiles: ["genome-scores", "genome-tags"]
+dataset-file-extention: ".csv"
+methods: ["collaborative", "content-based"]
+models: ["kmeans", "knn", "rf", "dnn"]
