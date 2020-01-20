@@ -10,9 +10,10 @@ users_ratings_pickle = "users_ratings.pickle"
 
 def read_csv(files):
     """
+    Reads every dataset from the files dictionary.
 
-    :param files:
-    :return:
+    :param files: files dictionary
+    :return: the datasets (csvs)
     """
     datasets = {}
     for name, file in files.items():
@@ -22,9 +23,15 @@ def read_csv(files):
 
 def preprocessing_collaborative(datasets):
     """
+    Initially, checks if the ratings list exists in the output folder and if this is the case it loads it. Otherwise,
+    it takes from the ratings dataset the ratings of the users, the name of the movies from the movies dataset and
+    creates a list with the movies ids. Then, within a for loop iterates the ratings dataframe and for each user
+    keeps track of the ratings he gave to every movie. If he didn't rate a movie, the algorithm put a zero to the corresponding
+    position of the vector. After finishing this process for every user, it returns the vectors of the users as a list called
+    user_ratings and writes it to the output folder.
 
-    :param datasets:
-    :return:
+    :param datasets: the datasets' dictionary which was created from the read_csv function
+    :return: the user_ratings list which is a list of vectors containing the ratings of every user
     """
     users_ratings = [[]]
 
@@ -56,10 +63,16 @@ def preprocessing_collaborative(datasets):
 
 def preprocessing_content_based(properties, datasets):
     """
+    Checks if the input and the rating file exists and loads them from the output folder. Otherwise, takes the rating, movies
+    and tads datasets and converts them to dataframes and also loads the glove file. It iterates the ratings dataframe keeping
+    from every row the movie id, user id and the rating. It uses the functions preprocess_rating, preprocess_text and text_to_glove
+    to create a vector corresponding to a movie's features and user id. The user's id is added on the first position of that vector.
+    Every vector is added to a list of vectors called input_data. Finally, the rating of every user for a particular movie is added
+    to a list called ratings and both this list as well as the input_data list are being saved to the output folder.
 
-    :param properties:
-    :param datasets:
-    :return:
+    :param properties: embedding file, classification, aggregation
+    :param datasets: filenames
+    :return: the vectors of numbers for the movies containing the tags of a user and the ratings list
     """
     input_data = [[]]
     ratings = []
@@ -84,18 +97,22 @@ def preprocessing_content_based(properties, datasets):
             # TODO standardization
             input_data.append(movie_vector)
             ratings.append(rating)
-        utils.write_to_pickle(object=input_data, directory=output_folder, filename=input_data_pickle)
-        utils.write_to_pickle(object=ratings, directory=output_folder, filename=ratings_pickle)
+        utils.write_to_pickle(obj=input_data, directory=output_folder, filename=input_data_pickle)
+        utils.write_to_pickle(obj=ratings, directory=output_folder, filename=ratings_pickle)
     return input_data, ratings
 
 
 def text_to_glove(properties, glove_df, word_list):
     """
+    Takes the processed text created by the preprocess_text function and converts it to a vector of numbers using the
+    word2vec algorithm (glove).This process is being done for every word of the text separately. In the end all the vectors
+    are gathered in a list of vectors (embeddings) and depending on the aggregation policy it creates a single vector containing
+    the average or the maximum number of every position of all the vectors.
 
-    :param properties:
-    :param glove_df:
-    :param word_list:
-    :return:
+    :param properties: aggregation
+    :param glove_df: embedding file
+    :param word_list: movie text or word list
+    :return: a vector for every movie text which contains the movie title and genre and also the tags of a user for this movie
     """
     embeddings = [[]]
     for word in word_list:
@@ -110,12 +127,15 @@ def text_to_glove(properties, glove_df, word_list):
 
 def preprocess_text(movies_df, tags_df, movie_id, user_id):
     """
+    It keeps the movie id from the movies dataset and also keeps the tags of a particular user for a specific movie. Then,
+    creates a string containing the movie title and movie genre which are taken from the movies dataset. Finally, it adds
+    the tags of the user for this movie to the string and gets rid of every symbol and number of that text.
 
-    :param movies_df:
-    :param tags_df:
-    :param movie_id:
-    :param user_id:
-    :return:
+    :param movies_df: movies dataset
+    :param tags_df: tags dataset
+    :param movie_id: id of a movie
+    :param user_id: id of a user
+    :return: the processed text containing the title and genre of a movie and the tags of a user for this movie
     """
     m = movies_df[movies_df["movieId"] == movie_id]
     tags = tags_df[tags_df["userId"] == user_id and tags_df["movieId"] == movie_id]
@@ -133,10 +153,11 @@ def preprocess_text(movies_df, tags_df, movie_id, user_id):
 
 def preprocess_rating(properties, rating):
     """
+    Converts a rating to a binary score o and 1 if the classification policy is binary else it keeps the rating and rounds it.
 
-    :param properties:
-    :param rating:
-    :return:
+    :param properties: classification
+    :param rating: rating of user for a movie
+    :return: a binary rating
     """
     if properties["classification"] == "binary":
         return 0 if rating > 3 else 1
