@@ -12,7 +12,7 @@ def main():
     # read datasets
     csvs = dp.read_csv(file_names)
     if "collaborative" in properties["methods"]:
-        input_collaborative = dp.preprocessing_collaborative(csvs)
+        input_collaborative = dp.preprocessing_collaborative(properties, csvs)
     if "content-based" in properties["methods"]:
         input_content_based = dp.preprocessing_content_based(properties, csvs)
 
