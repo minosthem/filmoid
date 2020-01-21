@@ -5,6 +5,8 @@ from os.path import join, exists
 
 import pandas as pd
 import yaml
+import sys
+import csv
 
 properties_folder = join(os.getcwd(), "properties")
 example_properties_file = join(properties_folder, "example_properties.yaml")
@@ -75,8 +77,18 @@ def load_glove_file(properties):
     :param properties: embeddings_file
     :return: glove word embeddings as Dataframe
     """
+    maxInt = sys.maxsize
     glove_file_path = join(os.getcwd(), properties["resources_folder"], properties["embeddings_file"])
-    return pd.read_csv(glove_file_path, delimiter=" ", header=None)
+    while True:
+        # decrease the maxInt value by factor 10
+        # as long as the OverflowError occurs.
+
+        try:
+            csv.field_size_limit(maxInt)
+            break
+        except OverflowError:
+            maxInt = int(maxInt / 10)
+    return pd.read_csv(glove_file_path, delimiter=" ", header=None, engine="python", error_bad_lines=False)
 
 
 def check_file_exists(directory, filename):
