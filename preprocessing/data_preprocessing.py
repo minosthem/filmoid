@@ -93,6 +93,8 @@ def preprocessing_content_based(properties, datasets):
             movie_text = preprocess_text(movies_df, tags_df, movie_id, user_id)
 
             movie_vector = text_to_glove(properties, glove_df, movie_text)
+            if not movie_vector:
+                continue
             movie_vector.insert(0, user_id)
             # TODO standardization
             input_data.append(movie_vector)
@@ -125,7 +127,7 @@ def text_to_glove(properties, glove_df, word_list):
             vector = vector.values.tolist()
             embeddings.append(vector)
     return [sum(col) / len(col) for col in zip(*embeddings)] if properties["aggregation"] == "avg" \
-        else [max(col) for col in zip(*embeddings)]
+        else [max(col) for col in zip(*embeddings)] if embeddings else None
 
 
 def preprocess_text(movies_df, tags_df, movie_id, user_id):
