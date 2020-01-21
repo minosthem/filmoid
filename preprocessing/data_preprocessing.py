@@ -2,7 +2,6 @@ import pandas as pd
 from nltk.tokenize import RegexpTokenizer
 import utils
 
-output_folder = "output"
 input_data_pickle = "input_data.pickle"
 ratings_pickle = "ratings.pickle"
 users_ratings_pickle = "users_ratings.pickle"
@@ -11,9 +10,8 @@ users_ratings_pickle = "users_ratings.pickle"
 def read_csv(files):
     """
     Reads every dataset from the files dictionary.
-
     :param files: files dictionary
-    :return: the datasets (csvs)
+    :return: a dictionary containing all the loaded Dataframes
     """
     datasets = {}
     for name, file in files.items():
@@ -21,20 +19,21 @@ def read_csv(files):
     return datasets
 
 
-def preprocessing_collaborative(datasets):
+def preprocessing_collaborative(properties, datasets):
     """
     Initially, checks if the ratings list exists in the output folder and if this is the case it loads it. Otherwise,
     it takes from the ratings dataset the ratings of the users, the name of the movies from the movies dataset and
     creates a list with the movies ids. Then, within a for loop iterates the ratings dataframe and for each user
-    keeps track of the ratings he gave to every movie. If he didn't rate a movie, the algorithm put a zero to the corresponding
-    position of the vector. After finishing this process for every user, it returns the vectors of the users as a list called
-    user_ratings and writes it to the output folder.
+    keeps track of the ratings he gave to every movie. If he didn't rate a movie, the algorithm put a zero to the
+    corresponding position of the vector. After finishing this process for every user, it returns the vectors of the
+    users as a list called user_ratings and writes it to the output folder as a pickle file.
 
+    :param properties: dictionary with the loaded properties from the yaml file
     :param datasets: the datasets' dictionary which was created from the read_csv function
     :return: the user_ratings list which is a list of vectors containing the ratings of every user
     """
     users_ratings = [[]]
-
+    output_folder = properties["output_folder"]
     if utils.check_file_exists(output_folder, users_ratings_pickle):
         users_ratings = utils.load_from_pickle(output_folder, users_ratings_pickle)
     else:
@@ -63,20 +62,21 @@ def preprocessing_collaborative(datasets):
 
 def preprocessing_content_based(properties, datasets):
     """
-    Checks if the input and the rating file exists and loads them from the output folder. Otherwise, takes the rating, movies
-    and tads datasets and converts them to dataframes and also loads the glove file. It iterates the ratings dataframe keeping
-    from every row the movie id, user id and the rating. It uses the functions preprocess_rating, preprocess_text and text_to_glove
-    to create a vector corresponding to a movie's features and user id. The user's id is added on the first position of that vector.
-    Every vector is added to a list of vectors called input_data. Finally, the rating of every user for a particular movie is added
-    to a list called ratings and both this list as well as the input_data list are being saved to the output folder.
+    Checks if the input and the rating file exist and loads them from the output folder. Otherwise, takes the rating,
+    movies and tags datasets and converts them to dataframes and also loads the glove file. It iterates the ratings
+    dataframe keeping from every row the movie id, user id and the rating. It uses the functions preprocess_rating,
+    preprocess_text and text_to_glove to create a vector corresponding to a movie's features and user id. The user's id
+    is added on the first position of that vector. Every vector is added to a list of vectors called input_data.
+    Finally, the rating of every user for a particular movie is added to a list called ratings and both this list as
+    well as the input_data list are being saved to the output folder.
 
     :param properties: embedding file, classification, aggregation
-    :param datasets: filenames
+    :param datasets: dictionary containing the dataframes of all the movielens csvs
     :return: the vectors of numbers for the movies containing the tags of a user and the ratings list
     """
     input_data = [[]]
     ratings = []
-
+    output_folder = properties["output_folder"]
     if utils.check_file_exists(output_folder, input_data_pickle) and \
             utils.check_file_exists(output_folder, ratings_pickle):
         input_data = utils.load_from_pickle(output_folder, input_data_pickle)
@@ -104,15 +104,18 @@ def preprocessing_content_based(properties, datasets):
 
 def text_to_glove(properties, glove_df, word_list):
     """
-    Takes the processed text created by the preprocess_text function and converts it to a vector of numbers using the
-    word2vec algorithm (glove).This process is being done for every word of the text separately. In the end all the vectors
-    are gathered in a list of vectors (embeddings) and depending on the aggregation policy it creates a single vector containing
-    the average or the maximum number of every position of all the vectors.
+    Takes the pre-processed text created by the preprocess_text function and converts it to a vector of numbers using
+    the word embeddings from Glove (https://nlp.stanford.edu/projects/glove/).
+    This process is being done for every word of the text separately. In the end all the vectors
+    are gathered in a list of vectors (embeddings) and, depending on the aggregation policy defined in the properties
+    yaml file, it creates a single vector containing the average or the maximum number of every position of all the
+    word embeddings vectors.
 
-    :param properties: aggregation
+    :param properties: aggregation strategy (avg or max)
     :param glove_df: embedding file
     :param word_list: movie text or word list
-    :return: a vector for every movie text which contains the movie title and genre and also the tags of a user for this movie
+    :return: a vector for every movie text which contains the movie title and genre and also the tags of a user for
+    a specific movie
     """
     embeddings = [[]]
     for word in word_list:
@@ -127,9 +130,10 @@ def text_to_glove(properties, glove_df, word_list):
 
 def preprocess_text(movies_df, tags_df, movie_id, user_id):
     """
-    It keeps the movie id from the movies dataset and also keeps the tags of a particular user for a specific movie. Then,
-    creates a string containing the movie title and movie genre which are taken from the movies dataset. Finally, it adds
-    the tags of the user for this movie to the string and gets rid of every symbol and number of that text.
+    It keeps the movie id from the movies dataset and also the tags of a particular user for the specific movie. Then,
+    creates a string containing the movie title and movie genre which are taken from the movies dataset as well as the.
+    Finally, it adds the tags of the user for this movie to the string and gets rid of every symbol and number of that
+    text.
 
     :param movies_df: movies dataset
     :param tags_df: tags dataset
@@ -153,7 +157,8 @@ def preprocess_text(movies_df, tags_df, movie_id, user_id):
 
 def preprocess_rating(properties, rating):
     """
-    Converts a rating to a binary score o and 1 if the classification policy is binary else it keeps the rating and rounds it.
+    Converts a rating to a binary score o and 1 if the classification policy is binary else it keeps the rating and
+    rounds it (uses the ratings as Integer numbers).
 
     :param properties: classification
     :param rating: rating of user for a movie

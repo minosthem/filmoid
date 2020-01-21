@@ -1,8 +1,14 @@
+os: "linux" # possible values: linux, windows
+setup_folders: False # boolean (True or False)
+output_folder: "output"
+datasets_folder: "Datasets"
+resources_folder: "resources"
 dataset: "small" # possible values: small, latest
 filenames: ["links", "movies", "ratings", "tags"]
 dataset-file-extention: ".csv"
 methods: ["collaborative", "content-based"]
 models: ["kmeans", "knn", "rf", "dnn"]
 embeddings_file: "glove.6B.50d.txt"
+embeddings_file_url: "http://nlp.stanford.edu/data/glove.6B.zip"
 aggregation: "avg" # possible values: avg, max
-classification: binary # possible values: binary, multi ==> multi == classes 1-5
+classification: "binary" # possible values: binary, multi ==> multi == classes 1-5

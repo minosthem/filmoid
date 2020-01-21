@@ -5,6 +5,8 @@ from preprocessing import data_preprocessing as dp
 def main():
     # load properties
     properties = utils.load_properties()
+    if properties["setup_folders"]:
+        utils.setup_folders(properties)
     # get dataset filenames to read
     file_names = utils.get_filenames(properties)
     # read datasets
