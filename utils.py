@@ -26,14 +26,15 @@ def setup_folders(properties):
     os.environ["OUTPUT_FOLDER"] = properties["output_folder"]
     os.environ["DATASETS_FOLDER"] = properties["datasets_folder"]
     os.environ["RESOURCES_FOLDER"] = properties["resources_folder"]
-    embeddings_file = properties["embeddings_file"].replace(".txt", ".zip")
-    os.environ["EMBEDDINGS_FILE"] = embeddings_file
+    embeddings_file = properties["embeddings_zip_file"]
+    os.environ["EMBEDDINGS_ZIP_FILE"] = embeddings_file
     os.environ["EMBEDDINGS_FILE_URL"] = properties["embeddings_file_url"]
     process = None
     if properties["os"] == "linux":
         process = subprocess.Popen("bash setup.sh", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     elif properties["os"] == "windows":
         process = subprocess.Popen("./setup.bat", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+    process.wait()
     output, error = process.stdout, process.stderr
     if process:
         if output:

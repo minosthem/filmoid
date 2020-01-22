@@ -8,8 +8,8 @@ mkdir -p "${DATASETS_FOLDER}"
 # download glove file
 cd "${RESOURCES_FOLDER}"
 wget "${EMBEDDINGS_FILE_URL}"
-unzip "${EMBEDDINGS_FILE}"
-rm "${EMBEDDINGS_FILE}"
+unzip "${EMBEDDINGS_ZIP_FILE}"
+rm "${EMBEDDINGS_ZIP_FILE}"
 cd ..
 
 # download datasets
