@@ -1,11 +1,15 @@
 import pandas as pd
+import numpy as np
 from nltk.tokenize import RegexpTokenizer
 import utils
+import string
+import re
 
 input_data_pickle = "input_data.pickle"
 ratings_pickle = "ratings.pickle"
 users_ratings_pickle = "users_ratings.pickle"
 
+punct_digit_to_space = str.maketrans(string.punctuation + string.digits, " " * len(string.punctuation + string.digits))
 
 def read_csv(files):
     """
@@ -144,7 +148,7 @@ def preprocess_text(movies_df, tags_df, movie_id, user_id):
     :return: the processed text containing the title and genre of a movie and the tags of a user for this movie
     """
     m = movies_df[movies_df["movieId"] == movie_id]
-    tags = tags_df[tags_df["userId"] == user_id and tags_df["movieId"] == movie_id]
+    tags = tags_df[(tags_df["userId"] == user_id) & (tags_df["movieId"] == movie_id)]
     movie_title = m.iloc[0]["title"]
     movie_genres = m.iloc[0]["genres"]
     movie_text = movie_title + " " + movie_genres
@@ -153,8 +157,15 @@ def preprocess_text(movies_df, tags_df, movie_id, user_id):
         for index, row in tags.iterrows():
             movie_text = movie_text + " " + row["tag"]
     # preprocessing title, genres, tags ==> remove symbols, numbers
-    tokenizer = RegexpTokenizer(r'\w+')
-    return tokenizer.tokenize(movie_text)
+    # remove digits and punctuation
+    movie_text = movie_text.translate(punct_digit_to_space).strip()
+    # merge multiple spaces
+    movie_text = re.sub("[ ]+", " ", movie_text)
+    # tokenization with the class below is probably not necessary
+    # tokenize
+    # tokenizer = RegexpTokenizer(r'\w+')
+    # return tokenizer.tokenize(movie_text)
+    return movie_text.split()
 
 
 def preprocess_rating(properties, rating):
