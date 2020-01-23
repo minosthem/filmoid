@@ -89,7 +89,8 @@ def load_glove_file(properties):
             break
         except OverflowError:
             maxInt = int(maxInt / 10)
-    return pd.read_csv(glove_file_path, delimiter=" ", header=None, engine="python", error_bad_lines=False)
+    res = pd.read_csv(glove_file_path, index_col=0, delimiter=" ", quoting=3, header=None, engine="python", error_bad_lines=False)
+    return res
 
 
 def check_file_exists(directory, filename):

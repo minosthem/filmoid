@@ -97,9 +97,9 @@ def preprocessing_content_based(properties, datasets):
             movie_text = preprocess_text(movies_df, tags_df, movie_id, user_id)
 
             movie_vector = text_to_glove(properties, glove_df, movie_text)
-            if not movie_vector:
+            if movie_vector.size == 0:
                 continue
-            movie_vector.insert(0, user_id)
+            movie_vector = np.append(user_id, movie_vector)
             # TODO standardization
             input_data.append(movie_vector)
             ratings.append(rating)
@@ -123,15 +123,26 @@ def text_to_glove(properties, glove_df, word_list):
     :return: a vector for every movie text which contains the movie title and genre and also the tags of a user for
     a specific movie
     """
-    embeddings = [[]]
+    embeddings = []
     for word in word_list:
-        row = glove_df[glove_df.iloc[:, 0] == word]
-        if not row.empty:
-            vector = row.iloc[:, 1:]
-            vector = vector.values.tolist()
-            embeddings.append(vector)
-    return [sum(col) / len(col) for col in zip(*embeddings)] if properties["aggregation"] == "avg" \
-        else [max(col) for col in zip(*embeddings)] if embeddings else None
+        # to lowercase
+        word = word.lower()
+        if word not in glove_df.index:
+            continue
+        # expand dimensions to a 1 x <dim> vector
+        embeddings.append(np.expand_dims(glove_df.loc[word].values, 0))
+
+    # concatenate to a <num words> x <dimension> matrix
+    embeddings = np.concatenate(embeddings, axis=0)
+
+    # aggregate all word vectors to a single vector
+    if properties["aggregation"] == "avg":
+        embeddings = np.mean(embeddings, axis=0)
+    elif properties["aggregation"] == "max":
+        embeddings = np.max(embeddings, axis=0)
+
+    # expand dimension to a 1 x <dim> vector
+    return np.expand_dims(embeddings, 0)
 
 
 def preprocess_text(movies_df, tags_df, movie_id, user_id):
