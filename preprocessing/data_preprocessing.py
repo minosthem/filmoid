@@ -1,16 +1,20 @@
-import pandas as pd
-import numpy as np
-from nltk.tokenize import RegexpTokenizer
-import utils
-import string
 import re
+import string
+
+import numpy as np
+import pandas as pd
 from sklearn import preprocessing
+from sklearn.model_selection import KFold
+from sklearn.model_selection import train_test_split
+
+import utils
 
 input_data_pickle = "input_data.pickle"
 ratings_pickle = "ratings.pickle"
 users_ratings_pickle = "users_ratings.pickle"
 
 punct_digit_to_space = str.maketrans(string.punctuation + string.digits, " " * len(string.punctuation + string.digits))
+
 
 def read_csv(files):
     """
@@ -22,6 +26,18 @@ def read_csv(files):
     for name, file in files.items():
         datasets[name] = pd.read_csv(file)
     return datasets
+
+
+def create_train_test_data(input, labels):
+    input_train, input_test, labels_train, labels_test = train_test_split(input, labels,
+                                                                          test_size=0.2,
+                                                                          random_state=0)
+    return input_train, input_test, labels_train, labels_test
+
+
+def create_cross_validation_data(input, properties):
+    kf = KFold(n_splits=properties["cross-validation"], shuffle=True, random_state=666)
+    return kf.split(input)
 
 
 def preprocessing_collaborative(properties, datasets):
@@ -40,13 +56,14 @@ def preprocessing_collaborative(properties, datasets):
     users_ratings = [[]]
     output_folder = properties["output_folder"]
     if utils.check_file_exists(output_folder, users_ratings_pickle):
+        print("Collaborative input vectors already exist and will be loaded from pickle file")
         users_ratings = utils.load_from_pickle(output_folder, users_ratings_pickle)
     else:
         ratings_df = datasets["ratings"]
         movies_df = datasets["movies"]
         user_ids = []
         movie_ids = movies_df["movieId"].values.tolist()
-
+        print("Generating input vectors")
         for index, row in ratings_df.iterrows():
             user_id = row["userId"]
             if user_id not in user_ids:
@@ -60,8 +77,12 @@ def preprocessing_collaborative(properties, datasets):
                         user_vector.append(rating_row[0])
                     else:
                         user_vector.append(0.0)
+                user_vector = np.array(user_vector)
                 users_ratings.append(user_vector)
-        utils.write_to_pickle(users_ratings, output_folder, users_ratings_pickle)
+        print("Writing input vectors into pickle file")
+        users_ratings = np.array(users_ratings)
+        users_ratings_pickle_filename = users_ratings_pickle + "_{}".format(properties["dataset"])
+        utils.write_to_pickle(users_ratings, output_folder, users_ratings_pickle_filename)
     return users_ratings
 
 
@@ -79,11 +100,12 @@ def preprocessing_content_based(properties, datasets):
     :param datasets: dictionary containing the dataframes of all the movielens csvs
     :return: the vectors of numbers for the movies containing the tags of a user and the ratings list
     """
-    input_data = [[]]
+    input_data = []
     ratings = []
     output_folder = properties["output_folder"]
     if utils.check_file_exists(output_folder, input_data_pickle) and \
             utils.check_file_exists(output_folder, ratings_pickle):
+        print("Content-based input data already exist and will be loaded from pickle file")
         input_data = utils.load_from_pickle(output_folder, input_data_pickle)
         ratings = utils.load_from_pickle(output_folder, ratings_pickle)
     else:
@@ -91,6 +113,7 @@ def preprocessing_content_based(properties, datasets):
         movies_df = datasets["movies"]
         tags_df = datasets["tags"]
         glove_df = utils.load_glove_file(properties)
+        print("Generating input vectors")
         for index, row in ratings_df.iterrows():
             movie_id, user_id, rating, _ = row
             # preprocess
@@ -100,13 +123,25 @@ def preprocessing_content_based(properties, datasets):
             movie_vector = text_to_glove(properties, glove_df, movie_text)
             if movie_vector.size == 0:
                 continue
-            movie_vector = np.append(user_id, movie_vector)
+            movie_vector = np.insert(movie_vector, 0, user_id,axis=1)
             input_data.append(movie_vector)
             ratings.append(rating)
+            # limit data size for testing purposes
+            if "limit_input" in properties and properties["limit_input"] <= len(ratings):
+                break
+            if len(ratings) % 20 == 0 and ratings:
+                print("Processed {} inputs.".format(len(ratings)))
+
+        input_data = np.concatenate(input_data)
+        print("Produced a feature matrix of shape {}".format(input_data.shape))
         # standardization
+        print("Standardize input vectors")
         input_data = preprocessing.scale(input_data)
-        utils.write_to_pickle(obj=input_data, directory=output_folder, filename=input_data_pickle)
-        utils.write_to_pickle(obj=ratings, directory=output_folder, filename=ratings_pickle)
+        print("Save input vectors to file")
+        input_data_pickle_filename = input_data_pickle + "_{}".format(properties["dataset"])
+        ratings_pickle_filename = ratings_pickle + "_{}".format(properties["dataset"])
+        utils.write_to_pickle(obj=input_data, directory=output_folder, filename=input_data_pickle_filename)
+        utils.write_to_pickle(obj=ratings, directory=output_folder, filename=ratings_pickle_filename)
     return input_data, ratings
 
 

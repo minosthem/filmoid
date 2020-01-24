@@ -64,8 +64,15 @@ def get_filenames(prop):
     files = {}
     datasets_folder = prop["datasets_folder"]
     base_path = join(os.getcwd(), datasets_folder)
-    dataset_path = join(base_path, ml_latest_small_folder) if prop["dataset"] == "small" \
-        else join(base_path, ml_latest)
+    # TODO
+    # dataset_path = join(base_path, ml_latest_small_folder) if prop["dataset"] == "small" \
+    #     else join(base_path, ml_latest)
+    if prop["dataset"] == "small":
+        dataset_path = join(base_path, ml_latest_small_folder)
+    elif prop["dataset"] == "latest":
+        dataset_path = join(base_path, ml_latest)
+    else:
+        dataset_path = join(base_path, "ml-dev")
     for file in prop["filenames"]:
         filename = file + prop["dataset-file-extention"]
         files[file] = join(dataset_path, filename)
@@ -113,7 +120,8 @@ def write_to_pickle(obj, directory, filename):
     :return: does not return anything
     """
     path = join(os.getcwd(), directory, filename)
-    pickle.dump(obj, path)
+    with open(path, "wb") as f:
+        pickle.dump(obj, f)
 
 
 def load_from_pickle(directory, file):
@@ -124,4 +132,5 @@ def load_from_pickle(directory, file):
     :return: the object loaded from the pickle file
     """
     path = join(os.getcwd(), directory, file)
-    return pickle.load(path)
+    with open(path, "rb") as f:
+        return pickle.load(f)
