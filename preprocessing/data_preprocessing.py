@@ -4,6 +4,7 @@ from nltk.tokenize import RegexpTokenizer
 import utils
 import string
 import re
+from sklearn import preprocessing
 
 input_data_pickle = "input_data.pickle"
 ratings_pickle = "ratings.pickle"
@@ -100,9 +101,10 @@ def preprocessing_content_based(properties, datasets):
             if movie_vector.size == 0:
                 continue
             movie_vector = np.append(user_id, movie_vector)
-            # TODO standardization
             input_data.append(movie_vector)
             ratings.append(rating)
+        # standardization
+        input_data = preprocessing.scale(input_data)
         utils.write_to_pickle(obj=input_data, directory=output_folder, filename=input_data_pickle)
         utils.write_to_pickle(obj=ratings, directory=output_folder, filename=ratings_pickle)
     return input_data, ratings
