@@ -14,6 +14,21 @@ properties_file = join(properties_folder, "properties.yaml")
 ml_latest_small_folder = "ml-latest-small"
 ml_latest = "ml-latest"
 
+def print_progress(container, step=20, msg="\tProcessed {} elements."):
+    if len(container) % step == 0 and container:
+        print(msg.format(len(container)))
+
+def limit_execution(container, properties):
+    """Signals end of execution if a limiter is defined in the properties file and the 
+    input container is of appropriate length
+    
+    :param container: container {iterable} -- The container to check
+    :return: boolean decision
+    """
+    try:
+        return len(container) >= properties["limit"]
+    except KeyError:
+        return False
 
 def setup_folders(properties):
     """
@@ -86,7 +101,14 @@ def load_glove_file(properties):
     :return: glove word embeddings as Dataframe
     """
     maxInt = sys.maxsize
+    resources_folder = join(os.getcwd(), properties["resources_folder"])
     glove_file_path = join(os.getcwd(), properties["resources_folder"], properties["embeddings_file"])
+    if not exists(resources_folder):
+        print("Resources folder not found in", resources_folder)
+        return None
+    if not exists(resources_folder):
+        print("Glove file not found in", glove_file_path)
+        return None
     while True:
         # decrease the maxInt value by factor 10
         # as long as the OverflowError occurs.
@@ -108,7 +130,7 @@ def check_file_exists(directory, filename):
     :return: boolean true if the file exists otherwise false
     """
     path = join(os.getcwd(), directory, filename)
-    return True if exists(path) else False
+    return exists(path)
 
 
 def write_to_pickle(obj, directory, filename):

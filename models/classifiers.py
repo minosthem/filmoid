@@ -12,7 +12,9 @@ def run_cross_validation(classifier_name, properties, input, labels, fold_idx):
     elif classifier_name == "dnn":
         classifier = DeepNN()
     matrices = []
-    for train_index, test_index in fold_idx:
+    fold_idx = list(fold_idx)
+    for idx, (train_index, test_index) in enumerate(fold_idx):
+        print("Running fold #{}/{}".format(idx+1, len(fold_idx)))
         input_train, input_test = input[train_index], input[test_index]
         labels_train, labels_test = labels[train_index], labels[test_index]
         classifier.train(input_train, labels_train)

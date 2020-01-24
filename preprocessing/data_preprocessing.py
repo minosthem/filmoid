@@ -1,5 +1,6 @@
 import re
 import string
+import os
 
 import numpy as np
 import pandas as pd
@@ -8,6 +9,10 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
 import utils
+# lim_infix = "_lim{}_".format(properties["limit"]) if "limit" in properties else ""
+# input_data_pickle = "input_data{}.pickle".format(lim_infix)
+# ratings_pickle = "ratings{}.pickle".format(lim_infix)
+# users_ratings_pickle = "users_ratings{}.pickle".format(lim_infix)
 
 input_data_pickle = "input_data.pickle"
 ratings_pickle = "ratings.pickle"
@@ -55,16 +60,20 @@ def preprocessing_collaborative(properties, datasets):
     """
     users_ratings = [[]]
     output_folder = properties["output_folder"]
-    if utils.check_file_exists(output_folder, users_ratings_pickle):
+    users_ratings_pickle_filename = users_ratings_pickle + "_{}".format(properties["dataset"])
+    
+    if utils.check_file_exists(output_folder, users_ratings_pickle_filename):
         print("Collaborative input vectors already exist and will be loaded from pickle file")
-        users_ratings = utils.load_from_pickle(output_folder, users_ratings_pickle)
+        users_ratings = utils.load_from_pickle(output_folder, users_ratings_pickle_filename)
+        print("Loaded user ratings of shape {}".format(users_ratings.shape))
     else:
+        os.makedirs(output_folder, exist_ok=True)
         ratings_df = datasets["ratings"]
         movies_df = datasets["movies"]
         user_ids = []
         movie_ids = movies_df["movieId"].values.tolist()
         print("Generating input vectors")
-        for index, row in ratings_df.iterrows():
+        for _, row in ratings_df.iterrows():
             user_id = row["userId"]
             if user_id not in user_ids:
                 user_ids.append(user_id)
@@ -79,9 +88,12 @@ def preprocessing_collaborative(properties, datasets):
                         user_vector.append(0.0)
                 user_vector = np.array(user_vector)
                 users_ratings.append(user_vector)
+            if utils.limit_execution(user_ratings, properties):
+                break
+            utils.print_progress(user_ratings)
         print("Writing input vectors into pickle file")
         users_ratings = np.array(users_ratings)
-        users_ratings_pickle_filename = users_ratings_pickle + "_{}".format(properties["dataset"])
+        
         utils.write_to_pickle(users_ratings, output_folder, users_ratings_pickle_filename)
     return users_ratings
 
@@ -103,12 +115,18 @@ def preprocessing_content_based(properties, datasets):
     input_data = []
     ratings = []
     output_folder = properties["output_folder"]
-    if utils.check_file_exists(output_folder, input_data_pickle) and \
-            utils.check_file_exists(output_folder, ratings_pickle):
+    input_data_pickle_filename = input_data_pickle + "_{}".format(properties["dataset"])
+    ratings_pickle_filename = ratings_pickle + "_{}".format(properties["dataset"])
+
+    if utils.check_file_exists(output_folder, input_data_pickle_filename) and \
+            utils.check_file_exists(output_folder, ratings_pickle_filename):
         print("Content-based input data already exist and will be loaded from pickle file")
-        input_data = utils.load_from_pickle(output_folder, input_data_pickle)
-        ratings = utils.load_from_pickle(output_folder, ratings_pickle)
+        input_data = utils.load_from_pickle(output_folder, input_data_pickle_filename)
+        ratings = utils.load_from_pickle(output_folder, ratings_pickle_filename)
+        print("Loaded inputs of shape {}".format(input_data.shape))
+        print("Loaded ratings of shape {}".format(ratings.shape))
     else:
+        os.makedirs(output_folder, exist_ok=True)
         ratings_df = datasets["ratings"]
         movies_df = datasets["movies"]
         tags_df = datasets["tags"]
@@ -127,19 +145,17 @@ def preprocessing_content_based(properties, datasets):
             input_data.append(movie_vector)
             ratings.append(rating)
             # limit data size for testing purposes
-            if "limit_input" in properties and properties["limit_input"] <= len(ratings):
+            if utils.limit_execution(ratings, properties):
                 break
-            if len(ratings) % 20 == 0 and ratings:
-                print("Processed {} inputs.".format(len(ratings)))
+            utils.print_progress(ratings)
 
+        ratings = np.asarray(ratings)
         input_data = np.concatenate(input_data)
         print("Produced a feature matrix of shape {}".format(input_data.shape))
         # standardization
         print("Standardize input vectors")
         input_data = preprocessing.scale(input_data)
         print("Save input vectors to file")
-        input_data_pickle_filename = input_data_pickle + "_{}".format(properties["dataset"])
-        ratings_pickle_filename = ratings_pickle + "_{}".format(properties["dataset"])
         utils.write_to_pickle(obj=input_data, directory=output_folder, filename=input_data_pickle_filename)
         utils.write_to_pickle(obj=ratings, directory=output_folder, filename=ratings_pickle_filename)
     return input_data, ratings

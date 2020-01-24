@@ -14,14 +14,14 @@ def main():
     print("Collect the dataset filenames")
     file_names = utils.get_filenames(properties)
     # read datasets
-    print("Create dataframes from the csvs in the selected dataset")
+    print("Creating dataframes from the csvs in the selected dataset")
     csvs = dp.read_csv(file_names)
     if "collaborative" in properties["methods"]:
-        print("Create input vectors for collaborative method")
+        print("Creating input vectors for collaborative method")
         input_data = dp.preprocessing_collaborative(properties, csvs)
         # TODO
     if "content-based" in properties["methods"]:
-        print("Create input vectors for content-based method")
+        print("Creating input vectors for content-based method")
         input_data, ratings = dp.preprocessing_content_based(properties, csvs)
         print("Split train and test datasets")
         input_train, input_test, ratings_train, ratings_test = dp.create_train_test_data(input_data, ratings)
@@ -33,6 +33,7 @@ def main():
                                                                         folds)
                 # TODO run test
 
+        print("Done!")
 
 if __name__ == '__main__':
     main()
