@@ -1,7 +1,7 @@
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
-
+import numpy as np
 
 def run_cross_validation(classifier_name, properties, input_data, labels, fold_idx):
     """
