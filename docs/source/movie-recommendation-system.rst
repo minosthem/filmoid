@@ -1,8 +1,8 @@
-Movie-Recommendation-System
+Filmoid
 ===========================
 
 .. toctree::
-   :caption: Movie-Recommendation-System
+   :caption: Filmoid
 
 .. automodule:: main
    :members:
