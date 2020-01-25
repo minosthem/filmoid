@@ -4,9 +4,9 @@ test:
   stage: test
   script:
   - apk update && apk add build-base \
-      && apk add --update-cache --no-cache libgcc libquadmath musl \
-      && apk add --update-cache --no-cache libgfortran \
-      && apk add --update-cache --no-cache lapack-dev
+      && apk add -u libgcc libquadmath musl \
+      && apk add -u libgfortran \
+      && apk add -u lapack-dev
   - pip install -r requirements.txt
   - pip install -U sphinx sphinx_rtd_theme recommonmark
   - sphinx-build -b html -a ./docs/source public
@@ -19,9 +19,9 @@ pages:
   stage: deploy
   script:
   - apk update && apk add build-base \
-      && apk add --update-cache --no-cache libgcc libquadmath musl \
-      && apk add --update-cache --no-cache libgfortran \
-      && apk add --update-cache --no-cache lapack-dev
+      && apk add -u libgcc libquadmath musl \
+      && apk add -u libgfortran \
+      && apk add -u lapack-dev
   - pip install -r requirements.txt
   - pip install -U sphinx sphinx_rtd_theme recommonmark
   - sphinx-build -b html -a ./docs/source public
