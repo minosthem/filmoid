@@ -251,4 +251,4 @@ def preprocess_rating(properties, rating):
     if properties["classification"] == "binary":
         return 0 if rating > 3 else 1
     else:
-        return int(rating)
+        return round(rating)
