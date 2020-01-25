@@ -13,6 +13,6 @@ embeddings_zip_file: "glove.6B.zip"
 embeddings_file_url: "http://nlp.stanford.edu/data/glove.6B.zip"
 aggregation: "avg" # possible values: avg, max
 classification: "binary" # possible values: binary, multi ==> multi == classes 1-5
-cross-validation: 10
-neighbors: 10
+cross-validation: 10 # k-folds for training the models
+neighbors: 10 # KNN neighbors
 limit: 200

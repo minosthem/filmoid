@@ -3,6 +3,18 @@ from sklearn.metrics import confusion_matrix
 
 
 def run_cross_validation(classifier_name, properties, input, labels, fold_idx):
+    """
+    Checks which classifier is selected and then takes the input data and labels which are divided into k folds.
+    Each fold contains a tuple with the train and test indices. For every fold the model is trained and the confusion
+    matrix is added to a list.
+
+    :param classifier_name: the classifier which is selected
+    :param properties: from properties yaml the value of the key neighbors
+    :param input: the input data - movie vectors
+    :param labels: true labels - ratings
+    :param fold_idx: the number of folds
+    :return: the classifier and the confusion matrices created for each fold
+    """
     classifier = Classifier()
     if classifier_name == "knn":
         classifier = KNN()

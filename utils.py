@@ -14,21 +14,25 @@ properties_file = join(properties_folder, "properties.yaml")
 ml_latest_small_folder = "ml-latest-small"
 ml_latest = "ml-latest"
 
+
 def print_progress(container, step=20, msg="\tProcessed {} elements."):
     if len(container) % step == 0 and container:
         print(msg.format(len(container)))
 
+
 def limit_execution(container, properties):
     """Signals end of execution if a limiter is defined in the properties file and the 
     input container is of appropriate length
-    
+
     :param container: container {iterable} -- The container to check
+    :param properties: limit
     :return: boolean decision
     """
     try:
         return len(container) >= properties["limit"]
     except KeyError:
         return False
+
 
 def setup_folders(properties):
     """
@@ -118,7 +122,8 @@ def load_glove_file(properties):
             break
         except OverflowError:
             maxInt = int(maxInt / 10)
-    res = pd.read_csv(glove_file_path, index_col=0, delimiter=" ", quoting=3, header=None, engine="python", error_bad_lines=False)
+    res = pd.read_csv(glove_file_path, index_col=0, delimiter=" ", quoting=3, header=None, engine="python",
+                      error_bad_lines=False)
     return res
 
 

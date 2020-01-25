@@ -9,6 +9,7 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
 import utils
+
 # lim_infix = "_lim{}_".format(properties["limit"]) if "limit" in properties else ""
 # input_data_pickle = "input_data{}.pickle".format(lim_infix)
 # ratings_pickle = "ratings{}.pickle".format(lim_infix)
@@ -34,6 +35,14 @@ def read_csv(files):
 
 
 def create_train_test_data(input, labels):
+    """
+    It splits the input data and the labels into a train dataset with the corresponding labels and a test dataset with
+    the corresponding labels.
+
+    :param input: input data, a list of vectors
+    :param labels: a list of ratings (numbers)
+    :return: the two datasets with the corresponding true labels
+    """
     input_train, input_test, labels_train, labels_test = train_test_split(input, labels,
                                                                           test_size=0.2,
                                                                           random_state=0)
@@ -41,6 +50,13 @@ def create_train_test_data(input, labels):
 
 
 def create_cross_validation_data(input, properties):
+    """
+    Takes the input data and creates k folds depending on the number of folds mentioned in the properties file.
+
+    :param input: train dataset
+    :param properties: cross-validation, number of folds
+    :return: a list of k tuples containing train and test indices
+    """
     kf = KFold(n_splits=properties["cross-validation"], shuffle=True, random_state=666)
     return kf.split(input)
 
@@ -58,10 +74,10 @@ def preprocessing_collaborative(properties, datasets):
     :param datasets: the datasets' dictionary which was created from the read_csv function
     :return: the user_ratings list which is a list of vectors containing the ratings of every user
     """
-    users_ratings = [[]]
+    users_ratings = []
     output_folder = properties["output_folder"]
     users_ratings_pickle_filename = users_ratings_pickle + "_{}".format(properties["dataset"])
-    
+
     if utils.check_file_exists(output_folder, users_ratings_pickle_filename):
         print("Collaborative input vectors already exist and will be loaded from pickle file")
         users_ratings = utils.load_from_pickle(output_folder, users_ratings_pickle_filename)
@@ -88,12 +104,12 @@ def preprocessing_collaborative(properties, datasets):
                         user_vector.append(0.0)
                 user_vector = np.array(user_vector)
                 users_ratings.append(user_vector)
-            if utils.limit_execution(user_ratings, properties):
+            if utils.limit_execution(users_ratings, properties):
                 break
-            utils.print_progress(user_ratings)
+            utils.print_progress(users_ratings)
         print("Writing input vectors into pickle file")
         users_ratings = np.array(users_ratings)
-        
+
         utils.write_to_pickle(users_ratings, output_folder, users_ratings_pickle_filename)
     return users_ratings
 
@@ -141,7 +157,7 @@ def preprocessing_content_based(properties, datasets):
             movie_vector = text_to_glove(properties, glove_df, movie_text)
             if movie_vector.size == 0:
                 continue
-            movie_vector = np.insert(movie_vector, 0, user_id,axis=1)
+            movie_vector = np.insert(movie_vector, 0, user_id, axis=1)
             input_data.append(movie_vector)
             ratings.append(rating)
             # limit data size for testing purposes
