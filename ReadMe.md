@@ -1,4 +1,4 @@
-# Movie-Recommendation-System
+# Filmoid
 
 ## Properties explained
 
