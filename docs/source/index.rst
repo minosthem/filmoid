@@ -10,7 +10,7 @@ Welcome to Filmoid's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   movie-recommendation-system
+   filmoid
    preprocessing
    models
    results
