@@ -61,7 +61,7 @@ def calc_results(properties, confusion_matrix):
     list_fmeasures = []
     for label in labels:
         true_positive = confusion_matrix[label][label] if properties["classification"] == "binary" else \
-        confusion_matrix[label - 1][label - 1]
+            confusion_matrix[label - 1][label - 1]
         false_positive = 0
         false_negative = 0
         for other_label in labels:
