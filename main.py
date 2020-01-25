@@ -1,3 +1,5 @@
+import time
+
 import utils
 from models import classifiers, results
 from preprocessing import data_preprocessing as dp
@@ -39,7 +41,9 @@ def main():
     if "collaborative" in properties["methods"]:
         print("Creating input vectors for collaborative method")
         input_data = dp.preprocessing_collaborative(properties, csvs)
-        # TODO kmeans
+        for model in properties["models"]["collaborative"]:
+            pass
+            # TODO kmeans
     if "content-based" in properties["methods"]:
         print("Creating input vectors for content-based method")
         input_data, ratings = dp.preprocessing_content_based(properties, csvs)
@@ -49,16 +53,17 @@ def main():
         folds = dp.create_cross_validation_data(input_train, properties)
         res = {}
         test_res = {}
-        for model in properties["models"]:
-            if model != "kmeans":
-                classifier, matrices = classifiers.run_cross_validation(model, properties, input_train, ratings_train,
-                                                                        folds)
-                for i, matrix in enumerate(matrices):
-                    res = results.write_results_to_file(properties, "fold_{}".format(i), model, matrix, res)
-                conf_matrix = classifier.test(input_test, ratings_test)
-                test_res = results.write_results_to_file(properties, "test_results", model, conf_matrix, test_res)
-        # TODO visualize the results
-        print("Done!")
+        for model in properties["models"]["content-based"]:
+            tic = time.time()
+            classifier, matrices = classifiers.run_cross_validation(model, properties, input_train, ratings_train,
+                                                                    folds)
+            print("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
+            for i, matrix in enumerate(matrices):
+                res = results.write_results_to_file(properties, "fold_{}".format(i), model, matrix, res)
+            conf_matrix = classifier.test(input_test, ratings_test)
+            test_res = results.write_results_to_file(properties, "test_results", model, conf_matrix, test_res)
+    # TODO visualize the results
+    print("Done!")
 
 
 if __name__ == '__main__':

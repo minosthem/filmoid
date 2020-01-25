@@ -7,7 +7,9 @@ dataset: "small" # possible values: small, latest
 filenames: ["links", "movies", "ratings", "tags"]
 dataset-file-extention: ".csv"
 methods: ["collaborative", "content-based"]
-models: ["kmeans", "knn", "rf", "dnn"]
+models:
+  collaborative: ["kmeans"]
+  content-based: ["knn", "rf", "dnn"]
 embeddings_file: "glove.6B.50d.txt"
 embeddings_zip_file: "glove.6B.zip"
 embeddings_file_url: "http://nlp.stanford.edu/data/glove.6B.zip"
@@ -19,5 +21,4 @@ knn:
 rf:
   estimators: 100
   max_depth: 10
-
 limit: 200 # define the number of input instances. Leave it blank to use all the dataset instances

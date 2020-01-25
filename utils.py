@@ -1,12 +1,13 @@
+import csv
 import os
 import pickle
 import subprocess
+import sys
+import time
 from os.path import join, exists
 
 import pandas as pd
 import yaml
-import sys
-import csv
 
 properties_folder = join(os.getcwd(), "properties")
 example_properties_file = join(properties_folder, "example_properties.yaml")
@@ -61,6 +62,15 @@ def setup_folders(properties):
         if error:
             print("Folders setup failed because: {}".format(error))
             exit(-1)
+
+
+def elapsed_str(previous_tic, up_to=None):
+    if up_to is None:
+        up_to = time.time()
+    duration_sec = up_to - previous_tic
+    m, s = divmod(duration_sec, 60)
+    h, m = divmod(m, 60)
+    return "%d:%02d:%02d" % (h, m, s)
 
 
 def load_properties():
