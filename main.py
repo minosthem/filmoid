@@ -4,6 +4,26 @@ from preprocessing import data_preprocessing as dp
 
 
 def main():
+    """
+    Main function is the starting point of the program. Properties from the yaml are loaded in order to be used as
+    configuration to the program. If the dataset and the embeddings files are not already downloaded, property
+    setup_folders should be set to True. The scripts setup.sh or setup.bat are used (based on the operating system) in
+    order to download the necessary files.
+
+    The next step is to read the csv of the selected dataset and convert the data into input vectors.
+    The recommendation is system is built using two methods: the collaborative and the content-based methods. For the
+    collaborative method, the ratings of a user are used as input vector and they are fed in a kmeans model. On the
+    other hand, for the content-based method, information about the user and the movie are used (associated with each
+    live of the ratings.csv). The rating serves as label to each input vector. Based on the classification property,
+    the labels are either binary (like, dislike) or 5 different classes (representing the possible ratings). The models
+    used for the content-based method are: KNN, Random Forest and Deep Neural Networks.
+
+    The dataset is split into training and testing datasets. The testing dataset is kept aside, while the training is
+    split into folds for 10-fold cross-validation. Finally, the testing dataset is used as additional validation of the
+    model. The confusion matrices of the folds as well as the one produced by the test dataset are used in order to
+    calculate micro/macro precision, recall, F-measure. The visualization method can be used in order to produce plots
+    of the micro/macro metrics.
+    """
     # load properties
     print("Loading properties")
     properties = utils.load_properties()
@@ -35,7 +55,7 @@ def main():
                                                                         folds)
                 for i, matrix in enumerate(matrices):
                     res = results.write_results_to_file(properties, "fold_{}".format(i), classifier, matrix, res)
-                conf_matrix = classifiers.run_test(classifier, input_test, ratings_test)
+                conf_matrix = classifier.test(input_test, ratings_test)
                 test_res = results.write_results_to_file(properties, "test_results", classifier, conf_matrix, test_res)
         # TODO visualize the results
         print("Done!")

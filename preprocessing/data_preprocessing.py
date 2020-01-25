@@ -10,11 +10,6 @@ from sklearn.model_selection import train_test_split
 
 import utils
 
-# lim_infix = "_lim{}_".format(properties["limit"]) if "limit" in properties else ""
-# input_data_pickle = "input_data{}.pickle".format(lim_infix)
-# ratings_pickle = "ratings{}.pickle".format(lim_infix)
-# users_ratings_pickle = "users_ratings{}.pickle".format(lim_infix)
-
 input_data_pickle = "input_data.pickle"
 ratings_pickle = "ratings.pickle"
 users_ratings_pickle = "users_ratings.pickle"
@@ -241,10 +236,6 @@ def preprocess_text(movies_df, tags_df, movie_id, user_id):
     movie_text = movie_text.translate(punct_digit_to_space).strip()
     # merge multiple spaces
     movie_text = re.sub("[ ]+", " ", movie_text)
-    # tokenization with the class below is probably not necessary
-    # tokenize
-    # tokenizer = RegexpTokenizer(r'\w+')
-    # return tokenizer.tokenize(movie_text)
     return movie_text.split()
 
 
