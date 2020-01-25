@@ -15,6 +15,7 @@ Welcome to movie-recommendation-system's documentation!
    models
    results
    utils
+   tests
 
 
 Indices and tables
