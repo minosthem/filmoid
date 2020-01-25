@@ -21,20 +21,6 @@ def print_progress(container, step=20, msg="\tProcessed {} elements."):
         print(msg.format(len(container)))
 
 
-def limit_execution(container, properties):
-    """Signals end of execution if a limiter is defined in the properties file and the 
-    input container is of appropriate length
-
-    :param container: container {iterable} -- The container to check
-    :param properties: limit
-    :return: boolean decision
-    """
-    try:
-        return len(container) >= properties["limit"]
-    except KeyError:
-        return False
-
-
 def setup_folders(properties):
     """
     Sets up environmental variables in order to execute the relevant script based on the operating system.

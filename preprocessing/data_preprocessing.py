@@ -99,8 +99,6 @@ def preprocessing_collaborative(properties, datasets):
                         user_vector.append(0.0)
                 user_vector = np.array(user_vector)
                 users_ratings.append(user_vector)
-            if utils.limit_execution(users_ratings, properties):
-                break
             utils.print_progress(users_ratings)
         print("Writing input vectors into pickle file")
         users_ratings = np.array(users_ratings)
@@ -155,9 +153,6 @@ def preprocessing_content_based(properties, datasets):
             movie_vector = np.insert(movie_vector, 0, user_id, axis=1)
             input_data.append(movie_vector)
             ratings.append(rating)
-            # limit data size for testing purposes
-            if utils.limit_execution(ratings, properties):
-                break
             utils.print_progress(ratings)
 
         ratings = np.asarray(ratings)
