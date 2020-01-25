@@ -1,4 +1,5 @@
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
 
 
@@ -18,7 +19,6 @@ def run_cross_validation(classifier_name, properties, input_data, labels, fold_i
     classifier = Classifier()
     if classifier_name == "knn":
         classifier = KNN()
-        classifier.neighbors = properties["neighbors"]
     elif classifier_name == "rf":
         classifier = RandomForest()
     elif classifier_name == "dnn":
@@ -29,7 +29,7 @@ def run_cross_validation(classifier_name, properties, input_data, labels, fold_i
         print("Running fold #{}/{}".format(idx + 1, len(fold_idx)))
         input_train, input_test = input_data[train_index], input_data[test_index]
         labels_train, labels_test = labels[train_index], labels[test_index]
-        classifier.train(input_train, labels_train)
+        classifier.train(input_train, labels_train, properties)
         conf_matrix = classifier.test(input_test, labels_test)
         matrices.append(conf_matrix)
     return classifier, matrices
@@ -41,7 +41,7 @@ class Classifier:
     train and test.
     """
 
-    def train(self, input_data, labels):
+    def train(self, input_data, labels, properties):
         pass
 
     def test(self, test_data, true_labels):
@@ -53,16 +53,16 @@ class KNN(Classifier):
     KNN class models the K-Nearest-Neighbor classifier. Extends the Classifier class and implements the methods
     train and test using the KNN model.
     """
-    neighbors = 0
     knn = None
 
-    def train(self, input_data, labels):
+    def train(self, input_data, labels, properties):
         """
         Train method for KNN classifier
         :param input_data: the training dataset
         :param labels: the training labels
+        :param properties: properties from yaml
         """
-        self.knn = KNeighborsClassifier(n_neighbors=self.neighbors)
+        self.knn = KNeighborsClassifier(n_neighbors=properties["knn"]["neighbors"])
         self.knn.fit(input_data, labels)
 
     def test(self, test_data, true_labels):
@@ -80,9 +80,10 @@ class RandomForest(Classifier):
     """
     Class to represent RandomForest model, extending the Classifier class
     """
+    rf = None
 
-    def train(self, input_data, labels):
-        pass
+    def train(self, input_data, labels, properties):
+        self.rf = RandomForestClassifier(random_state=7)
 
     def test(self, test_data, true_labels):
         pass
@@ -92,7 +93,7 @@ class DeepNN(Classifier):
     """
     Class representing a Deep Neural Network.
     """
-    def train(self, input_data, labels):
+    def train(self, input_data, labels, properties):
         pass
 
     def test(self, test_data, true_labels):

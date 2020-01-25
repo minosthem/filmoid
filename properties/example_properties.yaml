@@ -14,5 +14,10 @@ embeddings_file_url: "http://nlp.stanford.edu/data/glove.6B.zip"
 aggregation: "avg" # possible values: avg, max
 classification: "binary" # possible values: binary, multi ==> multi == classes 1-5
 cross-validation: 10 # k-folds for training the models
-neighbors: 10 # KNN neighbors
+knn:
+  neighbors: 10 # KNN neighbors
+rf:
+  estimators: 100
+  max_depth: 10
+
 limit: 200 # define the number of input instances. Leave it blank to use all the dataset instances

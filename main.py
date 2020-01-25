@@ -39,7 +39,7 @@ def main():
     if "collaborative" in properties["methods"]:
         print("Creating input vectors for collaborative method")
         input_data = dp.preprocessing_collaborative(properties, csvs)
-        # TODO
+        # TODO kmeans
     if "content-based" in properties["methods"]:
         print("Creating input vectors for content-based method")
         input_data, ratings = dp.preprocessing_content_based(properties, csvs)
