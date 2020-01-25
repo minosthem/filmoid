@@ -60,13 +60,18 @@ def calc_results(properties, confusion_matrix):
     list_recalls = []
     list_fmeasures = []
     for label in labels:
-        true_positive = confusion_matrix[label][label]
+        true_positive = confusion_matrix[label][label] if properties["classification"] == "binary" else \
+        confusion_matrix[label - 1][label - 1]
         false_positive = 0
         false_negative = 0
         for other_label in labels:
             if other_label != label:
-                false_positive = false_positive + confusion_matrix[other_label][label]
-                false_negative = false_negative + confusion_matrix[label][other_label]
+                fp_position = confusion_matrix[other_label][label] if properties["classification"] == "binary" else \
+                    confusion_matrix[other_label - 1][label - 1]
+                fn_position = confusion_matrix[label][other_label] if properties["classification"] == "binary" else \
+                    confusion_matrix[label - 1][other_label - 1]
+                false_positive = false_positive + fp_position
+                false_negative = false_negative + fn_position
         print(label, " true_positive ", true_positive, " false_negative ", false_negative, " false_positive ",
               false_positive)
         if (true_positive + false_positive) == 0:
