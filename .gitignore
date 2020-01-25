@@ -7,3 +7,5 @@ output/
 Datasets/
 resources/
 docs/build
+public
+docs/_build
