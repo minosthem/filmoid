@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'movie-recommendation-system'
+project = 'Filmoid'
 copyright = '2020, Minos Themelis'
 author = 'Minos Themelis'
 
