@@ -229,8 +229,8 @@ def preprocess_text(movies_df, tags_df, movie_id, user_id):
     movie_text = movie_title + " " + movie_genres
     if not tags.empty:
         tags = tags["tag"]
-        for index, row in tags.iterrows():
-            movie_text = movie_text + " " + row["tag"]
+        for index, row in tags.iteritems():
+            movie_text = movie_text + " " + row
     # preprocessing title, genres, tags ==> remove symbols, numbers
     # remove digits and punctuation
     movie_text = movie_text.translate(punct_digit_to_space).strip()
