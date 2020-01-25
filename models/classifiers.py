@@ -18,13 +18,13 @@ def run_cross_validation(classifier_name, properties, input, labels, fold_idx):
         input_train, input_test = input[train_index], input[test_index]
         labels_train, labels_test = labels[train_index], labels[test_index]
         classifier.train(input_train, labels_train)
-        conf_matrix = classifier.evaluate(input_test, labels_test)
+        conf_matrix = classifier.test(input_test, labels_test)
         matrices.append(conf_matrix)
     return classifier, matrices
 
 
 def run_test(classifier, test_data, test_labels):
-    pass
+    return classifier.test(test_data, test_labels)
 
 
 class Classifier:
@@ -32,10 +32,7 @@ class Classifier:
     def train(self, input, labels):
         pass
 
-    def evaluate(self, test, true_labels):
-        pass
-
-    def test(self, test_data, test_labels):
+    def test(self, test, true_labels):
         pass
 
 
@@ -47,12 +44,9 @@ class KNN(Classifier):
         self.knn = KNeighborsClassifier(n_neighbors=self.neighbors)
         self.knn.fit(input, labels)
 
-    def evaluate(self, test, true_labels):
+    def test(self, test, true_labels):
         predicted_labels = self.knn.predict(test)
         return confusion_matrix(true_labels, predicted_labels)
-
-    def test(self, test_data, test_labels):
-        pass
 
 
 class RandomForest(Classifier):
@@ -60,10 +54,7 @@ class RandomForest(Classifier):
     def train(self, input, labels):
         pass
 
-    def evaluate(self, test, true_labels):
-        pass
-
-    def test(self, test_data, test_labels):
+    def test(self, test, true_labels):
         pass
 
 
@@ -72,8 +63,5 @@ class DeepNN(Classifier):
     def train(self, input, labels):
         pass
 
-    def evaluate(self, test, true_labels):
-        pass
-
-    def test(self, test_data, test_labels):
+    def test(self, test, true_labels):
         pass
