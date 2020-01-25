@@ -3,6 +3,7 @@ image: python:3.7-alpine
 test:
   stage: test
   script:
+  - sudo apt update && sudo apt install build-essential
   - pip install -U sphinx sphinx_rtd_theme
   - cd docs/ && make html
   - mv _build/html ../public
@@ -14,6 +15,7 @@ test:
 pages:
   stage: deploy
   script:
+  - sudo apt update && sudo apt install build-essential
   - pip install -U sphinx sphinx_rtd_theme
   - cd docs/ && make html
   - mv _build/html ../public
