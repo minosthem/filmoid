@@ -3,10 +3,8 @@ image: python:3.7-alpine
 test:
   stage: test
   script:
-  - apk update && apk add build-base
   - pip install -U sphinx sphinx_rtd_theme
-  - cd docs/ && make html
-  - mv build/html ../public
+  - sphinx-build -b html -a ./docs/source public
   only:
   - branches
   except:
@@ -15,10 +13,8 @@ test:
 pages:
   stage: deploy
   script:
-  - apk update && apk add build-base
   - pip install -U sphinx sphinx_rtd_theme
-  - cd docs/ && make html
-  - mv build/html ../public
+  - sphinx-build -b html -a ./docs/source public
   artifacts:
     paths:
     - public
