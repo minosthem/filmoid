@@ -10,35 +10,12 @@ Welcome to movie-recommendation-system's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-Movie-Recommentation-System
-===========================
+   movie-recommendation-system
+   preprocessing
+   models
+   results
+   utils
 
-.. automodule:: main
-   :members:
-
-Utility functions
-=================
-
-.. automodule:: utils
-   :members:
-
-Data preprocessing
-==================
-
-.. automodule:: preprocessing.data_preprocessing
-   :members:
-
-Models
-======
-
-.. automodule:: models.classifiers
-   :members:
-
-Results
-=======
-
-.. automodule:: models.results
-   :members:
 
 Indices and tables
 ==================
