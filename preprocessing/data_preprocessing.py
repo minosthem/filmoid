@@ -1,6 +1,6 @@
+import os
 import re
 import string
-import os
 
 import numpy as np
 import pandas as pd
@@ -29,31 +29,31 @@ def read_csv(files):
     return datasets
 
 
-def create_train_test_data(input, labels):
+def create_train_test_data(input_data, labels):
     """
     It splits the input data and the labels into a train dataset with the corresponding labels and a test dataset with
     the corresponding labels.
 
-    :param input: input data, a list of vectors
+    :param input_data: input data, a list of vectors
     :param labels: a list of ratings (numbers)
     :return: the two datasets with the corresponding true labels
     """
-    input_train, input_test, labels_train, labels_test = train_test_split(input, labels,
+    input_train, input_test, labels_train, labels_test = train_test_split(input_data, labels,
                                                                           test_size=0.2,
                                                                           random_state=0)
     return input_train, input_test, labels_train, labels_test
 
 
-def create_cross_validation_data(input, properties):
+def create_cross_validation_data(input_data, properties):
     """
     Takes the input data and creates k folds depending on the number of folds mentioned in the properties file.
 
-    :param input: train dataset
+    :param input_data: train dataset
     :param properties: cross-validation, number of folds
     :return: a list of k tuples containing train and test indices
     """
     kf = KFold(n_splits=properties["cross-validation"], shuffle=True, random_state=666)
-    return kf.split(input)
+    return kf.split(input_data)
 
 
 def preprocessing_collaborative(properties, datasets):

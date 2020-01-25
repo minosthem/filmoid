@@ -104,7 +104,7 @@ def load_glove_file(properties):
     :param properties: embeddings_file
     :return: glove word embeddings as Dataframe
     """
-    maxInt = sys.maxsize
+    max_int = sys.maxsize
     resources_folder = join(os.getcwd(), properties["resources_folder"])
     glove_file_path = join(os.getcwd(), properties["resources_folder"], properties["embeddings_file"])
     if not exists(resources_folder):
@@ -118,10 +118,10 @@ def load_glove_file(properties):
         # as long as the OverflowError occurs.
 
         try:
-            csv.field_size_limit(maxInt)
+            csv.field_size_limit(max_int)
             break
         except OverflowError:
-            maxInt = int(maxInt / 10)
+            max_int = int(max_int / 10)
     res = pd.read_csv(glove_file_path, index_col=0, delimiter=" ", quoting=3, header=None, engine="python",
                       error_bad_lines=False)
     return res

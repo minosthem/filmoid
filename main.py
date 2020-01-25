@@ -54,9 +54,9 @@ def main():
                 classifier, matrices = classifiers.run_cross_validation(model, properties, input_train, ratings_train,
                                                                         folds)
                 for i, matrix in enumerate(matrices):
-                    res = results.write_results_to_file(properties, "fold_{}".format(i), classifier, matrix, res)
+                    res = results.write_results_to_file(properties, "fold_{}".format(i), model, matrix, res)
                 conf_matrix = classifier.test(input_test, ratings_test)
-                test_res = results.write_results_to_file(properties, "test_results", classifier, conf_matrix, test_res)
+                test_res = results.write_results_to_file(properties, "test_results", model, conf_matrix, test_res)
         # TODO visualize the results
         print("Done!")
 

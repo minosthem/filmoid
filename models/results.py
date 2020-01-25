@@ -1,4 +1,4 @@
-from os.path import join
+from os.path import join, exists
 from os import mkdir, getcwd
 
 
@@ -9,7 +9,8 @@ def write_results_to_file(properties, fold, classifier, conf_matrix, results):
     :param classifier: current classifier
     :param conf_matrix: the results from the classification
     :param properties: properties from yaml
-    :param results: the dictionary with the results that will be used by main function to export the average from all folds
+    :param results: the dictionary with the results that will be used by main function to export the average from all
+    folds
     :return: the results dictionary
     """
     macro_precision, micro_precision, macro_recall, micro_recall, macro_f, micro_f = calc_results(properties,
@@ -18,9 +19,12 @@ def write_results_to_file(properties, fold, classifier, conf_matrix, results):
     if classifier not in results:
         results[classifier] = []
     results[classifier].append(measure_tuples)
-    output_folder_path = join(getcwd(), properties["output_folder"])
+    output_folder_path = join(getcwd(), properties["output_folder"], "results")
+    if not exists(output_folder_path):
+        mkdir(output_folder_path)
     fold_path = join(output_folder_path, fold)
-    mkdir(fold_path)
+    if not exists(fold_path):
+        mkdir(fold_path)
     filename = "Result_test_" + classifier + ".txt"
     result_file = join(fold_path, filename)
     with open(result_file, 'w') as f:

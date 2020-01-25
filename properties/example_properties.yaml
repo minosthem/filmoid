@@ -15,4 +15,4 @@ aggregation: "avg" # possible values: avg, max
 classification: "binary" # possible values: binary, multi ==> multi == classes 1-5
 cross-validation: 10 # k-folds for training the models
 neighbors: 10 # KNN neighbors
-limit: 200
+limit: 200 # define the number of input instances. Leave it blank to use all the dataset instances
