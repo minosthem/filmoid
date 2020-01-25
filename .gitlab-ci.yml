@@ -6,7 +6,7 @@ test:
   - apk update && apk add build-base
   - pip install -U sphinx sphinx_rtd_theme
   - cd docs/ && make html
-  - mv _build/html ../public
+  - mv build/html ../public
   only:
   - branches
   except:
@@ -18,7 +18,7 @@ pages:
   - apk update && apk add build-base
   - pip install -U sphinx sphinx_rtd_theme
   - cd docs/ && make html
-  - mv _build/html ../public
+  - mv build/html ../public
   artifacts:
     paths:
     - public
