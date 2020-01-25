@@ -142,7 +142,9 @@ def preprocessing_content_based(properties, datasets):
         glove_df = utils.load_glove_file(properties)
         print("Generating input vectors")
         for index, row in ratings_df.iterrows():
-            movie_id, user_id, rating, _ = row
+            user_id, movie_id, rating, _ = row
+            movie_id = int(movie_id)
+            user_id = int(user_id)
             # preprocess
             rating = preprocess_rating(properties, rating)
             movie_text = preprocess_text(movies_df, tags_df, movie_id, user_id)

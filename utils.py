@@ -17,17 +17,28 @@ ml_latest = "ml-latest"
 
 
 def print_progress(container, step=20, msg="\tProcessed {} elements."):
+    """
+    Function to periodically print the progress of the flow
+
+    Args:
+        container (list): list or nd array containing the input data
+        step (int): integer value based on which the printing period is defined
+        msg (str): message to be printed
+
+    Returns:
+        bool: The return value. True for success, False otherwise.
+    """
     if len(container) % step == 0 and container:
         print(msg.format(len(container)))
 
 
 def setup_folders(properties):
     """
-    Sets up environmental variables in order to execute the relevant script based on the operating system.
-    The script creates the output, datasets and resources folders and downloads the dataset csv files as well as
-    the defined glove txt file
-    :param properties: dictionary with the properties loaded from the yaml file
-    :return: nothing
+    Function to set up the necessary folders and files. Based on the operating system, it uses the relevant script
+    (setup.sh or setup.bat) to download the datasets and the word embeddings from glove.
+
+    Args:
+        properties (dict): dictionary containing all the loaded properties from the respective yaml file
     """
     os.environ["OUTPUT_FOLDER"] = properties["output_folder"]
     os.environ["DATASETS_FOLDER"] = properties["datasets_folder"]
@@ -51,6 +62,16 @@ def setup_folders(properties):
 
 
 def elapsed_str(previous_tic, up_to=None):
+    """
+    Calculates the time passed from a previous tic.
+
+    Args:
+        previous_tic (float): time in float format of some previous time
+        up_to (float): define the end time - if not provided then current time will be calculated
+
+    Returns:
+        str: The return value. Time difference in str format
+    """
     if up_to is None:
         up_to = time.time()
     duration_sec = up_to - previous_tic
@@ -62,7 +83,9 @@ def elapsed_str(previous_tic, up_to=None):
 def load_properties():
     """
     Load yaml file containing program's properties.
-    :return: the properties dictionary
+
+    Returns:
+        dict: the properties dictionary
     """
     file = properties_file if exists(properties_file) else example_properties_file
     with open(file, 'r') as f:
@@ -73,14 +96,19 @@ def load_properties():
 def get_filenames(prop):
     """
     Creates the base path for the datasets files as well as the path for each of them.
-    :param prop: filenames, dataset-file-extention
-    :return: the files dictionary and each dataset's path
+
+    Args:
+        prop (dict): filenames, dataset-file-extention
+
+    Returns:
+        dict: the files dictionary and each dataset's path
     """
     files = {}
     datasets_folder = prop["datasets_folder"]
     base_path = join(os.getcwd(), datasets_folder)
-    dataset_path = join(base_path, ml_latest_small_folder) if prop["dataset"] == "small" \
-        else join(base_path, ml_latest)
+    # dataset_path = join(base_path, ml_latest_small_folder) if prop["dataset"] == "small" \
+    #     else join(base_path, ml_latest)
+    dataset_path = join(base_path, "ml-dev")
     for file in prop["filenames"]:
         filename = file + prop["dataset-file-extention"]
         files[file] = join(dataset_path, filename)
@@ -90,8 +118,12 @@ def get_filenames(prop):
 def load_glove_file(properties):
     """
     Creates the glove's file path and reads this file.
-    :param properties: embeddings_file
-    :return: glove word embeddings as Dataframe
+
+    Args:
+        properties (dict): embeddings_file
+
+    Returns:
+        DataFrame: glove word embeddings as Dataframe
     """
     max_int = sys.maxsize
     resources_folder = join(os.getcwd(), properties["resources_folder"])
