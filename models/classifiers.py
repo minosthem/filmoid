@@ -25,6 +25,7 @@ def run_cross_validation(classifier_name, properties, input_data, labels, fold_i
         classifier = DeepNN()
     matrices = []
     fold_idx = list(fold_idx)
+    labels = np.asarray(labels)
     for idx, (train_index, test_index) in enumerate(fold_idx):
         print("Running fold #{}/{}".format(idx + 1, len(fold_idx)))
         input_train, input_test = input_data[train_index], input_data[test_index]

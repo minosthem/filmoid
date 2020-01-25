@@ -49,6 +49,7 @@ def main():
         input_data, ratings = dp.preprocessing_content_based(properties, csvs)
         print("Split train and test datasets")
         input_train, input_test, ratings_train, ratings_test = dp.create_train_test_data(input_data, ratings)
+        ratings_test = np.asarray(ratings_test)
         print("Get k-fold indices")
         folds = dp.create_cross_validation_data(input_train, properties)
         res = {}
