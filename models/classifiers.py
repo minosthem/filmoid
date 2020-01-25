@@ -83,10 +83,26 @@ class RandomForest(Classifier):
     rf = None
 
     def train(self, input_data, labels, properties):
+        """
+        Train method for Random Forest classifier
+
+        :param input_data: the training dataset
+        :param labels: the training labels
+        :param properties: properties from yaml
+        """
         self.rf = RandomForestClassifier(random_state=7)
+        self.rf.fit(input_data, labels)
 
     def test(self, test_data, true_labels):
-        pass
+        """
+        Method to test the Random Forest model
+
+        :param test_data: testing dataset
+        :param true_labels: testing labels
+        :return: confusion matrix
+        """
+        predicted_labels = self.rf.predict(test_data)
+        return confusion_matrix(true_labels, predicted_labels)
 
 
 class DeepNN(Classifier):
