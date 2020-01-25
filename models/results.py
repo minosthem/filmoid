@@ -52,7 +52,7 @@ def calc_results(properties, confusion_matrix):
         :param properties: yaml properties
         :return: a tuple with micro/macro average for precision, recall and F-Measure
         """
-    labels = [0, 1] if properties["binary"] else [1, 2, 3, 4, 5]
+    labels = [0, 1] if properties["classification"] == "binary" else [1, 2, 3, 4, 5]
     total_true_positives = 0
     total_false_positives = 0
     total_false_negatives = 0
