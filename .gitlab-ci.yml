@@ -3,6 +3,7 @@ image: python:3.7-alpine
 test:
   stage: test
   script:
+  - pip install -r requirements.txt
   - pip install -U sphinx sphinx_rtd_theme recommonmark
   - sphinx-build -b html -a ./docs/source public
   only:
@@ -13,6 +14,7 @@ test:
 pages:
   stage: deploy
   script:
+  - pip install -r requirements.txt
   - pip install -U sphinx sphinx_rtd_theme recommonmark
   - sphinx-build -b html -a ./docs/source public
   artifacts:
