@@ -149,11 +149,10 @@ class TestClassifiers(unittest.TestCase):
     def run_classifier(classifier):
         properties = {"knn": {"neighbors": 5}, "rf": {"estimators": 100,
                                                       "max_depth": 10}, "cross-validation": 2}
-        input_data, labels = np.arange(1000).reshape((100, 10)), [randint(1, 5) for p in range(100)]
+        input_data, labels = np.arange(1000).reshape((100, 10)), [randint(1, 5) for _ in range(100)]
         input_train, input_test, labels_training, labels_testing = dp.create_train_test_data(input_data=input_data,
                                                                                              labels=labels)
         labels_training = np.asarray(labels_training)
-        labels_testing = np.asarray(labels_testing)
         folds = dp.create_cross_validation_data(input_data=input_train, properties=properties)
         matrices = []
         fold_idx = list(folds)

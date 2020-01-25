@@ -3,6 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
 import numpy as np
 
+
 def run_cross_validation(classifier_name, properties, input_data, labels, fold_idx):
     """
     Checks which classifier is selected and then takes the input data and labels which are divided into k folds.
@@ -110,6 +111,7 @@ class DeepNN(Classifier):
     """
     Class representing a Deep Neural Network.
     """
+
     def train(self, input_data, labels, properties):
         pass
 
