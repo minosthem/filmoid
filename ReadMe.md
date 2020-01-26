@@ -45,4 +45,18 @@ The MovieLens Datasets: History and Context. ACM Transactions on Interactive Int
 If the input vectors are not stored in pickle files, the program will generated the input data by executing the
 preprocessing step. The step is different for the collaborative and content-based methods. For the first method, the
 generated vectors have the same size as the number of existing movies in the dataset and for each instance they contain
-the existing ratings of a user (if a rating does not exist the cell remains empty).
+the existing ratings of a user (if a rating does not exist the cell remains empty). The input vector for the content-based
+approach is concatenated user and movie information, where each instance is associate with a line in the ratings.csv 
+dataset. The respective labels are the ratings, which are also preprocessed by taking into account the classification
+kind (binary or multi-class). 
+
+Finally, the configuration file must include both the recommendation system methods (collaborative and/or content-based)
+that the user wishes to execute as well as the respective models for each aforementioned method. The implemented models
+for each method are the ones listed below:
+
+1. Collaborative method:
+    a. kmeans
+2. Content-Based method:
+    a. K-Nearest Neighbors
+    b. Random Forest
+    c. Deep Neural Networks
