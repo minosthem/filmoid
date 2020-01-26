@@ -9,6 +9,10 @@ from os.path import join, exists
 import pandas as pd
 import yaml
 
+from models.knn_classifier import KNN
+from models.rf_classifier import RandomForest
+from models.dnn_classifier import DeepNN
+
 properties_folder = join(os.getcwd(), "properties")
 example_properties_file = join(properties_folder, "example_properties.yaml")
 properties_file = join(properties_folder, "properties.yaml")
@@ -189,3 +193,12 @@ def load_from_pickle(directory, file):
     path = join(os.getcwd(), directory, file)
     with open(path, "rb") as f:
         return pickle.load(f)
+
+
+def init_classifier(classifier_name):
+    if classifier_name == "knn":
+        return KNN()
+    elif classifier_name == "rf":
+        return RandomForest()
+    elif classifier_name == "dnn":
+        return DeepNN()

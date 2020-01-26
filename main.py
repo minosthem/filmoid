@@ -3,8 +3,10 @@ import time
 import numpy as np
 
 import utils
-from models import classifiers, results
-from preprocessing import data_preprocessing as dp
+from models import results
+from preprocessing.data_preprocessing import DataPreprocessing
+from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
+from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 
 
 def main():
@@ -39,16 +41,23 @@ def main():
     file_names = utils.get_filenames(properties)
     # read datasets
     print("Creating dataframes from the csvs in the selected dataset")
-    csvs = dp.read_csv(file_names)
+    dp = DataPreprocessing()
+    dp.read_csv(file_names)
+    csvs = dp.datasets
     if "collaborative" in properties["methods"]:
+        dp = CollaborativePreprocessing()
         print("Creating input vectors for collaborative method")
-        input_data = dp.preprocessing_collaborative(properties, csvs)
+        dp.preprocess(properties=properties, datasets=csvs)
+        input_data = dp.users_ratings
         for model in properties["models"]["collaborative"]:
             pass
             # TODO kmeans
     if "content-based" in properties["methods"]:
+        dp = ContentBasedPreprocessing()
         print("Creating input vectors for content-based method")
-        input_data, ratings = dp.preprocessing_content_based(properties, csvs)
+        dp.preprocess(properties, csvs)
+        input_data = dp.input_data
+        ratings = dp.ratings
         print("Split train and test datasets")
         input_train, input_test, ratings_train, ratings_test = dp.create_train_test_data(input_data, ratings)
         ratings_test = np.asarray(ratings_test)
@@ -58,8 +67,9 @@ def main():
         test_res = {}
         for model in properties["models"]["content-based"]:
             tic = time.time()
-            classifier, matrices = classifiers.run_cross_validation(model, properties, input_train, ratings_train,
-                                                                    folds)
+            classifier = utils.init_classifier(model)
+            classifier, matrices = classifier.run_cross_validation(classifier, properties, input_train, ratings_train,
+                                                                   folds)
             print("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
             for i, matrix in enumerate(matrices):
                 res = results.write_results_to_file(properties, "fold_{}".format(i), model, matrix, res)

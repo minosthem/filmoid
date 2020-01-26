@@ -6,8 +6,11 @@ import pandas as pd
 import numpy as np
 import utils
 
-from preprocessing import data_preprocessing as dp
-from models import classifiers, results
+from preprocessing.data_preprocessing import DataPreprocessing
+from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
+from models import results
+from models.knn_classifier import KNN
+from models.rf_classifier import RandomForest
 
 
 class TestUtilMethods(unittest.TestCase):
@@ -18,6 +21,7 @@ class TestUtilMethods(unittest.TestCase):
     def test_load_properties(self):
         """
         Tests whether the properties yaml is loaded
+
         Examined test case: the value for the datasets_folder
         """
         utils.properties_file = join(os.getcwd(), "properties", "properties.yaml")
@@ -27,6 +31,7 @@ class TestUtilMethods(unittest.TestCase):
     def test_check_file_exists(self):
         """
         Test case for check_file_exists method in utils.py
+
         Examined test case: smallest glove file exists in resources folder
         """
         file_exist = utils.check_file_exists("resources", "glove.6B.50d.txt")
@@ -36,7 +41,8 @@ class TestUtilMethods(unittest.TestCase):
         """
         Tests the get_filenames method for the links, movies, ratings and tags csv files. The purpose is to create
         a dictionary with keys the name of the files (without the file extension) and values the full path to those
-        files
+        files.
+
         Examined test case: dictionary contains 4 key-value pairs
         """
         properties = {"datasets_folder": "Datasets", "dataset": "ml-dev",
@@ -47,6 +53,7 @@ class TestUtilMethods(unittest.TestCase):
     def test_load_glove_file(self):
         """
         Test method to load the glove file as DataFrame
+
         Examined test case: just checks that the DataFrame is not empty
         """
         properties = {"resources_folder": "resources", "embeddings_file": "glove.6B.50d.txt"}
@@ -63,10 +70,12 @@ class TestDataPreProcessing(unittest.TestCase):
         """
         Method to test the read_csv function. Given a dictionary containing the full path to the csv files to be read,
         the function should return a dictionary with keys the name of the files (without the file extension) and values
-        the DataFrames
+        the DataFrames.
+
         Examined test cases:
-            1. The returned dictionary contains 4 key-value pairs
-            2. No dataframe is empty
+
+        1. The returned dictionary contains 4 key-value pairs
+        2. No dataframe is empty
         """
         properties = {"datasets_folder": "Datasets", "dataset": "ml-dev",
                       "filenames": ["links", "movies", "ratings", "tags"], "dataset-file-extention": ".csv"}
@@ -75,7 +84,9 @@ class TestDataPreProcessing(unittest.TestCase):
         for file in properties["filenames"]:
             filename = file + properties["dataset-file-extention"]
             files[file] = join(folder_path, filename)
-        datasets = dp.read_csv(files)
+        data_preprocess = DataPreprocessing()
+        data_preprocess.read_csv(files)
+        datasets = data_preprocess.datasets
         self.assertEqual(len(datasets.keys()), 4)
         for dataset, df in datasets.items():
             self.assertTrue(not df.empty)
@@ -84,13 +95,16 @@ class TestDataPreProcessing(unittest.TestCase):
         """
         Test method for the create_train_test_data function. The purpose of the function is to split a given dataset
         into training and test datasets by keeping 20% of the data as test.
+
         Examined test cases:
-            1. Size of input train data
-            2. Size of input test data
-            3. Length of training labels list
-            4. Length of testing labels list
+
+        1. Size of input train data
+        2. Size of input test data
+        3. Length of training labels list
+        4. Length of testing labels list
         """
         input_data, labels = np.arange(10).reshape((5, 2)), range(5)
+        dp = ContentBasedPreprocessing()
         input_train, input_test, labels_train, labels_test = dp.create_train_test_data(input_data=input_data,
                                                                                        labels=labels)
         self.assertEqual(input_train.shape, (4, 2))
@@ -101,13 +115,16 @@ class TestDataPreProcessing(unittest.TestCase):
     def test_create_cross_validation_data(self):
         """
         Test method for the create_cross_validation_data. The training dataset is used to generate k folds.
+
         Examined test cases:
-            1. The size of train indices
-            2. The size of test indices
-            3. The number of the generated folds
+
+        1. The size of train indices
+        2. The size of test indices
+        3. The number of the generated folds
         """
         properties = {"cross-validation": 2}
         input_data = np.array([[1, 2], [3, 4], [1, 2], [3, 4]])
+        dp = ContentBasedPreprocessing()
         folds = dp.create_cross_validation_data(input_data=input_data, properties=properties)
         count = 0
         for idx, (train_index, test_index) in enumerate(folds):
@@ -121,6 +138,7 @@ class TestDataPreProcessing(unittest.TestCase):
         Method to test the functionality of the text_to_glove function. Given a list of words and a DataFrame of
         word embeddings (words represented as vectors) the method transforms the list into list of vectors following
         an aggregation strategy (avg or max).
+
         Examined test case: given and expected input vectors are the same
         """
         word_list = ["Toy", "Story", "Adventure", "Animation", "Children", "Comedy", "Fantasy", "funny"]
@@ -134,7 +152,8 @@ class TestDataPreProcessing(unittest.TestCase):
         glove_df = glove_df.set_index(0)
         properties = {"aggregation": "avg"}
         expected_vector = np.array([[3.5, 3.5, 3.5, 3.5, 3.5]])
-        text_vector = dp.text_to_glove(properties=properties, glove_df=glove_df, word_list=word_list)
+        data_preprocess = ContentBasedPreprocessing()
+        text_vector = data_preprocess._text_to_glove(properties=properties, glove_df=glove_df, word_list=word_list)
         self.assertEqual(text_vector.all(), expected_vector.all())
 
     def test_preprocess_text(self):
@@ -142,6 +161,7 @@ class TestDataPreProcessing(unittest.TestCase):
         Test method for the preprocess_text function. Given a movie and user id, the movie title, genres and given tags
         by the user are collected and concatenated into a single text. Then the text is preprocessed by removing symbols
         and numbers and splitting the text into a list of words.
+
         Examined test case: the returned list of words is the same as the expected list of words
         """
         movies_df = pd.DataFrame(data=[[1, "Toy Story (1995)", "Adventure|Animation|Children|Comedy|Fantasy"]],
@@ -149,7 +169,9 @@ class TestDataPreProcessing(unittest.TestCase):
         tags_df = pd.DataFrame(data=[[1, 1, "funny"]], columns=["userId", "movieId", "tag"])
         movie_id = 1
         user_id = 1
-        text = dp.preprocess_text(movies_df=movies_df, tags_df=tags_df, movie_id=movie_id, user_id=user_id)
+        data_preprocess = ContentBasedPreprocessing()
+        text = data_preprocess._preprocess_text(movies_df=movies_df, tags_df=tags_df, movie_id=movie_id,
+                                                user_id=user_id)
         expected_text = ["Toy", "Story", "Adventure", "Animation", "Children", "Comedy", "Fantasy", "funny"]
         self.assertEqual(text, expected_text)
 
@@ -157,7 +179,9 @@ class TestDataPreProcessing(unittest.TestCase):
         """
         Test method for preprocess_rating function. Based on the classification (binary or multi-class) the rating
         values are replaced by 0,1 or 1,2,3,4,5 respectively.
+
         Examined test cases:
+
             1. Binary classification
                 a. rating for dislike
                 b. rating for like
@@ -166,22 +190,23 @@ class TestDataPreProcessing(unittest.TestCase):
                 b. same rating
                 c. round rating to the same number without the decimal numbers
         """
+        data_preprocessing = ContentBasedPreprocessing()
         # test cases for binary classification
         properties = {"classification": "binary"}
         # case dislike
         rating = 1.5
         expected_rating = 1
-        new_rating = dp.preprocess_rating(properties, rating)
+        new_rating = data_preprocessing._preprocess_rating(properties, rating)
         self.assertEqual(new_rating, expected_rating)
         # case like
         rating = 4
         expected_rating = 0
-        new_rating = dp.preprocess_rating(properties, rating)
+        new_rating = data_preprocessing._preprocess_rating(properties, rating)
         self.assertEqual(new_rating, expected_rating)
         # case dislike
         rating = 2.9
         expected_rating = 1
-        new_rating = dp.preprocess_rating(properties, rating)
+        new_rating = data_preprocessing._preprocess_rating(properties, rating)
         self.assertEqual(new_rating, expected_rating)
 
         # test rating for multi-class classification
@@ -189,17 +214,17 @@ class TestDataPreProcessing(unittest.TestCase):
         # round rating
         rating = 1.5
         expected_rating = 2
-        new_rating = dp.preprocess_rating(properties, rating)
+        new_rating = data_preprocessing._preprocess_rating(properties, rating)
         self.assertEqual(new_rating, expected_rating)
         # rating remains the same
         rating = 3
         expected_rating = 3
-        new_rating = dp.preprocess_rating(properties, rating)
+        new_rating = data_preprocessing._preprocess_rating(properties, rating)
         self.assertEqual(new_rating, expected_rating)
         # round rating
         rating = 4.22
         expected_rating = 4
-        new_rating = dp.preprocess_rating(properties, rating)
+        new_rating = data_preprocessing._preprocess_rating(properties, rating)
         self.assertEqual(new_rating, expected_rating)
 
 
@@ -211,26 +236,30 @@ class TestClassifiers(unittest.TestCase):
     def test_knn_classifier(self):
         """
         Test function for knn classifier
+
         Examined test cases:
-            1. Number of confusion matrices returned based on the requested folds
-            2. Type of the classifier is equal to classifiers.KNN
+
+        1. Number of confusion matrices returned based on the requested folds
+        2. Type of the classifier is equal to classifiers.KNN
         """
-        knn = classifiers.KNN()
+        knn = KNN()
         matrices = self.run_classifier(knn)
         self.assertEqual(len(matrices), 2)
-        self.assertTrue(type(knn) == classifiers.KNN)
+        self.assertTrue(type(knn) == KNN)
 
     def test_random_forest(self):
         """
         Test function for Random Forest classifier
+
         Examined test cases:
-            1. Number of confusion matrices returned based on the requested folds
-            2. Type of the classifier is equal to classifiers.RandomForest
+
+        1. Number of confusion matrices returned based on the requested folds
+        2. Type of the classifier is equal to classifiers.RandomForest
         """
-        rf = classifiers.RandomForest()
+        rf = RandomForest()
         matrices = self.run_classifier(rf)
         self.assertEqual(len(matrices), 2)
-        self.assertTrue(type(rf) == classifiers.RandomForest)
+        self.assertTrue(type(rf) == RandomForest)
 
     @staticmethod
     def run_classifier(classifier):
@@ -242,6 +271,7 @@ class TestClassifiers(unittest.TestCase):
         properties = {"knn": {"neighbors": 5}, "rf": {"estimators": 100,
                                                       "max_depth": 10}, "cross-validation": 2}
         input_data, labels = np.arange(1000).reshape((100, 10)), [randint(1, 5) for _ in range(100)]
+        dp = ContentBasedPreprocessing()
         input_train, input_test, labels_training, labels_testing = dp.create_train_test_data(input_data=input_data,
                                                                                              labels=labels)
         labels_training = np.asarray(labels_training)
@@ -252,7 +282,7 @@ class TestClassifiers(unittest.TestCase):
             print("Running fold #{}/{}".format(idx + 1, len(fold_idx)))
             input_training, input_testing = input_train[train_idx], input_train[test_idx]
             labels_train, labels_test = labels_training[train_idx], labels_training[test_idx]
-            classifier.train(input_training, labels_train, properties)
+            classifier.train(properties, input_training, labels_train)
             conf_matrix = classifier.test(input_testing, labels_test)
             matrices.append(conf_matrix)
         return matrices
@@ -267,10 +297,11 @@ class TestResults(unittest.TestCase):
         """
         Testing the method calc_results for the KNN classifier. The method should calculate the micro/macro precision,
         recall and F-measure
+
         Examined test case: the number of the returned metrics for the 1st fold is equal to 6
         """
         test_classifiers = TestClassifiers()
-        knn = classifiers.KNN()
+        knn = KNN()
         matrices = test_classifiers.run_classifier(knn)
         matrix = matrices[0]
         properties = {"classification": "multi"}

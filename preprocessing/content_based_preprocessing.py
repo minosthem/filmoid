@@ -1,0 +1,188 @@
+import os
+import re
+import string
+
+import numpy as np
+from sklearn import preprocessing
+from sklearn.model_selection import KFold
+from sklearn.model_selection import train_test_split
+
+import utils
+from preprocessing.data_preprocessing import DataPreprocessing
+
+
+class ContentBasedPreprocessing(DataPreprocessing):
+
+    input_data_pickle = "input_data.pickle"
+    ratings_pickle = "ratings.pickle"
+    punct_digit_to_space = str.maketrans(string.punctuation + string.digits,
+                                         " " * len(string.punctuation + string.digits))
+
+    input_data = None
+    ratings = None
+
+    def preprocess(self, properties, datasets):
+        """
+            Checks if the input and the rating file exist and loads them from the output folder. Otherwise, takes the
+            rating, movies and tags datasets and converts them to dataframes and also loads the glove file. It iterates
+            the ratings dataframe keeping from every row the movie id, user id and the rating. It uses the functions
+            preprocess_rating, preprocess_text and text_to_glove to create a vector corresponding to a movie's features
+            and user id. The user's id is added on the first position of that vector. Every vector is added to a list of
+            vectors called input_data. Finally, the rating of every user for a particular movie is added to a list
+            called ratings and both this list as well as the input_data list are being saved to the output folder.
+
+            Args:
+                properties(dict): properties loaded from yaml file. Used so as to get the output folder
+                datasets (dict): contains the dataframes of all the movielens csvs
+        """
+        output_folder = properties["output_folder"]
+        input_data_pickle_filename = self.input_data_pickle + "_{}".format(properties["dataset"])
+        ratings_pickle_filename = self.ratings_pickle + "_{}".format(properties["dataset"])
+
+        if utils.check_file_exists(output_folder, input_data_pickle_filename) and \
+                utils.check_file_exists(output_folder, ratings_pickle_filename):
+            print("Content-based input data already exist and will be loaded from pickle file")
+            self.input_data = utils.load_from_pickle(output_folder, input_data_pickle_filename)
+            self.ratings = utils.load_from_pickle(output_folder, ratings_pickle_filename)
+            print("Loaded inputs of shape {}".format(self.input_data.shape))
+            print("Loaded ratings of shape {}".format(self.ratings.shape))
+        else:
+            os.makedirs(output_folder, exist_ok=True)
+            ratings_df = datasets["ratings"]
+            movies_df = datasets["movies"]
+            tags_df = datasets["tags"]
+            glove_df = utils.load_glove_file(properties)
+            print("Generating input vectors")
+            self.input_data = []
+            self.ratings = []
+            for index, row in ratings_df.iterrows():
+                user_id, movie_id, rating, _ = row
+                movie_id = int(movie_id)
+                user_id = int(user_id)
+                # preprocess
+                rating = self._preprocess_rating(properties, rating)
+                movie_text = self._preprocess_text(movies_df, tags_df, movie_id, user_id)
+
+                movie_vector = self._text_to_glove(properties, glove_df, movie_text)
+                if movie_vector.size == 0:
+                    continue
+                movie_vector = np.insert(movie_vector, 0, user_id, axis=1)
+                self.input_data.append(movie_vector)
+                self.ratings.append(rating)
+                utils.print_progress(self.ratings)
+
+            self.ratings = np.asarray(self.ratings)
+            self.input_data = np.concatenate(self.input_data)
+            print("Produced a feature matrix of shape {}".format(self.input_data.shape))
+            # standardization
+            print("Standardize input vectors")
+            self.input_data = preprocessing.scale(self.input_data)
+            print("Save input vectors to file")
+            utils.write_to_pickle(obj=self.input_data, directory=output_folder, filename=input_data_pickle_filename)
+            utils.write_to_pickle(obj=self.ratings, directory=output_folder, filename=ratings_pickle_filename)
+
+    @staticmethod
+    def _text_to_glove(properties, glove_df, word_list):
+        """
+        Takes the pre-processed text created by the preprocess_text function and converts it to a vector of numbers
+        using the word embeddings from Glove (https://nlp.stanford.edu/projects/glove/).
+        This process is being done for every word of the text separately. In the end all the vectors
+        are gathered in a list of vectors (embeddings) and, depending on the aggregation policy defined in the
+        properties yaml file, it creates a single vector containing the average or the maximum number of every position
+        of all the word embeddings vectors.
+
+        :param properties: aggregation strategy (avg or max)
+        :param glove_df: embedding file
+        :param word_list: movie text or word list
+        :return: a vector for every movie text which contains the movie title and genre and also the tags of a user for
+        a specific movie
+        """
+        embeddings = []
+        for word in word_list:
+            # to lowercase
+            word = word.lower()
+            if word not in glove_df.index:
+                continue
+            # expand dimensions to a 1 x <dim> vector
+            embeddings.append(np.expand_dims(glove_df.loc[word].values, 0))
+
+        # concatenate to a <num words> x <dimension> matrix
+        embeddings = np.concatenate(embeddings, axis=0)
+
+        # aggregate all word vectors to a single vector
+        if properties["aggregation"] == "avg":
+            embeddings = np.mean(embeddings, axis=0)
+        elif properties["aggregation"] == "max":
+            embeddings = np.max(embeddings, axis=0)
+
+        # expand dimension to a 1 x <dim> vector
+        return np.expand_dims(embeddings, 0)
+
+    def _preprocess_text(self, movies_df, tags_df, movie_id, user_id):
+        """
+        It keeps the movie id from the movies dataset and also the tags of a particular user for the specific movie.
+        Then, it creates a string containing the movie title and movie genre which are taken from the movies dataset as
+        well as the. Finally, it adds the tags of the user for this movie to the string and gets rid of every symbol
+        and number of that text.
+
+        :param movies_df: movies dataset
+        :param tags_df: tags dataset
+        :param movie_id: id of a movie
+        :param user_id: id of a user
+        :return: the processed text containing the title and genre of a movie and the tags of a user for this movie
+        """
+        m = movies_df[movies_df["movieId"] == movie_id]
+        tags = tags_df[(tags_df["userId"] == user_id) & (tags_df["movieId"] == movie_id)]
+        movie_title = m.iloc[0]["title"]
+        movie_genres = m.iloc[0]["genres"]
+        movie_text = movie_title + " " + movie_genres
+        if not tags.empty:
+            tags = tags["tag"]
+            for index, row in tags.iteritems():
+                movie_text = movie_text + " " + row
+        # preprocessing title, genres, tags ==> remove symbols, numbers
+        # remove digits and punctuation
+        movie_text = movie_text.translate(self.punct_digit_to_space).strip()
+        # merge multiple spaces
+        movie_text = re.sub("[ ]+", " ", movie_text)
+        return movie_text.split()
+
+    @staticmethod
+    def _preprocess_rating(properties, rating):
+        """
+        Converts a rating to a binary score o and 1 if the classification policy is binary else it keeps the rating and
+        rounds it (uses the ratings as Integer numbers).
+
+        :param properties: classification
+        :param rating: rating of user for a movie
+        :return: a binary rating
+        """
+        if properties["classification"] == "binary":
+            return 0 if rating > 3 else 1
+        else:
+            return round(rating)
+
+    def create_train_test_data(self, input_data, labels):
+        """
+        It splits the input data and the labels into a train dataset with the corresponding labels and a test dataset
+        with the corresponding labels.
+
+        :param input_data: input data, a list of vectors
+        :param labels: a list of ratings (numbers)
+        :return: the two datasets with the corresponding true labels
+        """
+        input_train, input_test, labels_train, labels_test = train_test_split(input_data, labels,
+                                                                              test_size=0.2,
+                                                                              random_state=0)
+        return input_train, input_test, labels_train, labels_test
+
+    def create_cross_validation_data(self, input_data, properties):
+        """
+        Takes the input data and creates k folds depending on the number of folds mentioned in the properties file.
+
+        :param input_data: train dataset
+        :param properties: cross-validation, number of folds
+        :return: a list of k tuples containing train and test indices
+        """
+        kf = KFold(n_splits=properties["cross-validation"], shuffle=True, random_state=666)
+        return kf.split(input_data)

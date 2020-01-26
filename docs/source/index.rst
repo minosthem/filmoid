@@ -7,12 +7,13 @@ Welcome to Filmoid's documentation!
 =======================================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
    filmoid
    preprocessing
-   models
+   classifiers
+   clustering
    results
    utils
    tests
