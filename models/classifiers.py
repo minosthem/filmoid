@@ -42,7 +42,6 @@ class ContentBasedClassifier(Classifier):
         """
 
         matrices = []
-        fold_idx = list(fold_idx)
         labels = np.asarray(labels)
         for idx, (train_index, test_index) in enumerate(fold_idx):
             print("Running fold #{}/{}".format(idx + 1, len(fold_idx)))

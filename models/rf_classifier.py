@@ -17,8 +17,10 @@ class RandomForest(ContentBasedClassifier):
         :param input_data: the training dataset
         :param labels: the training labels
         :param properties: properties from yaml
-        """
-        self.rf = RandomForestClassifier(random_state=7)
+        """ 
+        estimators = properties["rf"]["estimators"]
+        max_depth = properties["rf"]["max_depth"]
+        self.rf = RandomForestClassifier(n_estimators=estimators, max_depth=max_depth, random_state=7)
         self.rf.fit(input_data, labels)
 
     def test(self, test_data, true_labels):

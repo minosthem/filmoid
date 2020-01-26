@@ -1,10 +1,17 @@
 # Filmoid
 
-## Properties explained
+## Project configuration
 
 The first set of options are used so as to setup the necessary folders which are the Datasets folder which 
 contains the csv files with the datasets to be used, the resources folder which contains the word embeddings 
-file and the output directory. Below, some information on the properties is presented:
+file and the output directory.
+ 
+The word embeddings and dataset information is also used in the preprocessing step. In the output directory, the input
+vectors are stored, therefore if the files are found they are loaded and the preprocessing step is skipped.
+
+Finally, there are properties regarding the models configuration (e.g. number of neighbors in KNN etc).
+
+Below, some information on the properties is presented:
 
 * os: define your operating system. The possible values that are currently handled by the software are linux
 and windows
@@ -23,3 +30,19 @@ are already downloaded inside the Datasets and resources directories, set this p
 * models: the classifiers to be used. Choose some or all of the following: ["kmeans", "knn", "rf", "dnn"]
 * aggregation: word embeddings aggregation strategies. Possible strategies: avg, max
 * classification: binary or multi-class classification. Possible values: binary, multi
+
+## Project execution
+
+The main.py is used to execute all the workflow. As already mentioned, the first step is to provide a configuration
+file. You may use the example_properties.yaml or you can create a new file in the same directory with the name
+properties.yaml. Remember to include all the aforementioned parameters and change their values accordingly.
+
+If you select to setup the directories, the program will execute one of the two scripts (setup.sh or setup.bat) based
+on the operating system. The setup step will download the requested glove file and store it in the resources folder
+as well as will download the necessary datasets from movielens ([F. Maxwell Harper and Joseph A. Konstan. 2015. 
+The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems](https://doi.org/10.1145/2827872))
+
+If the input vectors are not stored in pickle files, the program will generated the input data by executing the
+preprocessing step. The step is different for the collaborative and content-based methods. For the first method, the
+generated vectors have the same size as the number of existing movies in the dataset and for each instance they contain
+the existing ratings of a user (if a rating does not exist the cell remains empty).

@@ -8,7 +8,7 @@ import utils
 
 from preprocessing.data_preprocessing import DataPreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
-from models import results
+from results import results
 from models.knn_classifier import KNN
 from models.rf_classifier import RandomForest
 

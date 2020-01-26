@@ -4,5 +4,5 @@ Results
 .. toctree::
    :caption: Results
 
-.. automodule:: models.results
+.. automodule:: results.results
    :members:

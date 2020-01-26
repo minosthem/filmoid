@@ -2,7 +2,7 @@ from os.path import join, exists
 from os import mkdir, getcwd
 
 
-def write_results_to_file(properties, fold, classifier, conf_matrix, results):
+def write_results_to_file(properties, results_folder, fold, classifier, conf_matrix, results):
     """
     Writes micro/macro precision, recall and F-Measure for current fold into a file
 
@@ -10,6 +10,7 @@ def write_results_to_file(properties, fold, classifier, conf_matrix, results):
         properties(dict): properties loaded from yaml file. Used so as to get the output folder
         fold (str): the name of the folder to be created to store the results. For cross-validation is the fold with the
         index while for the testing the name is test_results.
+        results_folder (str): the directory where the results will be stored
         classifier (str): the name of the classifier
         conf_matrix (ConfusionMatrix): the confusion matrix of the current fold or of the test dataset
         results (dict): dictionary with keys the classifiers' names and values a list with the metrics per fold
@@ -23,8 +24,7 @@ def write_results_to_file(properties, fold, classifier, conf_matrix, results):
     if classifier not in results:
         results[classifier] = []
     results[classifier].append(measure_tuples)
-    output_folder_path = join(getcwd(), properties["output_folder"],
-                              "results_{}_{}".format(properties["dataset"], properties["classification"]))
+    output_folder_path = join(getcwd(), properties["output_folder"], results_folder)
     if not exists(output_folder_path):
         mkdir(output_folder_path)
     fold_path = join(output_folder_path, fold)

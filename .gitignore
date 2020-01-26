@@ -4,6 +4,7 @@ __pycache__/
 models/__pycache__/
 preprocessing/__pycache__/
 output/
+output_backup/
 Datasets/
 resources/
 docs/build

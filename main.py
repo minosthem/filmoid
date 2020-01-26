@@ -3,7 +3,7 @@ import time
 import numpy as np
 
 import utils
-from models import results
+from results import results, parse_results
 from preprocessing.data_preprocessing import DataPreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
@@ -63,6 +63,8 @@ def main():
         ratings_test = np.asarray(ratings_test)
         print("Get k-fold indices")
         folds = dp.create_cross_validation_data(input_train, properties)
+        folds = list(folds)
+        results_folder = "results_{}_{}".format(properties["dataset"], properties["classification"])
         res = {}
         test_res = {}
         for model in properties["models"]["content-based"]:
@@ -72,11 +74,14 @@ def main():
                                                                    folds)
             print("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
             for i, matrix in enumerate(matrices):
-                res = results.write_results_to_file(properties, "fold_{}".format(i), model, matrix, res)
+                res = results.write_results_to_file(properties, results_folder, "fold_{}".format(i), model, matrix, res)
             conf_matrix = classifier.test(input_test, ratings_test)
-            test_res = results.write_results_to_file(properties, "test_results", model, conf_matrix, test_res)
-    # TODO visualize the results
-    print("Done!")
+            test_res = results.write_results_to_file(properties, results_folder, "test_results", model, conf_matrix,
+                                                     test_res)
+
+        avg_metrics = parse_results.calc_avg_fold_metrics_content_based(properties, results_folder)
+        # TODO visualize the results
+        print("Done!")
 
 
 if __name__ == '__main__':
