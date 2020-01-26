@@ -5,13 +5,17 @@ from os import mkdir, getcwd
 def write_results_to_file(properties, fold, classifier, conf_matrix, results):
     """
     Writes micro/macro precision, recall and F-Measure for current fold into a file
-    :param fold: current fold
-    :param classifier: current classifier
-    :param conf_matrix: the results from the classification
-    :param properties: properties from yaml
-    :param results: the dictionary with the results that will be used by main function to export the average from all
-    folds
-    :return: the results dictionary
+
+    Args:
+        properties(dict): properties loaded from yaml file. Used so as to get the output folder
+        fold (str): the name of the folder to be created to store the results. For cross-validation is the fold with the
+        index while for the testing the name is test_results.
+        classifier (str): the name of the classifier
+        conf_matrix (ConfusionMatrix): the confusion matrix of the current fold or of the test dataset
+        results (dict): dictionary with keys the classifiers' names and values a list with the metrics per fold
+
+    Returns:
+        dict: the results dictionary
     """
     macro_precision, micro_precision, macro_recall, micro_recall, macro_f, micro_f = calc_results(properties,
                                                                                                   conf_matrix)
@@ -47,11 +51,15 @@ def write_results_to_file(properties, fold, classifier, conf_matrix, results):
 
 def calc_results(properties, confusion_matrix):
     """
-        Function that calculates micro/macro precision, recall and F-Measure of the specific fold
-        :param confusion_matrix: the results from the classification
-        :param properties: yaml properties
-        :return: a tuple with micro/macro average for precision, recall and F-Measure
-        """
+    Function that calculates micro/macro precision, recall and F-Measure of the specific fold
+
+    Args:
+        properties(dict): properties loaded from yaml file. Used so as to get the output folder
+        confusion_matrix (ConfusionMatrix): the confusion matrix of the current fold or of the test dataset
+
+    Returns:
+        tuple: a tuple with micro/macro average for precision, recall and F-Measure
+    """
     labels = [0, 1] if properties["classification"] == "binary" else [1, 2, 3, 4, 5]
     total_true_positives = 0
     total_false_positives = 0

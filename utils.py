@@ -136,7 +136,6 @@ def load_glove_file(properties):
     while True:
         # decrease the maxInt value by factor 10
         # as long as the OverflowError occurs.
-
         try:
             csv.field_size_limit(max_int)
             break
@@ -150,9 +149,13 @@ def load_glove_file(properties):
 def check_file_exists(directory, filename):
     """
     Checks if the the path of a file exists in order not to create it again.
-    :param directory: the directory where the file should be stored
-    :param filename: the name of the file to be checked
-    :return: boolean true if the file exists otherwise false
+
+    Args:
+        directory (str): the directory where the file should be stored
+        filename (str): the name of the file to be checked
+
+    Returns:
+        bool: True if the file exists otherwise False
     """
     path = join(os.getcwd(), directory, filename)
     return exists(path)
@@ -161,10 +164,11 @@ def check_file_exists(directory, filename):
 def write_to_pickle(obj, directory, filename):
     """
     Writes an object in pickle format in the output directory
-    :param obj: object to be stored in the file
-    :param directory: output folder
-    :param filename: the name of the file where this object is saved
-    :return: does not return anything
+
+    Args:
+        obj (Object): the object to be stored in a pickle file
+        directory (str): the directory where the file should be stored
+        filename (str): the name of the file where the object will be written
     """
     path = join(os.getcwd(), directory, filename)
     with open(path, "wb") as f:
@@ -174,9 +178,13 @@ def write_to_pickle(obj, directory, filename):
 def load_from_pickle(directory, file):
     """
     Loads an object from a pickle file.
-    :param directory: output folder
-    :param file: the file name to be loaded from the output folder
-    :return: the object loaded from the pickle file
+
+    Args:
+        directory (str): the directory where the file should be stored
+        file(str): the name of the file where the object will be written
+
+    Returns:
+        Object: the object loaded from the pickle file
     """
     path = join(os.getcwd(), directory, file)
     with open(path, "rb") as f:
