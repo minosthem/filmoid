@@ -5,7 +5,6 @@ test:
   script:
   - apk update && apk add build-base libgcc libquadmath musl libgfortran lapack-dev
   - pip install -r requirements.txt
-  - pip install -U sphinx sphinx_rtd_theme recommonmark
   - sphinx-build -b html -a ./docs/source public
   only:
   - branches
@@ -17,7 +16,6 @@ pages:
   script:
   - apk update && apk add build-base libgcc libquadmath musl libgfortran lapack-dev
   - pip install -r requirements.txt
-  - pip install -U sphinx sphinx_rtd_theme recommonmark
   - sphinx-build -b html -a ./docs/source public
   artifacts:
     paths:
