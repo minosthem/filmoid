@@ -23,7 +23,8 @@ def write_results_to_file(properties, fold, classifier, conf_matrix, results):
     if classifier not in results:
         results[classifier] = []
     results[classifier].append(measure_tuples)
-    output_folder_path = join(getcwd(), properties["output_folder"], "results")
+    output_folder_path = join(getcwd(), properties["output_folder"],
+                              "results_{}_{}".format(properties["dataset"], properties["classification"]))
     if not exists(output_folder_path):
         mkdir(output_folder_path)
     fold_path = join(output_folder_path, fold)

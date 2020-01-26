@@ -12,7 +12,6 @@ from preprocessing.data_preprocessing import DataPreprocessing
 
 
 class ContentBasedPreprocessing(DataPreprocessing):
-
     input_data_pickle = "input_data.pickle"
     ratings_pickle = "ratings.pickle"
     punct_digit_to_space = str.maketrans(string.punctuation + string.digits,
@@ -36,8 +35,10 @@ class ContentBasedPreprocessing(DataPreprocessing):
                 datasets (dict): contains the dataframes of all the movielens csvs
         """
         output_folder = properties["output_folder"]
-        input_data_pickle_filename = self.input_data_pickle + "_{}".format(properties["dataset"])
-        ratings_pickle_filename = self.ratings_pickle + "_{}".format(properties["dataset"])
+        input_data_pickle_filename = self.input_data_pickle + "_{}_{}".format(properties["dataset"],
+                                                                              properties["classification"])
+        ratings_pickle_filename = self.ratings_pickle + "_{}_{}".format(properties["dataset"],
+                                                                        properties["classification"])
 
         if utils.check_file_exists(output_folder, input_data_pickle_filename) and \
                 utils.check_file_exists(output_folder, ratings_pickle_filename):
