@@ -1,9 +1,8 @@
-image: python:3.7-ubuntu:18.04
+image: python:3.7
 
 test:
   stage: test
   script:
-  - apt update && apt install libblas-dev liblapack-dev libatlas-base-dev gfortran
   - pip install -r requirements.txt
   - sphinx-build -b html -a ./docs/source public
   only:
@@ -14,7 +13,6 @@ test:
 pages:
   stage: deploy
   script:
-  - apt update && apt install libblas-dev liblapack-dev libatlas-base-dev gfortran
   - pip install -r requirements.txt
   - sphinx-build -b html -a ./docs/source public
   artifacts:
