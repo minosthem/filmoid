@@ -78,7 +78,7 @@ def main():
             conf_matrix = classifier.test(input_test, ratings_test)
             test_res = results.write_results_to_file(properties, results_folder, "test_results", model, conf_matrix,
                                                      test_res)
-
+        print("Calculating average for macro/micro precision, recall and F-measure")
         avg_metrics = parse_results.calc_avg_fold_metrics_content_based(properties, results_folder)
         # TODO visualize the results
         print("Done!")
