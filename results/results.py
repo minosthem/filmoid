@@ -1,5 +1,6 @@
 from os.path import join, exists
 from os import mkdir, getcwd
+import pandas as pd
 
 
 def write_results_to_file(properties, results_folder, fold, classifier, conf_matrix, results):
@@ -112,6 +113,32 @@ def calc_results(properties, confusion_matrix):
     print("macro_precision: ", macro_precision, " macro_recall: ", macro_recall, " macro_f: ", macro_f,
           " micro_precision: ", micro_precision, " micro_recall: ", micro_recall, " micro_f: ", micro_f)
     return macro_precision, micro_precision, macro_recall, micro_recall, macro_f, micro_f
+
+
+def write_results_to_csv(output_folder, results_folder, avg_metrics, test_res):
+    folder = join(output_folder, results_folder)
+    df = pd.DataFrame(columns=["classifier", "metric", "result_kind", "result"])
+    row = 0
+    for classifier, metrics in avg_metrics.items():
+        for metric, value in metrics.items():
+            df.loc[row] = [classifier, metric, "avg", value]
+            row += 1
+    for classifier, measure_tuple in test_res.items():
+        df.loc[row] = [classifier, "macro_precision", "test", measure_tuple[0][0]]
+        row += 1
+        df.loc[row] = [classifier, "micro_precision", "test", measure_tuple[0][1]]
+        row += 1
+        df.loc[row] = [classifier, "macro_recall", "test", measure_tuple[0][2]]
+        row += 1
+        df.loc[row] = [classifier, "micro_recall", "test", measure_tuple[0][3]]
+        row += 1
+        df.loc[row] = [classifier, "macro_f", "test", measure_tuple[0][4]]
+        row += 1
+        df.loc[row] = [classifier, "micro_f", "test", measure_tuple[0][5]]
+        row += 1
+    filename = "Results.csv"
+    file_path = join(folder, filename)
+    df.to_csv(file_path, sep=',')
 
 
 def visualize():

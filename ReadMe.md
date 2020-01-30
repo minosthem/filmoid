@@ -30,6 +30,7 @@ are already downloaded inside the Datasets and resources directories, set this p
 * models: the classifiers to be used. Choose some or all of the following: ["kmeans", "knn", "rf", "dnn"]
 * aggregation: word embeddings aggregation strategies. Possible strategies: avg, max
 * classification: binary or multi-class classification. Possible values: binary, multi
+* cross-validation:
 
 ## Project execution
 
@@ -42,7 +43,7 @@ on the operating system. The setup step will download the requested glove file a
 as well as will download the necessary datasets from movielens ([F. Maxwell Harper and Joseph A. Konstan. 2015. 
 The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems](https://doi.org/10.1145/2827872))
 
-If the input vectors are not stored in pickle files, the program will generated the input data by executing the
+If the input vectors are not stored in pickle files, the program will generate the input data by executing the
 preprocessing step. The step is different for the collaborative and content-based methods. For the first method, the
 generated vectors have the same size as the number of existing movies in the dataset and for each instance they contain
 the existing ratings of a user (if a rating does not exist the cell remains empty). The input vector for the content-based
