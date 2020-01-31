@@ -28,7 +28,7 @@ are already downloaded inside the Datasets and resources directories, set this p
 * dataset-file-extention: the file extension of the dataset files. You should provide it: ".csv"
 * methods: the recommendation policies which are: ["collaborative", "content-based"]
 * models:
-    * collaborative: classifier to be used. ["k-means"]
+    * collaborative: the classifier to be used. ["k-means"]
     * content-based: the classifiers to be used. Choose some or all of the following: ["knn", "rf", "dnn"]
 * aggregation: word embeddings aggregation strategies. Possible strategies: avg, max
 * classification: binary or multi-class classification. Possible values: binary, multi
