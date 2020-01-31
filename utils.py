@@ -18,6 +18,7 @@ example_properties_file = join(properties_folder, "example_properties.yaml")
 properties_file = join(properties_folder, "properties.yaml")
 ml_latest_small_folder = "ml-latest-small"
 ml_latest = "ml-latest"
+metric_names = ["macro-precision", "micro-precision", "macro-recall", "micro-recall", "macro-f", "micro-f"]
 
 
 def print_progress(container, step=20, msg="\tProcessed {} elements."):
@@ -212,9 +213,22 @@ def load_from_pickle(directory, file):
 
 
 def init_classifier(classifier_name):
+    """
+    Function that inits a classifier object based on a given name. Stores the given name in a field of the object.
+
+    Args
+        classifier_name (str): the name of the model
+
+    Returns
+        Classifier: a classifier object
+    """
+    classifier = None
     if classifier_name == "knn":
-        return KNN()
+        classifier = KNN()
     elif classifier_name == "rf":
-        return RandomForest()
+        classifier = RandomForest()
     elif classifier_name == "dnn":
-        return DeepNN()
+        classifier = DeepNN()
+    if classifier:
+        classifier.model_name = classifier_name
+    return classifier

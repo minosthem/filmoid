@@ -14,7 +14,6 @@ Welcome to Filmoid's documentation!
    preprocessing
    classifiers
    clustering
-   results
    utils
    tests
 

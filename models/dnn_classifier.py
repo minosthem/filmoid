@@ -1,12 +1,12 @@
 from os import mkdir
 from os.path import join, exists
+
 import keras
 import numpy as np
+from keras import callbacks
 from keras.layers import Dense, Dropout
 from keras.models import Sequential
-from keras import callbacks
 from keras.optimizers import SGD
-from sklearn.metrics import confusion_matrix
 
 from models.classifiers import ContentBasedClassifier
 
@@ -49,7 +49,7 @@ class DeepNN(ContentBasedClassifier):
         result = self.models[-1].predict(test_data) if kind == "validation" else self.best_model.predict(test_data)
         for i in range(result.shape[0]):
             predicted_labels.append(np.argmax(result[i]))
-        return confusion_matrix(true_labels, predicted_labels)
+        return true_labels, predicted_labels
 
     @staticmethod
     def _build_model(properties, input_dim):

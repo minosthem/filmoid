@@ -1,16 +1,13 @@
-from os.path import join
-from random import randint
-import unittest
 import os
-import pandas as pd
-import numpy as np
-import utils
+import unittest
+from os.path import join
 
-from preprocessing.data_preprocessing import DataPreprocessing
+import numpy as np
+import pandas as pd
+
+import utils
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
-from results import results
-from models.knn_classifier import KNN
-from models.rf_classifier import RandomForest
+from preprocessing.data_preprocessing import DataPreprocessing
 
 
 class TestUtilMethods(unittest.TestCase):
@@ -226,84 +223,3 @@ class TestDataPreProcessing(unittest.TestCase):
         expected_rating = 4
         new_rating = data_preprocessing._preprocess_rating(properties, rating)
         self.assertEqual(new_rating, expected_rating)
-
-
-class TestClassifiers(unittest.TestCase):
-    """
-    Class to test the classifiers.py file
-    """
-
-    def test_knn_classifier(self):
-        """
-        Test function for knn classifier
-
-        Examined test cases:
-
-        1. Number of confusion matrices returned based on the requested folds
-        2. Type of the classifier is equal to classifiers.KNN
-        """
-        knn = KNN()
-        matrices = self.run_classifier(knn)
-        self.assertEqual(len(matrices), 2)
-        self.assertTrue(type(knn) == KNN)
-
-    def test_random_forest(self):
-        """
-        Test function for Random Forest classifier
-
-        Examined test cases:
-
-        1. Number of confusion matrices returned based on the requested folds
-        2. Type of the classifier is equal to classifiers.RandomForest
-        """
-        rf = RandomForest()
-        matrices = self.run_classifier(rf)
-        self.assertEqual(len(matrices), 2)
-        self.assertTrue(type(rf) == RandomForest)
-
-    @staticmethod
-    def run_classifier(classifier):
-        """
-        Method used by the classifiers testing methods to implement the training and the testing of the classifier.
-        :param classifier: the model to be tested
-        :return: the confusion matrices of all the folds
-        """
-        properties = {"knn": {"neighbors": 5}, "rf": {"estimators": 100,
-                                                      "max_depth": 10}, "cross-validation": 2}
-        input_data, labels = np.arange(1000).reshape((100, 10)), [randint(1, 5) for _ in range(100)]
-        dp = ContentBasedPreprocessing()
-        input_train, input_test, labels_training, labels_testing = dp.create_train_test_data(input_data=input_data,
-                                                                                             labels=labels)
-        labels_training = np.asarray(labels_training)
-        folds = dp.create_cross_validation_data(input_data=input_train, properties=properties)
-        matrices = []
-        fold_idx = list(folds)
-        for idx, (train_idx, test_idx) in enumerate(fold_idx):
-            print("Running fold #{}/{}".format(idx + 1, len(fold_idx)))
-            input_training, input_testing = input_train[train_idx], input_train[test_idx]
-            labels_train, labels_test = labels_training[train_idx], labels_training[test_idx]
-            classifier.train(properties, input_training, labels_train)
-            conf_matrix = classifier.test(input_testing, labels_test)
-            matrices.append(conf_matrix)
-        return matrices
-
-
-class TestResults(unittest.TestCase):
-    """
-    Class to test the functionality of the methods in the results.py
-    """
-
-    def test_calc_results(self):
-        """
-        Testing the method calc_results for the KNN classifier. The method should calculate the micro/macro precision,
-        recall and F-measure
-
-        Examined test case: the number of the returned metrics for the 1st fold is equal to 6
-        """
-        test_classifiers = TestClassifiers()
-        knn = KNN()
-        matrices = test_classifiers.run_classifier(knn)
-        matrix = matrices[0]
-        properties = {"classification": "multi"}
-        metrics = results.calc_results(properties=properties, confusion_matrix=matrix)
-        self.assertEqual(len(metrics), 6)

@@ -1,4 +1,3 @@
-from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
 
 from models.classifiers import ContentBasedClassifier
@@ -35,4 +34,4 @@ class KNN(ContentBasedClassifier):
         """
         predicted_labels = self.models[-1].predict(test_data) if kind == "validation" else self.best_model.predict(
             test_data)
-        return confusion_matrix(true_labels, predicted_labels)
+        return true_labels, predicted_labels
