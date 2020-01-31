@@ -116,6 +116,15 @@ def calc_results(properties, confusion_matrix):
 
 
 def write_results_to_csv(output_folder, results_folder, avg_metrics, test_res):
+    """
+    It creates a dataframe to write the results obtained from the models to csv files.
+
+    Args
+        output_folder (str): the output folder
+        results_folder (str): the results folder which is in the output folder
+        avg_metrics (dict): the average results of the k-folds of the models created in parse_results.py
+        test_res (dict): the test results of the models
+    """
     folder = join(output_folder, results_folder)
     df = pd.DataFrame(columns=["classifier", "metric", "result_kind", "result"])
     row = 0

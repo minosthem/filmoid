@@ -18,6 +18,14 @@ class DeepNN(ContentBasedClassifier):
     dnn = None
 
     def train(self, properties, input_data, labels):
+        """
+        Takes as input the vectors created from word2vec and feed them to the neural network to train it.
+
+        Args
+            properties (dict): classification and dnn parameters
+            input_data (ndarray): vectors created for training
+            labels (ndarray): true labels of the input data
+        """
         input_dim = input_data.shape[1]
         self.dnn = self._build_model(properties, input_dim)
         num_classes = 2 if properties["classification"] == "binary" else 5
@@ -26,6 +34,15 @@ class DeepNN(ContentBasedClassifier):
                      verbose=True, callbacks=self._get_training_callbacks(properties))
 
     def test(self, test_data, true_labels):
+        """
+        Takes the test vectors and the corresponding true labels and tests the performance of the model.
+
+        Args
+            test_data (ndarray): test vectors
+            true_labels (ndarray): test true labels
+        Returns
+            confusion_matrix: the confusion matrix of the created model
+        """
         predicted_labels = []
         result = self.dnn.predict(test_data)
         for i in range(result.shape[0]):
@@ -34,6 +51,17 @@ class DeepNN(ContentBasedClassifier):
 
     @staticmethod
     def _build_model(properties, input_dim):
+        """
+        Builds the deep neural network by adding hidden layers and the output layer depending on the classification
+        approach. Finally, it optimizes the model using stochastic gradient descent.
+
+        Args
+            properties (dict): dnn characteristics and classification
+            input_dim (int): the dimension of the input vectors
+
+        Returns
+            Sequential: the neural network
+        """
         dnn = Sequential()
         for i, hidden in enumerate(properties["dnn"]["hidden_layers"]):
             if type(hidden[0]) == int:
@@ -58,7 +86,18 @@ class DeepNN(ContentBasedClassifier):
         return dnn
 
     @staticmethod
-    def _get_training_callbacks(properties, monitor_metric="loss"):
+    def _get_training_callbacks(properties, monitor_metric="val_loss"):
+        """
+        It saves the model after some period, stops it if there is no improvement after a predetermined number of epochs
+        and modifies the learning rate if the improvement of the loss function is smaller than a threshold value.
+
+        Args
+            properties (dict): output folder and dnn characteristics
+            monitor_metric (str): validation loss which is the monitoring measure for the callbacks
+
+        Returns
+            list: callbacks after the termination of the model training
+        """
         output_folder = properties["output_folder"]
         model_folder_path = join(output_folder, "model")
         if not exists(model_folder_path):

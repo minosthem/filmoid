@@ -10,6 +10,15 @@ from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 
 
 def run_collaborative(properties, csvs):
+    """
+    It processes the data to obtain the input vectors for the collaborative method and then uses the input data to
+    create the model for the collaborative method.
+
+    Args
+        properties (dict): dictionary containing all the properties loaded from the yaml file - here the models
+        parameter is used
+        csvs (dict): the datasets loaded from the csv files
+    """
     dp = CollaborativePreprocessing()
     print("Creating input vectors for collaborative method")
     dp.preprocess(properties=properties, datasets=csvs)
@@ -20,6 +29,16 @@ def run_collaborative(properties, csvs):
 
 
 def run_content_based(properties, csvs):
+    """
+    It processes the data to obtain the input vectors for the content-based methods and then uses them to create the
+    models. It splits the data into train and test datasets, uses k-fold cross-validation and finally, run the models
+    and write them into files for both the train and test results. In the end it calculates the average of the folds
+    for the validation and test dataset.
+
+    Args
+        properties (dict): datasets, classification, models and output folder
+        csvs (dict): the non-processed datasets
+    """
     dp = ContentBasedPreprocessing()
     print("Creating input vectors for content-based method")
     dp.preprocess(properties, csvs)
