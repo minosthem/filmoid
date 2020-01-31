@@ -124,6 +124,9 @@ def write_results_to_csv(output_folder, results_folder, avg_metrics, test_res):
         results_folder (str): the results folder which is in the output folder
         avg_metrics (dict): the average results of the k-folds of the models created in parse_results.py
         test_res (dict): the test results of the models
+
+    Returns
+        DataFrame: the results in a pandas DataFrame
     """
     folder = join(output_folder, results_folder)
     df = pd.DataFrame(columns=["classifier", "metric", "result_kind", "result"])
@@ -148,6 +151,7 @@ def write_results_to_csv(output_folder, results_folder, avg_metrics, test_res):
     filename = "Results.csv"
     file_path = join(folder, filename)
     df.to_csv(file_path, sep=',')
+    return df
 
 
 def visualize():

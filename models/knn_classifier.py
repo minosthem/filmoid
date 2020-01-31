@@ -9,7 +9,6 @@ class KNN(ContentBasedClassifier):
     KNN class models the K-Nearest-Neighbor classifier. Extends the Classifier class and implements the methods
     train and test using the KNN model.
     """
-    knn = None
 
     def train(self, properties, input_data, labels):
         """
@@ -18,15 +17,22 @@ class KNN(ContentBasedClassifier):
         :param labels: the training labels
         :param properties: properties from yaml
         """
-        self.knn = KNeighborsClassifier(n_neighbors=properties["knn"]["neighbors"])
-        self.knn.fit(input_data, labels)
+        knn = KNeighborsClassifier(n_neighbors=properties["knn"]["neighbors"])
+        self.models.append(knn)
+        knn.fit(input_data, labels)
 
-    def test(self, test_data, true_labels):
+    def test(self, test_data, true_labels, kind="validation"):
         """
         Method to test the KNN model
-        :param test_data: testing dataset
-        :param true_labels: testing labels
-        :return: confusion matrix
+
+        Args
+            test_data (ndarray): testing dataset
+            true_labels (ndarray): testing labels
+            kind (str): validation or test
+
+        Returns
+            confusion_matrix: the confusion matrix of the testing
         """
-        predicted_labels = self.knn.predict(test_data)
+        predicted_labels = self.models[-1].predict(test_data) if kind == "validation" else self.best_model.predict(
+            test_data)
         return confusion_matrix(true_labels, predicted_labels)

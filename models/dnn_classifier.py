@@ -15,7 +15,6 @@ class DeepNN(ContentBasedClassifier):
     """
     Class representing a Deep Neural Network.
     """
-    dnn = None
 
     def train(self, properties, input_data, labels):
         """
@@ -27,24 +26,27 @@ class DeepNN(ContentBasedClassifier):
             labels (ndarray): true labels of the input data
         """
         input_dim = input_data.shape[1]
-        self.dnn = self._build_model(properties, input_dim)
+        dnn = self._build_model(properties, input_dim)
+        self.models.append(dnn)
         num_classes = 2 if properties["classification"] == "binary" else 5
         labels = keras.utils.to_categorical(labels, num_classes=num_classes)
-        self.dnn.fit(input_data, labels, epochs=properties["dnn"]["epochs"], batch_size=properties["dnn"]["batch_size"],
-                     verbose=True, callbacks=self._get_training_callbacks(properties))
+        dnn.fit(input_data, labels, epochs=properties["dnn"]["epochs"], batch_size=properties["dnn"]["batch_size"],
+                verbose=True, callbacks=self._get_training_callbacks(properties))
 
-    def test(self, test_data, true_labels):
+    def test(self, test_data, true_labels, kind="validation"):
         """
         Takes the test vectors and the corresponding true labels and tests the performance of the model.
 
         Args
-            test_data (ndarray): test vectors
-            true_labels (ndarray): test true labels
+            test_data (ndarray): testing dataset
+            true_labels (ndarray): testing labels
+            kind (str): validation or test
+
         Returns
-            confusion_matrix: the confusion matrix of the created model
+            confusion_matrix: the confusion matrix of the testing
         """
         predicted_labels = []
-        result = self.dnn.predict(test_data)
+        result = self.models[-1].predict(test_data) if kind == "validation" else self.best_model.predict(test_data)
         for i in range(result.shape[0]):
             predicted_labels.append(np.argmax(result[i]))
         return confusion_matrix(true_labels, predicted_labels)
@@ -113,6 +115,6 @@ class DeepNN(ContentBasedClassifier):
             callbacks.ReduceLROnPlateau(monitor=monitor_metric, factor=0.1,
                                         patience=reduce_lr, verbose=0, mode='auto',
                                         min_delta=0.0001, cooldown=0, min_lr=0)
-            ]
+        ]
 
         return callbacks_list

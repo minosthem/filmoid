@@ -10,7 +10,7 @@ class Classifier:
     def train(self, properties, input_data, labels):
         pass
 
-    def test(self, test_data, true_labels):
+    def test(self, test_data, true_labels, kind="validation"):
         pass
 
 
@@ -19,11 +19,13 @@ class ContentBasedClassifier(Classifier):
     Class to be extended by content-based models. Methods train and test should be implemented by the
     sub-classes.
     """
+    models = []
+    best_model = None
 
     def train(self, properties, input_data, labels):
         pass
 
-    def test(self, test_data, true_labels):
+    def test(self, test_data, true_labels, kind="validation"):
         pass
 
     @staticmethod

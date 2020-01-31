@@ -33,6 +33,8 @@ are already downloaded inside the Datasets and resources directories, set this p
 * aggregation: word embeddings aggregation strategies. Possible strategies: avg, max
 * classification: binary or multi-class classification. Possible values: binary, multi
 * cross-validation: the number of the folds for the k-fold cross-validation
+* metric_best_model: define the metric on which the classifiers from cross-validation will be evaluated and the best model
+will be selected for the testset. The possible values are: "macro-precision", "micro-precision", "macro-recall", "micro-recall", "macro-f" or "micro-f"
 * knn: configuration parameters for KNN model. The only configuration parameter so far is the neighbors paramter
 * rf: configuration parameters for Random Forest model. You can configure the number of estimators and the max depth
 * dnn: Deep Neural Network configuration:

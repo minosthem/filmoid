@@ -53,6 +53,7 @@ def run_content_based(properties, csvs):
     results_folder = "results_{}_{}".format(properties["dataset"], properties["classification"])
     res = {}
     test_res = {}
+    classifiers = {}
     for model in properties["models"]["content-based"]:
         tic = time.time()
         classifier = utils.init_classifier(model)
@@ -61,13 +62,19 @@ def run_content_based(properties, csvs):
         print("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
         for i, matrix in enumerate(matrices):
             res = results.write_results_to_file(properties, results_folder, "fold_{}".format(i), model, matrix, res)
-        conf_matrix = classifier.test(input_test, ratings_test)
+        classifiers[model] = classifier
+    print("Calculating average for macro/micro precision, recall and F-measure")
+    avg_metrics, best_models = parse_results.calc_avg_fold_metrics_content_based(properties, results_folder)
+    for model in properties["models"]["content-based"]:
+        classifier = classifiers[model]
+        print("Best classifier with metric {} for model {}".format(properties["metric_best_model"], model))
+        best_idx = best_models[model][1]
+        classifier.best_model = classifier.models[best_idx]
+        conf_matrix = classifier.test(input_test, ratings_test, kind="test")
         test_res = results.write_results_to_file(properties, results_folder, "test_results", model, conf_matrix,
                                                  test_res)
-    print("Calculating average for macro/micro precision, recall and F-measure")
-    avg_metrics = parse_results.calc_avg_fold_metrics_content_based(properties, results_folder)
-    results.write_results_to_csv(output_folder=properties["output_folder"], results_folder=results_folder,
-                                 avg_metrics=avg_metrics, test_res=test_res)
+    results_df = results.write_results_to_csv(output_folder=properties["output_folder"], results_folder=results_folder,
+                                              avg_metrics=avg_metrics, test_res=test_res)
     # TODO visualize the results
     print("Done!")
 

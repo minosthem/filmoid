@@ -10,11 +10,13 @@ def calc_avg_fold_metrics_content_based(properties, directory):
     metrics = {}
     for metric_name in metric_names:
         metrics[metric_name] = {}
+    best_models = {}
     for fold in range(fold_num):
         fold_dir = "fold_{}".format(fold)
         fold_dir_path = join(base_path, fold_dir)
         for model in properties["models"]["content-based"]:
             if model not in metrics[metric_names[0]]:
+                best_models[model] = -1
                 for metric_name in metric_names:
                     metrics[metric_name][model] = []
             filename = "Result_test_{}.txt".format(model)
@@ -40,6 +42,7 @@ def calc_avg_fold_metrics_content_based(properties, directory):
                     elif line.startswith("Micro F-Measure:"):
                         micro_f = float(line.split(":")[1].strip())
                         metrics[metric_names[5]][model].append(micro_f)
+            best_models[model] = (metrics[properties["metric_best_model"]][model], fold)
     avg_metrics = {}
     for model in properties["models"]["content-based"]:
         avg_metrics[model] = {}
@@ -49,4 +52,4 @@ def calc_avg_fold_metrics_content_based(properties, directory):
             avg_metrics[model][metric_name] = avg
             print("Showing results for model {} with configuration {}".format(model, properties[model]))
             print("Average results for {} for model {} is: {}".format(metric_name, model, avg))
-    return avg_metrics
+    return avg_metrics, best_models
