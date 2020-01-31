@@ -9,9 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
 
-from models.knn_classifier import KNN
-from models.rf_classifier import RandomForest
-from models.dnn_classifier import DeepNN
+
 
 properties_folder = join(os.getcwd(), "properties")
 example_properties_file = join(properties_folder, "example_properties.yaml")
@@ -212,26 +210,7 @@ def load_from_pickle(directory, file):
         return pickle.load(f)
 
 
-def init_classifier(classifier_name):
-    """
-    Function that inits a classifier object based on a given name. Stores the given name in a field of the object.
 
-    Args
-        classifier_name (str): the name of the model
-
-    Returns
-        Classifier: a classifier object
-    """
-    classifier = None
-    if classifier_name == "knn":
-        classifier = KNN()
-    elif classifier_name == "rf":
-        classifier = RandomForest()
-    elif classifier_name == "dnn":
-        classifier = DeepNN()
-    if classifier:
-        classifier.model_name = classifier_name
-    return classifier
 
 
 def visualize(df, output_folder, results_folder, folder_name, filename):

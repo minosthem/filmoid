@@ -6,6 +6,31 @@ import utils
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
+from models.knn_classifier import KNN
+from models.rf_classifier import RandomForest
+from models.dnn_classifier import DeepNN
+
+
+def init_classifier(classifier_name):
+    """
+    Function that inits a classifier object based on a given name. Stores the given name in a field of the object.
+
+    Args
+        classifier_name (str): the name of the model
+
+    Returns
+        Classifier: a classifier object
+    """
+    classifier = None
+    if classifier_name == "knn":
+        classifier = KNN()
+    elif classifier_name == "rf":
+        classifier = RandomForest()
+    elif classifier_name == "dnn":
+        classifier = DeepNN()
+    if classifier:
+        classifier.model_name = classifier_name
+    return classifier
 
 
 def run_collaborative(properties, csvs):
@@ -53,7 +78,7 @@ def run_content_based(properties, csvs):
     classifiers = {}
     for model in properties["models"]["content-based"]:
         tic = time.time()
-        classifier = utils.init_classifier(model)
+        classifier = init_classifier(model)
         classifier.run_cross_validation(classifier, properties, input_train, ratings_train,
                                         folds, results_folder)
         print("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
