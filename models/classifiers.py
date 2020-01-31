@@ -88,6 +88,8 @@ class ContentBasedClassifier(Classifier):
         filename = "Results_{}.csv".format(self.model_name)
         file_path = join(fold_path, filename)
         df.to_csv(file_path, sep=',')
+        utils.visualize(df, output_folder, results_folder, "fold_{}".format(fold_num),
+                        "Plot_fold_{}_{}.png".format(fold_num, self.model_name))
 
     def write_test_results_to_file(self, output_folder, results_folder):
         """
@@ -108,6 +110,8 @@ class ContentBasedClassifier(Classifier):
             row += 1
         file_path = join(fold_path, "Results_test_{}.csv".format(self.model_name))
         df.to_csv(file_path, sep=",")
+        utils.visualize(df, output_folder, results_folder, "test_results",
+                        "Plot_test_{}.png".format(self.model_name))
 
     def get_fold_avg_result(self, output_folder, results_folder):
         """
@@ -132,6 +136,8 @@ class ContentBasedClassifier(Classifier):
             df.loc[row] = [self.model_name, metric_name, "avg", metric_value]
             row += 1
         df.to_csv(csv_path, sep=",")
+        utils.visualize(df, output_folder, results_folder, "fold_avg",
+                        "Plot_avg_{}.png".format(self.model_name))
 
     def find_best_model(self, properties):
         metric_to_compare = properties["metric_best_model"]

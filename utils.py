@@ -5,7 +5,7 @@ import subprocess
 import sys
 import time
 from os.path import join, exists
-
+import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
 
@@ -232,3 +232,10 @@ def init_classifier(classifier_name):
     if classifier:
         classifier.model_name = classifier_name
     return classifier
+
+
+def visualize(df, output_folder, results_folder, folder_name, filename):
+    df.pivot("classifier", "metric", "result").plot(kind='bar')
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.savefig(join(output_folder, results_folder, folder_name, filename))
+    plt.show()

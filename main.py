@@ -67,7 +67,6 @@ def run_content_based(properties, csvs):
         true_labels, predicted_labels = classifier.test(input_test, ratings_test, kind="test")
         classifier.get_results(true_labels, predicted_labels, kind="test")
         classifier.write_test_results_to_file(properties["output_folder"], results_folder)
-    # TODO visualize the results
     print("Done!")
 
 
