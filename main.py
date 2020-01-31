@@ -55,7 +55,7 @@ def run_content_based(properties, csvs):
         tic = time.time()
         classifier = utils.init_classifier(model)
         classifier.run_cross_validation(classifier, properties, input_train, ratings_train,
-                                        folds)
+                                        folds, results_folder)
         print("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
         classifiers[model] = classifier
     print("Calculating average for macro/micro precision, recall and F-measure")
