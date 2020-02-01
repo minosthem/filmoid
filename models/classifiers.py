@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score
 
 import utils
+from utils import logger
 
 
 class Classifier:
@@ -177,7 +178,7 @@ class ContentBasedClassifier(Classifier):
 
         labels = np.asarray(labels)
         for idx, (train_index, test_index) in enumerate(fold_idx):
-            print("Running fold #{}/{}".format(idx + 1, len(fold_idx)))
+            logger.info("Running fold #{}/{}".format(idx + 1, len(fold_idx)))
             input_train, input_test = input_data[train_index], input_data[test_index]
             labels_train, labels_test = labels[train_index], labels[test_index]
             classifier.train(properties=properties, input_data=input_train, labels=labels_train)

@@ -1,10 +1,13 @@
 import csv
+import logging
 import os
 import pickle
 import subprocess
 import sys
 import time
+from datetime import datetime
 from os.path import join, exists
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
@@ -16,6 +19,17 @@ ml_latest_small_folder = "ml-latest-small"
 ml_latest = "ml-latest"
 metric_names = ["macro_precision", "micro_precision", "macro_recall", "micro_recall", "macro_f", "micro_f"]
 current_dir = os.getcwd()
+
+logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+logger = logging.getLogger(__name__)
+
+fileHandler = logging.FileHandler("{0}/{1}.log".format("logs", "logs_{}.txt".format(datetime.now())))
+fileHandler.setFormatter(logFormatter)
+logger.addHandler(fileHandler)
+
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logFormatter)
+logger.addHandler(consoleHandler)
 
 
 def print_progress(container, step=20, msg="\tProcessed {} elements."):
@@ -31,7 +45,7 @@ def print_progress(container, step=20, msg="\tProcessed {} elements."):
         bool: The return value. True for success, False otherwise.
     """
     if len(container) % step == 0 and container:
-        print(msg.format(len(container)))
+        logger.info(msg.format(len(container)))
 
 
 def setup_folders(properties):
@@ -60,9 +74,9 @@ def setup_folders(properties):
     output, error = process.stdout, process.stderr
     if process:
         if output:
-            print("Folders setup finished successfully!")
+            logger.info("Folders setup finished successfully!")
         if error:
-            print("Folders setup failed because: {}".format(error))
+            logger.info("Folders setup failed because: {}".format(error))
             exit(-1)
 
 
@@ -115,12 +129,12 @@ def load_properties():
         if not exists(datasets_folder):
             os.mkdir(datasets_folder)
         if not os.listdir(resources_folder) and not properties["setup_folders"] and not os.listdir(output_folder):
-            print(
+            logger.info(
                 "Resources folder is empty and setup folders property is set to false. You need to either download "
                 "manually an embeddings file or set the property to true")
             exit(-1)
         if not os.listdir(datasets_folder) and not properties["setup_folders"] and not os.listdir(output_folder):
-            print(
+            logger.info(
                 "Datasets folder is empty and setup folders property is set to false. You need to either download "
                 "manually the MovieLens educational datasets or set the property to true")
             exit(-1)
@@ -162,10 +176,10 @@ def load_glove_file(properties):
     resources_folder = join(os.getcwd(), properties["resources_folder"])
     glove_file_path = join(os.getcwd(), properties["resources_folder"], properties["embeddings_file"])
     if not exists(resources_folder):
-        print("Resources folder not found in", resources_folder)
+        logger.info("Resources folder not found in", resources_folder)
         return None
     if not exists(resources_folder):
-        print("Glove file not found in", glove_file_path)
+        logger.info("Glove file not found in", glove_file_path)
         return None
     while True:
         # decrease the maxInt value by factor 10

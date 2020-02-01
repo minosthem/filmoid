@@ -1,5 +1,6 @@
 properties/properties.yaml
-.idea
+.idea/
+logs/
 __pycache__/
 models/__pycache__/
 preprocessing/__pycache__/

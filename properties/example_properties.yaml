@@ -9,7 +9,7 @@ dataset-file-extention: ".csv"
 methods: ["content-based"]
 models:
   collaborative: ["kmeans"]
-  content-based: ["dnn"]
+  content-based: ["random", "naive", "knn", "rf", "dnn"]
 embeddings_file: "glove.6B.50d.txt"
 embeddings_zip_file: "glove.6B.zip"
 embeddings_file_url: "http://nlp.stanford.edu/data/glove.6B.zip"
@@ -23,13 +23,13 @@ rf:
   estimators: 500
   max_depth: 10
 dnn:
-  hidden_layers: [[64, "relu", 0.5], [64, "relu"], ["softmax"]] # first number is hidden units, second one is the activation function and third one is the dropout
-  sgd:
-    lr: 0.01
-    decay: 0.000001
-    momentum: 0.9
-    nesterov: True
-  loss: "categorical_crossentropy" # possible values are binary_crossentropy and categorical_crossentropy
-  metrics: ["accuracy"]
-  epochs: 10
-  batch_size: 500
+  hidden_layers: [[200, "relu", 0.5], [200, "relu", 0.5], [200, "relu", 0.5] , ["softmax"]] # first number is hidden units, second one is the activation function and third one is the dropout
+    sgd:
+      lr: 0.01
+      decay: 0.000001
+      momentum: 0.9
+      nesterov: True
+    loss: "categorical_crossentropy" # possible values are binary_crossentropy and categorical_crossentropy
+    metrics: ["accuracy"]
+    epochs: 10
+    batch_size: 500

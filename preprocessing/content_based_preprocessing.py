@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 
 import utils
 from preprocessing.data_preprocessing import DataPreprocessing
+from utils import logger
 
 
 class ContentBasedPreprocessing(DataPreprocessing):
@@ -42,18 +43,18 @@ class ContentBasedPreprocessing(DataPreprocessing):
 
         if utils.check_file_exists(output_folder, input_data_pickle_filename) and \
                 utils.check_file_exists(output_folder, ratings_pickle_filename):
-            print("Content-based input data already exist and will be loaded from pickle file")
+            logger.info("Content-based input data already exist and will be loaded from pickle file")
             self.input_data = utils.load_from_pickle(output_folder, input_data_pickle_filename)
             self.ratings = utils.load_from_pickle(output_folder, ratings_pickle_filename)
-            print("Loaded inputs of shape {}".format(self.input_data.shape))
-            print("Loaded ratings of shape {}".format(self.ratings.shape))
+            logger.info("Loaded inputs of shape {}".format(self.input_data.shape))
+            logger.info("Loaded ratings of shape {}".format(self.ratings.shape))
         else:
             os.makedirs(output_folder, exist_ok=True)
             ratings_df = datasets["ratings"]
             movies_df = datasets["movies"]
             tags_df = datasets["tags"]
             glove_df = utils.load_glove_file(properties)
-            print("Generating input vectors")
+            logger.info("Generating input vectors")
             self.input_data = []
             self.ratings = []
             for index, row in ratings_df.iterrows():
@@ -74,11 +75,11 @@ class ContentBasedPreprocessing(DataPreprocessing):
 
             self.ratings = np.asarray(self.ratings)
             self.input_data = np.concatenate(self.input_data)
-            print("Produced a feature matrix of shape {}".format(self.input_data.shape))
+            logger.info("Produced a feature matrix of shape {}".format(self.input_data.shape))
             # standardization
-            print("Standardize input vectors")
+            logger.info("Standardize input vectors")
             self.input_data = preprocessing.scale(self.input_data)
-            print("Save input vectors to file")
+            logger.info("Save input vectors to file")
             utils.write_to_pickle(obj=self.input_data, directory=output_folder, filename=input_data_pickle_filename)
             utils.write_to_pickle(obj=self.ratings, directory=output_folder, filename=ratings_pickle_filename)
 

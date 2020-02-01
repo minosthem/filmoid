@@ -4,6 +4,7 @@ import numpy as np
 
 import utils
 from preprocessing.data_preprocessing import DataPreprocessing
+from utils import logger
 
 
 class CollaborativePreprocessing(DataPreprocessing):
@@ -31,9 +32,9 @@ class CollaborativePreprocessing(DataPreprocessing):
         users_ids_pickle_filename = self.users_ids_pickle + "_{}".format(properties["dataset"])
 
         if utils.check_file_exists(output_folder, users_ratings_pickle_filename):
-            print("Collaborative input vectors already exist and will be loaded from pickle file")
+            logger.info("Collaborative input vectors already exist and will be loaded from pickle file")
             self.users_ratings = utils.load_from_pickle(output_folder, users_ratings_pickle_filename)
-            print("Loaded user ratings of shape {}".format(self.users_ratings.shape))
+            logger.info("Loaded user ratings of shape {}".format(self.users_ratings.shape))
         else:
             os.makedirs(output_folder, exist_ok=True)
             ratings_df = datasets["ratings"]
@@ -41,7 +42,7 @@ class CollaborativePreprocessing(DataPreprocessing):
             self.users_ratings = []
             self.user_ids = []
             movie_ids = movies_df["movieId"].values.tolist()
-            print("Generating input vectors")
+            logger.info("Generating input vectors")
             for _, row in ratings_df.iterrows():
                 user_id = row["userId"]
                 if user_id not in self.user_ids:
@@ -58,7 +59,7 @@ class CollaborativePreprocessing(DataPreprocessing):
                     user_vector = np.array(user_vector)
                     self.users_ratings.append(user_vector)
                 utils.print_progress(self.users_ratings)
-            print("Writing input vectors into pickle file")
+            logger.info("Writing input vectors into pickle file")
             self.users_ratings = np.array(self.users_ratings)
             self.user_ids = np.asarray(self.user_ids)
             utils.write_to_pickle(self.users_ratings, output_folder, users_ratings_pickle_filename)

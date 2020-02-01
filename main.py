@@ -3,12 +3,14 @@ import time
 import numpy as np
 
 import utils
+from utils import logger
+from models.baseline import Naive, Random
+from models.dnn_classifier import DeepNN
+from models.knn_classifier import KNN
+from models.rf_classifier import RandomForest
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
-from models.knn_classifier import KNN
-from models.rf_classifier import RandomForest
-from models.dnn_classifier import DeepNN
 
 
 def init_classifier(classifier_name):
@@ -27,6 +29,10 @@ def init_classifier(classifier_name):
         return RandomForest()
     elif classifier_name == "dnn":
         return DeepNN()
+    elif classifier_name == "naive":
+        return Naive()
+    elif classifier_name == "random":
+        return Random()
 
 
 def run_collaborative(properties, csvs):
@@ -40,7 +46,7 @@ def run_collaborative(properties, csvs):
         csvs (dict): the datasets loaded from the csv files
     """
     dp = CollaborativePreprocessing()
-    print("Creating input vectors for collaborative method")
+    logger.info("Creating input vectors for collaborative method")
     dp.preprocess(properties=properties, datasets=csvs)
     input_data = dp.users_ratings
     for model in properties["models"]["collaborative"]:
@@ -60,30 +66,31 @@ def run_content_based(properties, csvs):
         csvs (dict): the non-processed datasets
     """
     dp = ContentBasedPreprocessing()
-    print("Creating input vectors for content-based method")
+    logger.info("Creating input vectors for content-based method")
     dp.preprocess(properties, csvs)
     input_data = dp.input_data
     ratings = dp.ratings
-    print("Split train and test datasets")
+    logger.info("Split train and test datasets")
     input_train, input_test, ratings_train, ratings_test = dp.create_train_test_data(input_data, ratings)
     ratings_test = np.asarray(ratings_test)
-    print("Get k-fold indices")
+    logger.info("Get k-fold indices")
     folds = dp.create_cross_validation_data(input_train, properties)
     folds = list(folds)
     results_folder = "results_{}_{}".format(properties["dataset"], properties["classification"])
     classifiers = {}
     for model in properties["models"]["content-based"]:
+        logger.info("Starting cross-validation for model {}".format(model))
         tic = time.time()
         classifier = init_classifier(model)
         classifier.run_cross_validation(classifier, properties, input_train, ratings_train,
                                         folds, results_folder)
-        print("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
+        logger.info("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
         classifiers[model] = classifier
-    print("Calculating average for macro/micro precision, recall and F-measure")
+    logger.info("Calculating average for macro/micro precision, recall and F-measure")
     for model in properties["models"]["content-based"]:
         classifier = classifiers[model]
         classifier.get_fold_avg_result(output_folder=properties["output_folder"], results_folder=results_folder)
-        print("Best classifier with metric {} for model {}".format(properties["metric_best_model"], model))
+        logger.info("Best classifier with metric {} for model {}".format(properties["metric_best_model"], model))
         classifier.find_best_model(properties)
         true_labels, predicted_labels = classifier.test(input_test, ratings_test, kind="test")
         classifier.get_results(true_labels, predicted_labels, kind="test")
@@ -113,16 +120,16 @@ def main():
     of the micro/macro metrics.
     """
     # load properties
-    print("Loading properties")
+    logger.info("Loading properties")
     properties = utils.load_properties()
     if properties["setup_folders"]:
-        print("Set up folders is true. Glove vectors and datasets will be downloaded")
+        logger.info("Set up folders is true. Glove vectors and datasets will be downloaded")
         utils.setup_folders(properties)
     # get dataset filenames to read
-    print("Collect the dataset filenames")
+    logger.info("Collect the dataset filenames")
     file_names = utils.get_filenames(properties)
     # read datasets
-    print("Creating dataframes from the csvs in the selected dataset")
+    logger.info("Creating dataframes from the csvs in the selected dataset")
     dp = DataPreprocessing()
     dp.read_csv(file_names)
     csvs = dp.datasets
