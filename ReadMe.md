@@ -33,14 +33,14 @@ are already downloaded inside the Datasets and resources directories, set this p
 * aggregation: word embeddings aggregation strategies. Possible strategies: avg, max
 * classification: binary or multi-class classification. Possible values: binary, multi
 * cross-validation: the number of the folds for the k-fold cross-validation
-* metric_best_model: define the metric on which the classifiers from cross-validation will be evaluated and the best model
+* metric\_best\_model: define the metric on which the classifiers from cross-validation will be evaluated and the best model
 will be selected for the testset. The possible values are: "macro-precision", "micro-precision", "macro-recall", "micro-recall", "macro-f" or "micro-f"
 * knn: configuration parameters for KNN model. The only configuration parameter so far is the neighbors paramter
 * rf: configuration parameters for Random Forest model. You can configure the number of estimators and the max depth
 * dnn: Deep Neural Network configuration:
     * hidden_layers: list of tuples which should provide the number of hidden units, the activation function and the Dropout value
     * sgd: stochastic gradient descent. Configuration parameters are: lr (learning rate), decay, momentum and nesterov
-    * loss: loss function of the network. Two possible values: categorical_crossentropy or binary_crossentropy
+    * loss: loss function of the network. Two possible values: categorical\_crossentropy or binary\_crossentropy
     * metrics: network validation metrics
     * epochs: configure the number of epochs
     * batch_size: configuration parameter of the batch size
@@ -68,9 +68,9 @@ Finally, the configuration file must include both the recommendation system meth
 that the user wishes to execute as well as the respective models for each aforementioned method. The implemented models
 for each method are the ones listed below:
 
-1. Collaborative method:
-    a. kmeans
-2. Content-Based method:
-    a. K-Nearest Neighbors
-    b. Random Forest
-    c. Deep Neural Networks
+* Collaborative method:
+    * kmeans
+* Content-Based method:
+    * K-Nearest Neighbors
+    * Random Forest
+    * Deep Neural Networks
