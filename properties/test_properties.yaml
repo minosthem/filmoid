@@ -1,0 +1,35 @@
+os: "linux" # possible values: linux, windows
+setup_folders: False # boolean (True or False)
+output_folder: "output"
+datasets_folder: "Datasets"
+resources_folder: "resources"
+dataset: "small" # possible values: small, latest
+filenames: ["links", "movies", "ratings", "tags"]
+dataset-file-extention: ".csv"
+methods: ["content-based"]
+models:
+  collaborative: ["kmeans"]
+  content-based: ["dnn"]
+embeddings_file: "glove.6B.50d.txt"
+embeddings_zip_file: "glove.6B.zip"
+embeddings_file_url: "http://nlp.stanford.edu/data/glove.6B.zip"
+aggregation: "avg" # possible values: avg, max
+classification: "multi" # possible values: binary, multi ==> multi == classes 1-5
+cross-validation: 2 # k-folds for training the models
+metric_best_model: "micro_f" # Possible values: "macro-precision", "micro-precision", "macro-recall", "micro-recall", "macro-f", "micro-f"
+knn:
+  neighbors: 5 # KNN neighbors
+rf:
+  estimators: 100
+  max_depth: 10
+dnn:
+  hidden_layers: [[20, "relu", 0.5], [20, "relu"], [20, "relu"] , ["softmax"]] # first number is hidden units, second one is the activation function and third one is the dropout
+  sgd:
+    lr: 0.01
+    decay: 0.000001
+    momentum: 0.9
+    nesterov: True
+  loss: "categorical_crossentropy" # possible values are binary_crossentropy and categorical_crossentropy
+  metrics: ["accuracy"]
+  epochs: 10
+  batch_size: 2

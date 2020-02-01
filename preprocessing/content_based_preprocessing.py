@@ -195,8 +195,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
 
         Args
             input_data (ndarray): the training set to be used for k-fold cross-validation
-            properties (dict): loaded from yaml file, uses the cross-validation parameter to define the number of
-            folds
+            properties (dict): loaded from yaml file, uses the cross-validation parameter to define the number of folds
 
         Returns
             FoldGenerator: the generator of the k-fold indices

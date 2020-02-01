@@ -1,5 +1,4 @@
 properties/properties.yaml
-properties/test_properties.yaml
 .idea
 __pycache__/
 models/__pycache__/
