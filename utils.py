@@ -123,7 +123,7 @@ def load_properties():
             print(
                 "Datasets folder is empty and setup folders property is set to false. You need to either download "
                 "manually the MovieLens educational datasets or set the property to true")
-    exit(-1)
+            exit(-1)
     return properties
 
 
@@ -240,4 +240,4 @@ def visualize(df, output_folder, results_folder, folder_name, filename):
     df.pivot("classifier", "metric", "result").plot(kind='bar')
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(join(output_folder, results_folder, folder_name, filename))
-    plt.show()
+    # plt.show()

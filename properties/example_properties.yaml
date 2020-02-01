@@ -16,7 +16,7 @@ embeddings_file_url: "http://nlp.stanford.edu/data/glove.6B.zip"
 aggregation: "avg" # possible values: avg, max
 classification: "binary" # possible values: binary, multi ==> multi == classes 1-5
 cross-validation: 10 # k-folds for training the models
-metric_best_model: "micro-f" # Possible values: "macro-precision", "micro-precision", "macro-recall", "micro-recall", "macro-f", "micro-f"
+metric_best_model: "micro_f" # Possible values: "macro-precision", "micro-precision", "macro-recall", "micro-recall", "macro-f", "micro-f"
 knn:
   neighbors: 20 # KNN neighbors
 rf:

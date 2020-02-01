@@ -2,6 +2,7 @@ import os
 import unittest
 from os.path import join
 from random import randint
+import yaml
 
 import numpy as np
 import pandas as pd
@@ -12,6 +13,12 @@ from preprocessing.data_preprocessing import DataPreprocessing
 from models.knn_classifier import KNN
 from models.rf_classifier import RandomForest
 from models.dnn_classifier import DeepNN
+
+
+def load_test_properties():
+    test_properties_path = join(os.getcwd(), "properties", "test_properties.yaml")
+    with open(test_properties_path, "r") as f:
+        return yaml.safe_load(f)
 
 
 class TestUtilMethods(unittest.TestCase):
@@ -230,10 +237,20 @@ class TestDataPreProcessing(unittest.TestCase):
 
 
 class TestClassifiers(unittest.TestCase):
-    properties = {"knn": {"neighbors": 5}, "rf": {"estimators": 100, "max_depth": 10}, "cross-validation": 2,
-                  "metric_best_model": "micro_f"}
+    properties = load_test_properties()
 
     def run_classifier(self, classifier):
+        """
+        Creates dummy data for testing. Then, it creates the data for the content-based models, creates train and test
+        datasets and performs cross-validation.
+
+        Args
+            classifier(ContentBasedClassifier): the model to run cross-validation
+
+        Returns
+            list, ndarray, ndarray: list of tuples with the true and predicted values, the input data, true labels
+
+        """
         input_data, labels = np.arange(1000).reshape((100, 10)), [randint(1, 5) for _ in range(100)]
         dp = ContentBasedPreprocessing()
         input_train, input_test, labels_training, labels_testing = dp.create_train_test_data(input_data=input_data,
@@ -252,6 +269,18 @@ class TestClassifiers(unittest.TestCase):
         return preds, input_test, labels_testing
 
     def test_knn_flow(self):
+        """
+        KNN classification testing
+
+        Examined test cases:
+
+        1. Number of folds
+        2. Number of metrics for the average of the folds
+        3. If best model exists
+        4. Number of metrics for test results
+        5. If the classifier's name is correct
+
+        """
         classifier = KNN()
         preds, input_test, labels_testing = self.run_classifier(classifier)
         for idx, pred in enumerate(preds):
@@ -261,7 +290,7 @@ class TestClassifiers(unittest.TestCase):
         classifier.get_fold_avg_result(output_folder="output", results_folder="testing")
         self.assertEqual(6, len(classifier.avg_metrics.keys()))
         classifier.find_best_model(self.properties)
-        self.assertTrue(classifier.best_model)
+        self.assertTrue(classifier.best_model is not None)
         true_labels, predicted_labels = classifier.test(input_test, labels_testing, kind="test")
         classifier.get_results(true_labels, predicted_labels, kind="test")
         self.assertEqual(6, len(classifier.test_metrics.keys()))
@@ -269,7 +298,59 @@ class TestClassifiers(unittest.TestCase):
         self.assertEqual("knn", classifier.model_name)
 
     def test_rf_flow(self):
-        pass
+        """
+        Random Forest classification testing
+
+        Examined test cases:
+
+        1. Number of folds
+        2. Number of metrics for the average of the folds
+        3. If best model exists
+        4. Number of metrics for test results
+        5. If the classifier's name is correct
+
+        """
+        classifier = RandomForest()
+        preds, input_test, labels_testing = self.run_classifier(classifier)
+        for idx, pred in enumerate(preds):
+            classifier.get_results(pred[0], pred[1])
+            classifier.write_fold_results_to_file("output", "testing", idx)
+        self.assertEqual(self.properties["cross-validation"], len(classifier.fold_metrics))
+        classifier.get_fold_avg_result(output_folder="output", results_folder="testing")
+        self.assertEqual(6, len(classifier.avg_metrics.keys()))
+        classifier.find_best_model(self.properties)
+        self.assertTrue(classifier.best_model is not None)
+        true_labels, predicted_labels = classifier.test(input_test, labels_testing, kind="test")
+        classifier.get_results(true_labels, predicted_labels, kind="test")
+        self.assertEqual(6, len(classifier.test_metrics.keys()))
+        classifier.write_test_results_to_file("output", "testing")
+        self.assertEqual("rf", classifier.model_name)
 
     def test_dnn_flow(self):
-        pass
+        """
+        Random Forest classification testing
+
+        Examined test cases:
+
+        1. Number of folds
+        2. Number of metrics for the average of the folds
+        3. If best model exists
+        4. Number of metrics for test results
+        5. If the classifier's name is correct
+
+        """
+        classifier = DeepNN()
+        preds, input_test, labels_testing = self.run_classifier(classifier)
+        for idx, pred in enumerate(preds):
+            classifier.get_results(pred[0], pred[1])
+            classifier.write_fold_results_to_file("output", "testing", idx)
+        self.assertEqual(self.properties["cross-validation"], len(classifier.fold_metrics))
+        classifier.get_fold_avg_result(output_folder="output", results_folder="testing")
+        self.assertEqual(6, len(classifier.avg_metrics.keys()))
+        classifier.find_best_model(self.properties)
+        self.assertTrue(classifier.best_model is not None)
+        true_labels, predicted_labels = classifier.test(input_test, labels_testing, kind="test")
+        classifier.get_results(true_labels, predicted_labels, kind="test")
+        self.assertEqual(6, len(classifier.test_metrics.keys()))
+        classifier.write_test_results_to_file("output", "testing")
+        self.assertEqual("dnn", classifier.model_name)

@@ -9,6 +9,13 @@ class KNN(ContentBasedClassifier):
     train and test using the KNN model.
     """
 
+    models = []
+    fold_metrics = []
+    avg_metrics = {}
+    test_metrics = {}
+    best_model = None
+    model_name = ""
+
     def __init__(self):
         self.model_name = "knn"
 

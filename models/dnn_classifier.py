@@ -16,6 +16,13 @@ class DeepNN(ContentBasedClassifier):
     Class representing a Deep Neural Network.
     """
 
+    models = []
+    fold_metrics = []
+    avg_metrics = {}
+    test_metrics = {}
+    best_model = None
+    model_name = ""
+
     def __init__(self):
         self.model_name = "dnn"
 
