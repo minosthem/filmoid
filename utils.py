@@ -23,6 +23,7 @@ current_dir = os.getcwd()
 logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
 logger = logging.getLogger(__name__)
 
+logger.setLevel(logging.INFO)
 fileHandler = logging.FileHandler("{0}/{1}.log".format("logs", "logs_{}.txt".format(datetime.now())))
 fileHandler.setFormatter(logFormatter)
 logger.addHandler(fileHandler)
