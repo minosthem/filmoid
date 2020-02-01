@@ -144,6 +144,7 @@ class ContentBasedClassifier(Classifier):
         """
         Uses a metric configured by the user to evaluate the best model among the folds.
         The best model is stored in the class field best_model to be later used for testing.
+
         Args
             properties (dict): properties loaded from the yaml file, uses metric_best_model
         """

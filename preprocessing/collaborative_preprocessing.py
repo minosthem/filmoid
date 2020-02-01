@@ -24,6 +24,7 @@ class CollaborativePreprocessing(DataPreprocessing):
         Args
             properties (dict): dictionary with the loaded properties from the yaml file
            datasets (dict): the datasets' dictionary which was created from the read_csv function
+
         """
         output_folder = properties["output_folder"]
         users_ratings_pickle_filename = self.users_ratings_pickle + "_{}".format(properties["dataset"])
