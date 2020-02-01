@@ -18,13 +18,15 @@ properties_file = join(properties_folder, "properties.yaml")
 ml_latest_small_folder = "ml-latest-small"
 ml_latest = "ml-latest"
 metric_names = ["macro_precision", "micro_precision", "macro_recall", "micro_recall", "macro_f", "micro_f"]
+captions = ["macro-prec", "micro-prec", "macro-recall", "micro-recall", "macro-f", "micro-f"]
 current_dir = os.getcwd()
+LOG_FILENAME = 'logs_%s.txt' % datetime.now().strftime('%m%d-%H%M%S')
 
 logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
 logger = logging.getLogger(__name__)
 
 logger.setLevel(logging.INFO)
-fileHandler = logging.FileHandler("{0}/{1}.log".format("logs", "logs_{}.txt".format(datetime.now())))
+fileHandler = logging.FileHandler("{0}/{1}.log".format("logs", LOG_FILENAME))
 fileHandler.setFormatter(logFormatter)
 logger.addHandler(fileHandler)
 
@@ -252,7 +254,9 @@ def visualize(df, output_folder, results_folder, folder_name, filename):
         folder_name (str): the fold name or avg or test folder
         filename (str): the name of the figure
     """
-    df.pivot("classifier", "metric", "result").plot(kind='bar')
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    df.pivot("classifier", "metric", "result").plot(kind='bar', width=0.3)
+    # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.xticks(rotation="horizontal")
+    plt.legend(captions)
     plt.savefig(join(output_folder, results_folder, folder_name, filename))
     # plt.show()
