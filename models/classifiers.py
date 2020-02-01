@@ -73,7 +73,7 @@ class ContentBasedClassifier(Classifier):
             results_folder (str): the name of the folder where the results of the current execution will be stored
             fold_num (int): the number of the current fold
         """
-        results_folder_path = join(output_folder, results_folder)
+        results_folder_path = join(utils.current_dir, output_folder, results_folder)
         if not exists(results_folder_path):
             mkdir(results_folder_path)
         fold_path = join(results_folder_path, "fold_{}".format(fold_num))
@@ -128,7 +128,8 @@ class ContentBasedClassifier(Classifier):
             self.avg_metrics[metric_name] = sum(metric_list) / len(metric_list)
         results_folder_path = join(output_folder, results_folder)
         avg_folder = join(results_folder_path, "fold_avg")
-        mkdir(avg_folder)
+        if not exists(avg_folder):
+            mkdir(avg_folder)
         csv_path = join(avg_folder, "Results_avg.csv")
         df = pd.DataFrame(columns=["classifier", "metric", "result_kind", "result"])
         row = 0
@@ -140,6 +141,12 @@ class ContentBasedClassifier(Classifier):
                         "Plot_avg_{}.png".format(self.model_name))
 
     def find_best_model(self, properties):
+        """
+        Uses a metric configured by the user to evaluate the best model among the folds.
+        The best model is stored in the class field best_model to be later used for testing.
+        Args
+            properties (dict): properties loaded from the yaml file, uses metric_best_model
+        """
         metric_to_compare = properties["metric_best_model"]
         metrics_to_keep = []
         for fold_metric in self.fold_metrics:

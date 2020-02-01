@@ -8,13 +8,17 @@ class RandomForest(ContentBasedClassifier):
     Class to represent RandomForest model, extending the Classifier class
     """
 
+    def __init__(self):
+        self.model_name = "rf"
+
     def train(self, properties, input_data, labels):
         """
-        Train method for Random Forest classifier
+        Train method for Random Forest classifier. The model is created, trained and stored in a list in a class field.
 
-        :param input_data: the training dataset
-        :param labels: the training labels
-        :param properties: properties from yaml
+        Args
+            properties (dict): loaded from yaml file, uses the estimators and max_depth for RandomForest
+            input_data (ndarray): the training set
+            labels (ndarray): the labels of the training data
         """
         estimators = properties["rf"]["estimators"]
         max_depth = properties["rf"]["max_depth"]

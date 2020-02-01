@@ -92,11 +92,14 @@ class ContentBasedPreprocessing(DataPreprocessing):
         properties yaml file, it creates a single vector containing the average or the maximum number of every position
         of all the word embeddings vectors.
 
-        :param properties: aggregation strategy (avg or max)
-        :param glove_df: embedding file
-        :param word_list: movie text or word list
-        :return: a vector for every movie text which contains the movie title and genre and also the tags of a user for
-        a specific movie
+        Args
+            properties (dict): loaded properties from yaml, uses the aggregation strategy (avg or max)
+            glove_df (DataFrame): the file with the Glove embeddings
+            word_list (list): movie text split into its words as list
+
+        Returns
+            ndarray: a vector for every movie text which contains the movie title and genre and also the tags of a user
+            for a specific movie
         """
         embeddings = []
         for word in word_list:
@@ -126,11 +129,14 @@ class ContentBasedPreprocessing(DataPreprocessing):
         well as the. Finally, it adds the tags of the user for this movie to the string and gets rid of every symbol
         and number of that text.
 
-        :param movies_df: movies dataset
-        :param tags_df: tags dataset
-        :param movie_id: id of a movie
-        :param user_id: id of a user
-        :return: the processed text containing the title and genre of a movie and the tags of a user for this movie
+        Args
+            movies_df (DataFrame): movies dataset
+            tags_df (DataFrame): tags dataset
+            movie_id (int): id of a movie
+            user_id (int): id of a user
+
+        Returns
+            list: the preprocessed text containing the title, genre and tags for the movie split into words
         """
         m = movies_df[movies_df["movieId"] == movie_id]
         tags = tags_df[(tags_df["userId"] == user_id) & (tags_df["movieId"] == movie_id)]
@@ -154,9 +160,12 @@ class ContentBasedPreprocessing(DataPreprocessing):
         Converts a rating to a binary score o and 1 if the classification policy is binary else it keeps the rating and
         rounds it (uses the ratings as Integer numbers).
 
-        :param properties: classification
-        :param rating: rating of user for a movie
-        :return: a binary rating
+        Args
+            properties (dict): loaded from yaml file, uses the classification parameter
+            rating (float): the rating of a user for a specific movie
+
+        Returns
+            int: 0 or 1 for binary classification, 1-5 numbers for multi-class classification
         """
         if properties["classification"] == "binary":
             return 0 if rating > 3 else 1
@@ -168,9 +177,12 @@ class ContentBasedPreprocessing(DataPreprocessing):
         It splits the input data and the labels into a train dataset with the corresponding labels and a test dataset
         with the corresponding labels.
 
-        :param input_data: input data, a list of vectors
-        :param labels: a list of ratings (numbers)
-        :return: the two datasets with the corresponding true labels
+        Args
+            input_data (ndarray): the input vectors of the ratings dataset
+            labels (ndarray): the labels of the input_data
+
+        Returns
+            ndarray: the train and test dataset and labels
         """
         input_train, input_test, labels_train, labels_test = train_test_split(input_data, labels,
                                                                               test_size=0.2,
@@ -181,9 +193,13 @@ class ContentBasedPreprocessing(DataPreprocessing):
         """
         Takes the input data and creates k folds depending on the number of folds mentioned in the properties file.
 
-        :param input_data: train dataset
-        :param properties: cross-validation, number of folds
-        :return: a list of k tuples containing train and test indices
+        Args
+            input_data (ndarray): the training set to be used for k-fold cross-validation
+            properties (dict): loaded from yaml file, uses the cross-validation parameter to define the number of
+            folds
+
+        Returns
+            FoldGenerator: the generator of the k-fold indices
         """
         kf = KFold(n_splits=properties["cross-validation"], shuffle=True, random_state=666)
         return kf.split(input_data)

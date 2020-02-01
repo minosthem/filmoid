@@ -21,8 +21,9 @@ class CollaborativePreprocessing(DataPreprocessing):
         zero to the corresponding position of the vector. After finishing this process for every user, it returns the
         vectors of the users as a list called user_ratings and writes it to the output folder as a pickle file.
 
-        :param properties: dictionary with the loaded properties from the yaml file
-        :param datasets: the datasets' dictionary which was created from the read_csv function
+        Args
+            properties (dict): dictionary with the loaded properties from the yaml file
+           datasets (dict): the datasets' dictionary which was created from the read_csv function
         """
         output_folder = properties["output_folder"]
         users_ratings_pickle_filename = self.users_ratings_pickle + "_{}".format(properties["dataset"])

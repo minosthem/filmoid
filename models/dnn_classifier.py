@@ -16,6 +16,9 @@ class DeepNN(ContentBasedClassifier):
     Class representing a Deep Neural Network.
     """
 
+    def __init__(self):
+        self.model_name = "dnn"
+
     def train(self, properties, input_data, labels):
         """
         Takes as input the vectors created from word2vec and feed them to the neural network to train it.

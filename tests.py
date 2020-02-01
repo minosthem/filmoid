@@ -1,6 +1,7 @@
 import os
 import unittest
 from os.path import join
+from random import randint
 
 import numpy as np
 import pandas as pd
@@ -8,6 +9,9 @@ import pandas as pd
 import utils
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
+from models.knn_classifier import KNN
+from models.rf_classifier import RandomForest
+from models.dnn_classifier import DeepNN
 
 
 class TestUtilMethods(unittest.TestCase):
@@ -223,3 +227,49 @@ class TestDataPreProcessing(unittest.TestCase):
         expected_rating = 4
         new_rating = data_preprocessing._preprocess_rating(properties, rating)
         self.assertEqual(new_rating, expected_rating)
+
+
+class TestClassifiers(unittest.TestCase):
+    properties = {"knn": {"neighbors": 5}, "rf": {"estimators": 100, "max_depth": 10}, "cross-validation": 2,
+                  "metric_best_model": "micro_f"}
+
+    def run_classifier(self, classifier):
+        input_data, labels = np.arange(1000).reshape((100, 10)), [randint(1, 5) for _ in range(100)]
+        dp = ContentBasedPreprocessing()
+        input_train, input_test, labels_training, labels_testing = dp.create_train_test_data(input_data=input_data,
+                                                                                             labels=labels)
+        labels_training = np.asarray(labels_training)
+        folds = dp.create_cross_validation_data(input_data=input_train, properties=self.properties)
+        fold_idx = list(folds)
+        preds = []
+        for idx, (train_idx, test_idx) in enumerate(fold_idx):
+            print("Running fold #{}/{}".format(idx + 1, len(fold_idx)))
+            input_training, input_testing = input_train[train_idx], input_train[test_idx]
+            labels_train, labels_test = labels_training[train_idx], labels_training[test_idx]
+            classifier.train(self.properties, input_training, labels_train)
+            true_labels, predicted_labels = classifier.test(input_testing, labels_test)
+            preds.append((true_labels, predicted_labels))
+        return preds, input_test, labels_testing
+
+    def test_knn_flow(self):
+        classifier = KNN()
+        preds, input_test, labels_testing = self.run_classifier(classifier)
+        for idx, pred in enumerate(preds):
+            classifier.get_results(pred[0], pred[1])
+            classifier.write_fold_results_to_file("output", "testing", idx)
+        self.assertEqual(self.properties["cross-validation"], len(classifier.fold_metrics))
+        classifier.get_fold_avg_result(output_folder="output", results_folder="testing")
+        self.assertEqual(6, len(classifier.avg_metrics.keys()))
+        classifier.find_best_model(self.properties)
+        self.assertTrue(classifier.best_model)
+        true_labels, predicted_labels = classifier.test(input_test, labels_testing, kind="test")
+        classifier.get_results(true_labels, predicted_labels, kind="test")
+        self.assertEqual(6, len(classifier.test_metrics.keys()))
+        classifier.write_test_results_to_file("output", "testing")
+        self.assertEqual("knn", classifier.model_name)
+
+    def test_rf_flow(self):
+        pass
+
+    def test_dnn_flow(self):
+        pass

@@ -9,12 +9,19 @@ class KNN(ContentBasedClassifier):
     train and test using the KNN model.
     """
 
+    def __init__(self):
+        self.model_name = "knn"
+
     def train(self, properties, input_data, labels):
         """
-        Train method for KNN classifier
-        :param input_data: the training dataset
-        :param labels: the training labels
-        :param properties: properties from yaml
+        Train method for KNN classifier. Creates a new KNN model and stores it in a list. The model is trained
+        using the input_data and labels.
+
+        Args
+            properties (dict): loaded from yaml file. Uses the property knn-neighbors to define the number of neighbors
+            for the model.
+            input_data (ndarray): the training set
+            labels (ndarray): the labels of the training data
         """
         knn = KNeighborsClassifier(n_neighbors=properties["knn"]["neighbors"])
         self.models.append(knn)

@@ -21,16 +21,12 @@ def init_classifier(classifier_name):
     Returns
         Classifier: a classifier object
     """
-    classifier = None
     if classifier_name == "knn":
-        classifier = KNN()
+        return KNN()
     elif classifier_name == "rf":
-        classifier = RandomForest()
+        return RandomForest()
     elif classifier_name == "dnn":
-        classifier = DeepNN()
-    if classifier:
-        classifier.model_name = classifier_name
-    return classifier
+        return DeepNN()
 
 
 def run_collaborative(properties, csvs):

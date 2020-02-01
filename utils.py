@@ -9,14 +9,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
 
-
-
 properties_folder = join(os.getcwd(), "properties")
 example_properties_file = join(properties_folder, "example_properties.yaml")
 properties_file = join(properties_folder, "properties.yaml")
 ml_latest_small_folder = "ml-latest-small"
 ml_latest = "ml-latest"
-metric_names = ["macro-precision", "micro-precision", "macro-recall", "micro-recall", "macro-f", "micro-f"]
+metric_names = ["macro_precision", "micro_precision", "macro_recall", "micro_recall", "macro_f", "micro_f"]
+current_dir = os.getcwd()
 
 
 def print_progress(container, step=20, msg="\tProcessed {} elements."):
@@ -210,10 +209,18 @@ def load_from_pickle(directory, file):
         return pickle.load(f)
 
 
-
-
-
 def visualize(df, output_folder, results_folder, folder_name, filename):
+    """
+    Method to visualize the results of a classifier for a specific fold, avg folds or test
+    Saves the plot into the specified folder and filename.
+
+    Args
+        df (DataFrame): a pandas DataFrame with the results of the model
+        output_folder (str): the name of the output folder
+        results_folder (str): the name of the folder of the current execution
+        folder_name (str): the fold name or avg or test folder
+        filename (str): the name of the figure
+    """
     df.pivot("classifier", "metric", "result").plot(kind='bar')
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.savefig(join(output_folder, results_folder, folder_name, filename))

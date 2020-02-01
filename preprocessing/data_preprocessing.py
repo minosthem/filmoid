@@ -11,8 +11,10 @@ class DataPreprocessing:
 
     def read_csv(self, filenames):
         """
-        Reads every dataset from the files dictionary.
-        :param filenames: files dictionary
+        Reads every dataset from the files dictionary.Stores the datasets into a class field (dictionary).
+
+        Args
+            filenames (dict): the path to the dataset csv files
         """
         for name, file in filenames.items():
             self.datasets[name] = pd.read_csv(file)
