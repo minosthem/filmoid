@@ -50,9 +50,12 @@ def setup_folders(properties):
     os.environ["EMBEDDINGS_FILE_URL"] = properties["embeddings_file_url"]
     process = None
     if properties["os"] == "linux":
-        process = subprocess.Popen("bash setup.sh", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        file_path = join(os.getcwd(), "setup", "setup.sh")
+        process = subprocess.Popen("bash {}".format(file_path), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                   shell=True)
     elif properties["os"] == "windows":
-        process = subprocess.Popen("./setup.bat", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        file_path = join(os.getcwd(), "setup", "setup.bat")
+        process = subprocess.Popen(file_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     process.wait()
     output, error = process.stdout, process.stderr
     if process:
@@ -84,23 +87,14 @@ def elapsed_str(previous_tic, up_to=None):
 
 def load_properties():
     """
-    Load yaml file containing program's properties.
-    
-    - os: define your operating system. The possible values that are currently handled by the software are linux and windows
-    - setup_folders: define whether you want to download the input data (glove file and datasets). If the files are already downloaded inside the Datasets and resources directories, set this parameter as False.
-    - output_folder: the name of the output folder where the saved models will be stored as well as the results
-    - datasets_folder: the name of the datasets directory
-    - resources_folder: the name of the directory where the word embeddings file will be stored
-    - embeddings_file: the name of the word embeddings file to be used(e.g. "glove.6B.50d.txt")
-    - embeddings_zip_file: the zip file name to extract when downloaded (e.g. "glove.6B.zip")
-    - embeddings_file_url: the URL from where to download the word embeddings file (e.g. "http://nlp.stanford.edu/data/glove.6B.zip")
-    - dataset: the dataset to be used in the experiments. Currently the possible values are small and latest
-    - filenames: the csv names which you should provide as follows: ["links", "movies", "ratings", "tags"]
-    - dataset-file-extention: the file extension of the dataset files. You should provide it: ".csv"
-    - methods: the recommendation policies which are: ["collaborative", "content-based"]
-    - models: the classifiers to be used. Choose some or all of the following: ["kmeans", "knn", "rf", "dnn"]
-    - aggregation: word embeddings aggregation strategies. Possible strategies: avg, max
-    - classification: binary or multi-class classification. Possible values: binary, multi
+    Load yaml file containing program's properties. Creates the output, resources and datasets folders if they  do not
+    exist. Check if the resources and datasets folders contain files/folders, otherwise checks if the setup folder
+    property is set to false and the output directory is empty.
+    If all conditions are true the program prints a warning and stops, because datasets and embeddings are missing (both
+    as files or pickle stored objects).
+
+    Check the ReadMe.md file of the directory for a complete list of the possible configuration properties and their
+    values.
 
     Returns:
         dict: the properties dictionary
@@ -108,6 +102,28 @@ def load_properties():
     file = properties_file if exists(properties_file) else example_properties_file
     with open(file, 'r') as f:
         properties = yaml.safe_load(f)
+        output_folder = join(os.getcwd(), properties["output_folder"]) if properties["output_folder"] else \
+            join(os.getcwd(), "output")
+        resources_folder = join(os.getcwd(), properties["resources_folder"]) if properties["resources_folder"] else \
+            join(os.getcwd(), "resources")
+        datasets_folder = join(os.getcwd(), properties["datasets_folder"]) if properties["datasets_folder"] else \
+            join(os.getcwd(), "Datasets")
+        if not exists(output_folder):
+            os.mkdir(output_folder)
+        if not exists(resources_folder):
+            os.mkdir(resources_folder)
+        if not exists(datasets_folder):
+            os.mkdir(datasets_folder)
+        if not os.listdir(resources_folder) and not properties["setup_folders"] and not os.listdir(output_folder):
+            print(
+                "Resources folder is empty and setup folders property is set to false. You need to either download "
+                "manually an embeddings file or set the property to true")
+            exit(-1)
+        if not os.listdir(datasets_folder) and not properties["setup_folders"] and not os.listdir(output_folder):
+            print(
+                "Datasets folder is empty and setup folders property is set to false. You need to either download "
+                "manually the MovieLens educational datasets or set the property to true")
+    exit(-1)
     return properties
 
 

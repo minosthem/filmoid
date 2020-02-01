@@ -1,5 +1,9 @@
 @ECHO OFF
 
+:: go to parent directory
+cd ..
+
+:: create necessary folders
 mkdir "%OUTPUT_FOLDER%"
 mkdir "%RESOURCES_FOLDER%"
 mkdir "%DATASETS_FOLDER%"
