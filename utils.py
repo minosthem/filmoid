@@ -20,19 +20,28 @@ ml_latest = "ml-latest"
 metric_names = ["macro_precision", "micro_precision", "macro_recall", "micro_recall", "macro_f", "micro_f"]
 captions = ["macro-prec", "micro-prec", "macro-recall", "micro-recall", "macro-f", "micro-f"]
 current_dir = os.getcwd()
-LOG_FILENAME = 'logs_%s.txt' % datetime.now().strftime('%m%d-%H%M%S')
 
-logFormatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-logger = logging.getLogger(__name__)
 
-logger.setLevel(logging.INFO)
-fileHandler = logging.FileHandler("{0}/{1}.log".format("logs", LOG_FILENAME))
-fileHandler.setFormatter(logFormatter)
-logger.addHandler(fileHandler)
+def config_logger():
+    if not exists(join(current_dir, "logs")):
+        os.mkdir(join(current_dir, "logs"))
+    log_filename = 'logs_%s' % datetime.now().strftime('%Y%m%d-%H%M%S')
 
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(logFormatter)
-logger.addHandler(consoleHandler)
+    log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
+    logger = logging.getLogger(__name__)
+
+    logger.setLevel(logging.INFO)
+    file_handler = logging.FileHandler("{0}/{1}.log".format("logs", log_filename))
+    file_handler.setFormatter(log_formatter)
+    logger.addHandler(file_handler)
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(log_formatter)
+    logger.addHandler(console_handler)
+    return logger
+
+
+logger = config_logger()
 
 
 def print_progress(container, step=20, msg="\tProcessed {} elements."):
