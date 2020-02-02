@@ -3,6 +3,9 @@ import numpy as np
 
 
 class Naive(ContentBasedClassifier):
+    """
+    Class representing a naive probabilistic model
+    """
     models = []
     fold_metrics = []
     avg_metrics = {}
@@ -46,6 +49,9 @@ class Naive(ContentBasedClassifier):
 
 
 class Random(ContentBasedClassifier):
+    """
+    Class that represents a random classifier.
+    """
     models = []
     fold_metrics = []
     avg_metrics = {}
