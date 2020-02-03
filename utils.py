@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime
-from os.path import join, exists, abspath
+from os.path import join, exists
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -303,7 +303,3 @@ def generate_recommendation_dataset():
     path_to_dataset = join(os.getcwd(), properties["datasets_folder"], dataset_folder)
     file_path = join(path_to_dataset, "test_recommendation.csv")
     test_df.to_csv(file_path, sep=",")
-
-
-if __name__ == '__main__':
-    generate_recommendation_dataset()
