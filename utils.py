@@ -6,11 +6,13 @@ import subprocess
 import sys
 import time
 from datetime import datetime
-from os.path import join, exists
+from os.path import join, exists, abspath
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
+
+from preprocessing.data_preprocessing import DataPreprocessing
 
 properties_folder = join(os.getcwd(), "properties")
 example_properties_file = join(properties_folder, "example_properties.yaml")
@@ -269,3 +271,39 @@ def visualize(df, output_folder, results_folder, folder_name, filename):
     plt.legend(captions)
     plt.savefig(join(output_folder, results_folder, folder_name, filename))
     # plt.show()
+
+
+def generate_recommendation_dataset():
+    properties = load_properties()
+    file_names = get_filenames(properties)
+    # read datasets
+    logger.info("Creating dataset for recommendation")
+    dp = DataPreprocessing()
+    dp.read_csv(file_names)
+    csvs = dp.datasets
+    ratings = csvs["ratings"]
+    movies = csvs["movies"]
+    user_ids = []
+    test_df = pd.DataFrame(columns=["userId", "movieId", "rating", "timestamp"])
+    count = 0
+    for _, row in ratings.iterrows():
+        user_id = row["userId"]
+        if user_id in user_ids:
+            continue
+        logger.info("Checking for user with id {}".format(row["userId"]))
+        user_ratings = ratings[ratings["userId"] == user_id]
+        movie_ids = movies["movieId"]
+        for movie_id in movie_ids:
+            if movie_id not in user_ratings["movieId"].values.tolist():
+                logger.info("Adding line number {}".format(count))
+                logger.info("Adding row with user id {} and movie id {}".format(user_id, movie_id))
+                test_df.loc[count] = [user_id, movie_id, None, datetime.now()]
+                count += 1
+    dataset_folder = ml_latest if properties["dataset"] == "latest" else ml_latest_small_folder
+    path_to_dataset = join(os.getcwd(), properties["datasets_folder"], dataset_folder)
+    file_path = join(path_to_dataset, "test_recommendation.csv")
+    test_df.to_csv(file_path, sep=",")
+
+
+if __name__ == '__main__':
+    generate_recommendation_dataset()
