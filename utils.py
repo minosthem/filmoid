@@ -274,6 +274,10 @@ def visualize(df, output_folder, results_folder, folder_name, filename):
 
 
 def generate_recommendation_dataset():
+    """
+    It creates a dataset with the movies that the users have not rated and saves it in a csv file in the dataset folder.
+
+    """
     properties = load_properties()
     file_names = get_filenames(properties)
     # read datasets
