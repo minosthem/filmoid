@@ -65,6 +65,7 @@ class CollaborativePreprocessing(DataPreprocessing):
             logger.info("Writing input vectors into pickle file")
             self.users_ratings = np.array(self.users_ratings)
             self.user_ids = np.asarray(self.user_ids)
+            self.movie_ids = np.asarray(self.movie_ids)
             utils.write_to_pickle(self.users_ratings, output_folder, users_ratings_pickle_filename)
             utils.write_to_pickle(self.user_ids, output_folder, users_ids_pickle_filename)
             utils.write_to_pickle(self.movie_ids, output_folder, movie_ids_pickle_filename)
