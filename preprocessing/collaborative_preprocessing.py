@@ -10,10 +10,12 @@ from utils import logger
 class CollaborativePreprocessing(DataPreprocessing):
     users_ratings_pickle = "users_ratings.pickle"
     users_ids_pickle = "user_ids.pickle"
+    movie_ids_pickle = "movie_ids.pickle"
     users_ratings = None
     user_ids = None
+    movie_ids = None
 
-    def preprocess(self, properties, datasets):
+    def preprocess(self, properties, datasets, kind="train"):
         """
         Initially, checks if the ratings list exists in the output folder and if this is the case it loads it.
         Otherwise, it takes from the ratings dataset the ratings of the users, the name of the movies from the movies
@@ -30,6 +32,7 @@ class CollaborativePreprocessing(DataPreprocessing):
         output_folder = properties["output_folder"]
         users_ratings_pickle_filename = self.users_ratings_pickle + "_{}".format(properties["dataset"])
         users_ids_pickle_filename = self.users_ids_pickle + "_{}".format(properties["dataset"])
+        movie_ids_pickle_filename = self.movie_ids_pickle + "_{}".format(properties["dataset"])
 
         if utils.check_file_exists(output_folder, users_ratings_pickle_filename):
             logger.info("Collaborative input vectors already exist and will be loaded from pickle file")
@@ -41,7 +44,7 @@ class CollaborativePreprocessing(DataPreprocessing):
             movies_df = datasets["movies"]
             self.users_ratings = []
             self.user_ids = []
-            movie_ids = movies_df["movieId"].values.tolist()
+            self.movie_ids = movies_df["movieId"].values.tolist()
             logger.info("Generating input vectors")
             for _, row in ratings_df.iterrows():
                 user_id = row["userId"]
@@ -49,7 +52,7 @@ class CollaborativePreprocessing(DataPreprocessing):
                     self.user_ids.append(user_id)
                     user_ratings = ratings_df[ratings_df["userId"] == user_id]
                     user_vector = []
-                    for movie_id in movie_ids:
+                    for movie_id in self.movie_ids:
                         rating_row = user_ratings[user_ratings["movieId"] == movie_id]
                         if not rating_row.empty:
                             rating_row = rating_row["rating"].values.tolist()
@@ -64,3 +67,4 @@ class CollaborativePreprocessing(DataPreprocessing):
             self.user_ids = np.asarray(self.user_ids)
             utils.write_to_pickle(self.users_ratings, output_folder, users_ratings_pickle_filename)
             utils.write_to_pickle(self.user_ids, output_folder, users_ids_pickle_filename)
+            utils.write_to_pickle(self.movie_ids, output_folder, movie_ids_pickle_filename)
