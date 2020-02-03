@@ -19,7 +19,7 @@ class DataPreprocessing:
         for name, file in filenames.items():
             self.datasets[name] = pd.read_csv(file)
 
-    def preprocess(self, properties, datasets):
+    def preprocess(self, properties, datasets, kind="train"):
         pass
 
     def create_train_test_data(self, input_data, labels):

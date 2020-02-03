@@ -21,7 +21,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
     input_data = None
     ratings = None
 
-    def preprocess(self, properties, datasets):
+    def preprocess(self, properties, datasets, kind="train"):
         """
             Checks if the input and the rating file exist and loads them from the output folder. Otherwise, takes the
             rating, movies and tags datasets and converts them to dataframes and also loads the glove file. It iterates
@@ -34,6 +34,8 @@ class ContentBasedPreprocessing(DataPreprocessing):
             Args:
                 properties(dict): properties loaded from yaml file. Used so as to get the output folder
                 datasets (dict): contains the dataframes of all the movielens csvs
+                kind (str): if set to train the ratings.csv is used for input vectors otherwise the generated
+                test_recommendation.csv is used
         """
         output_folder = properties["output_folder"]
         input_data_pickle_filename = self.input_data_pickle + "_{}_{}".format(properties["dataset"],
@@ -50,7 +52,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
             logger.info("Loaded ratings of shape {}".format(self.ratings.shape))
         else:
             os.makedirs(output_folder, exist_ok=True)
-            ratings_df = datasets["ratings"]
+            ratings_df = datasets["ratings"] if kind == "train" else datasets["test_recommendation"]
             movies_df = datasets["movies"]
             tags_df = datasets["tags"]
             glove_df = utils.load_glove_file(properties)

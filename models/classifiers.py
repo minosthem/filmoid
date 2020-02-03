@@ -160,6 +160,11 @@ class ContentBasedClassifier(Classifier):
                 max_value = value
                 max_idx = idx
         self.best_model = self.models[max_idx]
+        best_models_folder = join(properties["output_folder"], "best_models")
+        if not exists(best_models_folder):
+            mkdir(best_models_folder)
+        best_model_pickle = "best_model_{}_{}.pickle".format(self.model_name, properties["dataset"])
+        utils.write_to_pickle(self.best_model, best_models_folder, best_model_pickle)
 
     def run_cross_validation(self, classifier, properties, input_data, labels, fold_idx, results_folder):
         """
