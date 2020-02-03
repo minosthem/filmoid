@@ -11,6 +11,7 @@ class CollaborativePreprocessing(DataPreprocessing):
     users_ratings_pickle = "users_ratings.pickle"
     users_ids_pickle = "user_ids.pickle"
     movie_ids_pickle = "movie_ids.pickle"
+    test_dataset_pickle = "test_recommendation.pickle"
     users_ratings = None
     user_ids = None
     movie_ids = None
@@ -33,6 +34,7 @@ class CollaborativePreprocessing(DataPreprocessing):
         users_ratings_pickle_filename = self.users_ratings_pickle + "_{}".format(properties["dataset"])
         users_ids_pickle_filename = self.users_ids_pickle + "_{}".format(properties["dataset"])
         movie_ids_pickle_filename = self.movie_ids_pickle + "_{}".format(properties["dataset"])
+        test_dataset_pickle_filename = self.test_dataset_pickle + "_{}".format(properties["dataset"])
 
         if utils.check_file_exists(output_folder, users_ratings_pickle_filename):
             logger.info("Collaborative input vectors already exist and will be loaded from pickle file")
@@ -40,7 +42,7 @@ class CollaborativePreprocessing(DataPreprocessing):
             logger.info("Loaded user ratings of shape {}".format(self.users_ratings.shape))
         else:
             os.makedirs(output_folder, exist_ok=True)
-            ratings_df = datasets["ratings"]
+            ratings_df = datasets["ratings"] if kind == "train" else datasets["test_recommendation"]
             movies_df = datasets["movies"]
             self.users_ratings = []
             self.user_ids = []
@@ -66,6 +68,7 @@ class CollaborativePreprocessing(DataPreprocessing):
             self.users_ratings = np.array(self.users_ratings)
             self.user_ids = np.asarray(self.user_ids)
             self.movie_ids = np.asarray(self.movie_ids)
-            utils.write_to_pickle(self.users_ratings, output_folder, users_ratings_pickle_filename)
+            input_filename = users_ratings_pickle_filename if kind == "train" else test_dataset_pickle_filename
+            utils.write_to_pickle(self.users_ratings, output_folder, input_filename)
             utils.write_to_pickle(self.user_ids, output_folder, users_ids_pickle_filename)
             utils.write_to_pickle(self.movie_ids, output_folder, movie_ids_pickle_filename)

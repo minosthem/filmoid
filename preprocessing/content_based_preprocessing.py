@@ -15,6 +15,7 @@ from utils import logger
 class ContentBasedPreprocessing(DataPreprocessing):
     input_data_pickle = "input_data.pickle"
     ratings_pickle = "ratings.pickle"
+    test_dataset_pickle = "test_recommendation.pickle"
     punct_digit_to_space = str.maketrans(string.punctuation + string.digits,
                                          " " * len(string.punctuation + string.digits))
 
@@ -42,6 +43,8 @@ class ContentBasedPreprocessing(DataPreprocessing):
                                                                               properties["classification"])
         ratings_pickle_filename = self.ratings_pickle + "_{}_{}".format(properties["dataset"],
                                                                         properties["classification"])
+        test_dataset_pickle_filename = self.test_dataset_pickle + "_{}_{}".format(properties["dataset"],
+                                                                                  properties["classification"])
 
         if utils.check_file_exists(output_folder, input_data_pickle_filename) and \
                 utils.check_file_exists(output_folder, ratings_pickle_filename):
@@ -82,7 +85,8 @@ class ContentBasedPreprocessing(DataPreprocessing):
             logger.info("Standardize input vectors")
             self.input_data = preprocessing.scale(self.input_data)
             logger.info("Save input vectors to file")
-            utils.write_to_pickle(obj=self.input_data, directory=output_folder, filename=input_data_pickle_filename)
+            input_filename = input_data_pickle_filename if kind == "train" else test_dataset_pickle_filename
+            utils.write_to_pickle(obj=self.input_data, directory=output_folder, filename=input_filename)
             utils.write_to_pickle(obj=self.ratings, directory=output_folder, filename=ratings_pickle_filename)
 
     @staticmethod
