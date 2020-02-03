@@ -13,6 +13,7 @@ import pandas as pd
 import yaml
 
 from preprocessing.data_preprocessing import DataPreprocessing
+from models.kmeans import Kmeans
 
 properties_folder = join(os.getcwd(), "properties")
 example_properties_file = join(properties_folder, "example_properties.yaml")
@@ -26,6 +27,12 @@ current_dir = os.getcwd()
 
 
 def config_logger():
+    """
+    Creates a logger which writes both in a file and in the console
+
+    Returns
+        Logger: the logger object
+    """
     if not exists(join(current_dir, "logs")):
         os.mkdir(join(current_dir, "logs"))
 
@@ -307,3 +314,8 @@ def generate_recommendation_dataset():
     path_to_dataset = join(os.getcwd(), properties["datasets_folder"], dataset_folder)
     file_path = join(path_to_dataset, "test_recommendation.csv")
     test_df.to_csv(file_path, sep=",")
+
+
+def init_collaborative_model(model_name):
+    if model_name == "kmeans":
+        return Kmeans()

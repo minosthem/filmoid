@@ -8,12 +8,13 @@ from models.baseline import Naive, Random
 from models.dnn_classifier import DeepNN
 from models.knn_classifier import KNN
 from models.rf_classifier import RandomForest
+from models.clustering import CollaborativeClustering
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
 
 
-def init_classifier(classifier_name):
+def init_content_based_model(model_name):
     """
     Function that inits a classifier object based on a given name. Stores the given name in a field of the object.
 
@@ -23,15 +24,15 @@ def init_classifier(classifier_name):
     Returns
         Classifier: a classifier object
     """
-    if classifier_name == "knn":
+    if model_name == "knn":
         return KNN()
-    elif classifier_name == "rf":
+    elif model_name == "rf":
         return RandomForest()
-    elif classifier_name == "dnn":
+    elif model_name == "dnn":
         return DeepNN()
-    elif classifier_name == "naive":
+    elif model_name == "naive":
         return Naive()
-    elif classifier_name == "random":
+    elif model_name == "random":
         return Random()
 
 
@@ -49,9 +50,12 @@ def run_collaborative(properties, csvs):
     logger.info("Creating input vectors for collaborative method")
     dp.preprocess(properties=properties, datasets=csvs)
     input_data = dp.users_ratings
-    for model in properties["models"]["collaborative"]:
-        pass
-        # TODO kmeans
+    user_ids = dp.user_ids
+    movie_ids = dp.movie_ids
+    clustering = CollaborativeClustering()
+    clustering.exec_collaborative_method(properties=properties, user_ratings=input_data, user_ids=user_ids,
+                                         movie_ids=movie_ids)
+    # TODO
 
 
 def run_content_based(properties, csvs):
@@ -81,7 +85,7 @@ def run_content_based(properties, csvs):
     for model in properties["models"]["content-based"]:
         logger.info("Starting cross-validation for model {}".format(model))
         tic = time.time()
-        classifier = init_classifier(model)
+        classifier = init_content_based_model(model)
         classifier.run_cross_validation(classifier, properties, input_train, ratings_train,
                                         folds, results_folder)
         logger.info("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
