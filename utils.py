@@ -19,6 +19,7 @@ example_properties_file = join(properties_folder, "example_properties.yaml")
 properties_file = join(properties_folder, "properties.yaml")
 ml_latest_small_folder = "ml-latest-small"
 ml_latest = "ml-latest"
+log_filename = 'logs_%s' % datetime.now().strftime('%Y%m%d-%H%M%S')
 metric_names = ["macro_precision", "micro_precision", "macro_recall", "micro_recall", "macro_f", "micro_f"]
 captions = ["macro-prec", "micro-prec", "macro-recall", "micro-recall", "macro-f", "micro-f"]
 current_dir = os.getcwd()
@@ -27,20 +28,19 @@ current_dir = os.getcwd()
 def config_logger():
     if not exists(join(current_dir, "logs")):
         os.mkdir(join(current_dir, "logs"))
-    log_filename = 'logs_%s' % datetime.now().strftime('%Y%m%d-%H%M%S')
 
     log_formatter = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-    logger = logging.getLogger(__name__)
+    program_logger = logging.getLogger(__name__)
 
-    logger.setLevel(logging.INFO)
+    program_logger.setLevel(logging.INFO)
     file_handler = logging.FileHandler("{0}/{1}.log".format("logs", log_filename))
     file_handler.setFormatter(log_formatter)
-    logger.addHandler(file_handler)
+    program_logger.addHandler(file_handler)
 
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(log_formatter)
-    logger.addHandler(console_handler)
-    return logger
+    program_logger.addHandler(console_handler)
+    return program_logger
 
 
 logger = config_logger()

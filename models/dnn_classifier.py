@@ -1,5 +1,5 @@
-from os import mkdir
-from os.path import join, exists
+from os import mkdir, getcwd, pardir
+from os.path import join, exists, abspath
 
 import keras
 import numpy as np
@@ -9,6 +9,8 @@ from keras.models import Sequential
 from keras.optimizers import SGD
 
 from models.classifiers import ContentBasedClassifier
+
+import utils
 
 
 class DeepNN(ContentBasedClassifier):
@@ -110,6 +112,7 @@ class DeepNN(ContentBasedClassifier):
         Returns
             list: callbacks after the termination of the model training
         """
+        parent_dir = abspath(join(getcwd(), pardir))
         output_folder = properties["output_folder"]
         model_folder_path = join(output_folder, "model")
         if not exists(model_folder_path):
@@ -124,7 +127,9 @@ class DeepNN(ContentBasedClassifier):
                                     verbose=0, mode='auto', baseline=None, restore_best_weights=False),
             callbacks.ReduceLROnPlateau(monitor=monitor_metric, factor=0.1,
                                         patience=reduce_lr, verbose=0, mode='auto',
-                                        min_delta=0.0001, cooldown=0, min_lr=0)
+                                        min_delta=0.0001, cooldown=0, min_lr=0),
+            keras.callbacks.callbacks.CSVLogger(join(parent_dir, "logs", utils.log_filename), separator=',',
+                                                append=True)
         ]
 
         return callbacks_list
