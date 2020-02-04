@@ -17,11 +17,28 @@ class Kmeans(CollaborativeClustering):
         self.model = None
 
     def train(self, properties, input_data):
+        """
+        Runs k-means algorithm and trains the model.
+
+        Args
+            properties (dict): kmeans configurations
+            input_data (ndarray): vectors with user ratings
+
+        """
         self.model = KMeans(n_clusters=properties["kmeans"]["clusters"], random_state=77, verbose=1,
                             n_init=properties["kmeans"]["n_init"], max_iter=properties["kmeans"]["max_iter"])
         self.model.fit(input_data)
 
     def test(self, test_data):
+        """
+        Calculates the distance of every instance to all the clusters.
+
+        Args
+            test_data (ndarray): vectors with user ratings
+
+        Returns
+            predictions (ndarray): contains the similarity to every cluster for every user
+        """
         cluster_distances = self.model.transform(test_data)
         # convert to "similarity" scores
         predictions = 1 - cluster_distances / np.max(cluster_distances)
@@ -112,6 +129,9 @@ class Kmeans(CollaborativeClustering):
 
 
 class User:
+    """
+    Class that represents users.
+    """
     user_id = -1
     user_idx = -1
     similar_users = []

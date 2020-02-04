@@ -18,7 +18,7 @@ from utils import logger
 
 def init_content_based_model(model_name):
     """
-    Function that inits a classifier object based on a given name. Stores the given name in a field of the object.
+    Function that initializes a classifier object based on a given name. Stores the given name in a field of the object.
 
     Args
         classifier_name (str): the name of the model
@@ -39,6 +39,15 @@ def init_content_based_model(model_name):
 
 
 def init_collaborative_model(model_name):
+    """
+    Function that initializes a classifier object based on a given name. Stores the given name in a field of the object.
+
+    Args
+        classifier_name (str): the name of the model
+
+    Returns
+        Classifier: a classifier object
+    """
     if model_name == CollaborativeModels.kmeans.value:
         return Kmeans()
 
