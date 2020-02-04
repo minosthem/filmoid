@@ -28,6 +28,17 @@ class Kmeans(CollaborativeClustering):
         return predictions
 
     def fit_transform(self, properties, input_data):
+        """
+        Runs the k-means algorithm and obtain the k clusters. Then computes for every instance the distances from every
+        cluster and converts these distances into similarities.
+
+        Args
+            properties (dict): Configurations of k-means
+            input_data (ndarray): The data created in collaborative preprocessing (users ratings)
+
+        Returns
+            The lists of similarities between every instance and the clusters
+        """
         self.model = KMeans(n_clusters=properties["kmeans"]["clusters"], random_state=77, verbose=1,
                             n_init=properties["kmeans"]["n_init"], max_iter=properties["kmeans"]["max_iter"])
         cluster_distances = self.model.fit_transform(input_data)
@@ -35,6 +46,20 @@ class Kmeans(CollaborativeClustering):
         return predictions
 
     def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids):
+        """
+        Calculates the similarity between a target user and the users belonging to the most similar cluster to the
+        target user using the pearson correlation coefficient similarity measure. Then it keeps track of the n most
+        similar users.
+
+         Args
+            properties (dict): kmeans configurations (n_similar)
+            user_ratings (ndarray): The users' ratings
+            user_ids (ndarray): The users' ids
+            movie_ids (ndarray): The movies' ids
+
+        Returns
+            A list with the predicted ratings for every user
+        """
         predictions = self.fit_transform(properties=properties, input_data=user_ratings)
         users = self._find_similar_users(user_ids=user_ids, user_ratings=user_ratings, predictions=predictions)
         for user in users:
@@ -57,6 +82,18 @@ class Kmeans(CollaborativeClustering):
 
     @staticmethod
     def _find_similar_users(user_ids, user_ratings, predictions):
+        """
+        Sorts the similarities of the predictions list. Then keeps the ratings of every user and the ratings
+        of the users belonging to the most similar cluster to the target user.
+
+        Args
+            user_ids (ndarray): The users' ids
+            user_ratings (ndarray): The ratings of users
+            predictions (ndarray): The similarities between the users and the clusters
+
+        Returns
+            A list of objects for every user containing the fields of the class user
+        """
         users = []
         rows, cols = predictions.shape
         for row in range(0, rows):

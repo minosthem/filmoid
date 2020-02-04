@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# go to parent directory
+cd ..
+
 # create missing directories
 mkdir -p "${OUTPUT_FOLDER}"
 mkdir -p "${RESOURCES_FOLDER}"
