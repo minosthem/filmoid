@@ -39,7 +39,11 @@ class CollaborativePreprocessing(DataPreprocessing):
 
         if utils.check_file_exists(output_folder, users_ratings_pickle_filename):
             logger.info("Collaborative input vectors already exist and will be loaded from pickle file")
-            self.users_ratings = utils.load_from_pickle(output_folder, users_ratings_pickle_filename)
+            input_filename = users_ratings_pickle_filename if kind == PreprocessKind.train.value else \
+                test_dataset_pickle_filename
+            self.users_ratings = utils.load_from_pickle(output_folder, input_filename)
+            self.user_ids = utils.load_from_pickle(output_folder, users_ids_pickle_filename)
+            self.movie_ids = utils.load_from_pickle(output_folder, movie_ids_pickle_filename)
             logger.info("Loaded user ratings of shape {}".format(self.users_ratings.shape))
         else:
             os.makedirs(output_folder, exist_ok=True)

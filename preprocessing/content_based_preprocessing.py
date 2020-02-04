@@ -50,7 +50,9 @@ class ContentBasedPreprocessing(DataPreprocessing):
         if utils.check_file_exists(output_folder, input_data_pickle_filename) and \
                 utils.check_file_exists(output_folder, ratings_pickle_filename):
             logger.info("Content-based input data already exist and will be loaded from pickle file")
-            self.input_data = utils.load_from_pickle(output_folder, input_data_pickle_filename)
+            input_filename = input_data_pickle_filename if kind == PreprocessKind.train.value else \
+                test_dataset_pickle_filename
+            self.input_data = utils.load_from_pickle(output_folder, input_filename)
             self.ratings = utils.load_from_pickle(output_folder, ratings_pickle_filename)
             logger.info("Loaded inputs of shape {}".format(self.input_data.shape))
             logger.info("Loaded ratings of shape {}".format(self.ratings.shape))
