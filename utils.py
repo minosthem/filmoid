@@ -13,7 +13,7 @@ import pandas as pd
 import yaml
 
 from preprocessing.data_preprocessing import DataPreprocessing
-from models.kmeans import Kmeans
+
 
 properties_folder = join(os.getcwd(), "properties")
 example_properties_file = join(properties_folder, "example_properties.yaml")
@@ -301,6 +301,7 @@ def generate_recommendation_dataset():
         user_id = row["userId"]
         if user_id in user_ids:
             continue
+        user_ids.append(user_id)
         logger.info("Checking for user with id {}".format(row["userId"]))
         user_ratings = ratings[ratings["userId"] == user_id]
         movie_ids = movies["movieId"]
@@ -316,6 +317,5 @@ def generate_recommendation_dataset():
     test_df.to_csv(file_path, sep=",")
 
 
-def init_collaborative_model(model_name):
-    if model_name == "kmeans":
-        return Kmeans()
+if __name__ == '__main__':
+    generate_recommendation_dataset()

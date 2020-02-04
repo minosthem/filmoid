@@ -112,7 +112,6 @@ class DeepNN(ContentBasedClassifier):
         Returns
             list: callbacks after the termination of the model training
         """
-        parent_dir = abspath(join(getcwd(), pardir))
         output_folder = properties["output_folder"]
         model_folder_path = join(output_folder, "model")
         if not exists(model_folder_path):
@@ -128,7 +127,7 @@ class DeepNN(ContentBasedClassifier):
             callbacks.ReduceLROnPlateau(monitor=monitor_metric, factor=0.1,
                                         patience=reduce_lr, verbose=0, mode='auto',
                                         min_delta=0.0001, cooldown=0, min_lr=0),
-            keras.callbacks.callbacks.CSVLogger(join(parent_dir, "logs", utils.log_filename), separator=',',
+            keras.callbacks.callbacks.CSVLogger(join(getcwd(), "logs", utils.log_filename + ".log"), separator=',',
                                                 append=True)
         ]
 

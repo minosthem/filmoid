@@ -9,6 +9,7 @@ from models.dnn_classifier import DeepNN
 from models.knn_classifier import KNN
 from models.rf_classifier import RandomForest
 from models.clustering import CollaborativeClustering
+from models.kmeans import Kmeans
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
@@ -36,6 +37,11 @@ def init_content_based_model(model_name):
         return Random()
 
 
+def init_collaborative_model(model_name):
+    if model_name == "kmeans":
+        return Kmeans()
+
+
 def run_collaborative(properties, csvs):
     """
     It processes the data to obtain the input vectors for the collaborative method and then uses the input data to
@@ -52,9 +58,10 @@ def run_collaborative(properties, csvs):
     input_data = dp.users_ratings
     user_ids = dp.user_ids
     movie_ids = dp.movie_ids
-    clustering = CollaborativeClustering()
-    clustering.exec_collaborative_method(properties=properties, user_ratings=input_data, user_ids=user_ids,
-                                         movie_ids=movie_ids)
+    for model_name in properties["models"]["collaborative"]:
+        clustering = init_collaborative_model(model_name)
+        clustering.exec_collaborative_method(properties=properties, user_ratings=input_data, user_ids=user_ids,
+                                             movie_ids=movie_ids)
     # TODO
 
 
