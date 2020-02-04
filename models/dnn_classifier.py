@@ -8,9 +8,9 @@ from keras.layers import Dense, Dropout
 from keras.models import Sequential
 from keras.optimizers import SGD
 
-from models.classifiers import ContentBasedClassifier
-
 import utils
+from enums import MetricKind, Classification, ContentBasedModels
+from models.classifiers import ContentBasedClassifier
 
 
 class DeepNN(ContentBasedClassifier):
@@ -26,7 +26,7 @@ class DeepNN(ContentBasedClassifier):
     model_name = ""
 
     def __init__(self):
-        self.model_name = "dnn"
+        self.model_name = ContentBasedModels.dnn.value
 
     def train(self, properties, input_data, labels):
         """
@@ -40,12 +40,12 @@ class DeepNN(ContentBasedClassifier):
         input_dim = input_data.shape[1]
         dnn = self._build_model(properties, input_dim)
         self.models.append(dnn)
-        num_classes = 2 if properties["classification"] == "binary" else 5
+        num_classes = 2 if properties["classification"] == Classification.binary.value else 5
         labels = keras.utils.to_categorical(labels, num_classes=num_classes)
         dnn.fit(input_data, labels, epochs=properties["dnn"]["epochs"], batch_size=properties["dnn"]["batch_size"],
                 verbose=True, callbacks=self._get_training_callbacks(properties))
 
-    def test(self, test_data, true_labels, kind="validation"):
+    def test(self, test_data, true_labels, kind=MetricKind.validation.value):
         """
         Takes the test vectors and the corresponding true labels and tests the performance of the model.
 
@@ -58,7 +58,8 @@ class DeepNN(ContentBasedClassifier):
             confusion_matrix: the confusion matrix of the testing
         """
         predicted_labels = []
-        result = self.models[-1].predict(test_data) if kind == "validation" else self.best_model.predict(test_data)
+        result = self.models[-1].predict(test_data) if kind == MetricKind.validation.value else \
+            self.best_model.predict(test_data)
         for i in range(result.shape[0]):
             predicted_labels.append(np.argmax(result[i]))
         return true_labels, predicted_labels
@@ -82,7 +83,7 @@ class DeepNN(ContentBasedClassifier):
                 hidden_units = hidden[0]
                 activation = hidden[1]
             else:
-                if properties["classification"] == "binary":
+                if properties["classification"] == Classification.binary.value:
                     hidden_units = 1 if properties["dnn"]["loss"] == "binary_crossentropy" else 2
                 else:
                     hidden_units = 5

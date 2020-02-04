@@ -1,5 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier
 
+from enums import MetricKind, ContentBasedModels
 from models.classifiers import ContentBasedClassifier
 
 
@@ -16,7 +17,7 @@ class RandomForest(ContentBasedClassifier):
     model_name = ""
 
     def __init__(self):
-        self.model_name = "rf"
+        self.model_name = ContentBasedModels.rf.value
 
     def train(self, properties, input_data, labels):
         """
@@ -33,7 +34,7 @@ class RandomForest(ContentBasedClassifier):
         self.models.append(rf)
         rf.fit(input_data, labels)
 
-    def test(self, test_data, true_labels, kind="validation"):
+    def test(self, test_data, true_labels, kind=MetricKind.validation.value):
         """
         Method to test the Random Forest model
 
@@ -45,6 +46,6 @@ class RandomForest(ContentBasedClassifier):
         Returns
             confusion_matrix: the confusion matrix of the testing
         """
-        predicted_labels = self.models[-1].predict(test_data) if kind == "validation" else self.best_model.predict(
-            test_data)
+        predicted_labels = self.models[-1].predict(test_data) if kind == MetricKind.validation.value else \
+            self.best_model.predict(test_data)
         return true_labels, predicted_labels

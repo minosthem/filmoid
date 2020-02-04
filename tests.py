@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 import utils
+from enums import ContentBasedModels
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
 from models.knn_classifier import KNN
@@ -32,7 +33,6 @@ class TestUtilMethods(unittest.TestCase):
 
         Examined test case: the value for the datasets_folder
         """
-        utils.properties_file = join(os.getcwd(), "properties", "properties.yaml")
         properties = utils.load_properties()
         self.assertEqual(properties["datasets_folder"], "Datasets")
 
@@ -251,7 +251,7 @@ class TestClassifiers(unittest.TestCase):
             list, ndarray, ndarray: list of tuples with the true and predicted values, the input data, true labels
 
         """
-        input_data, labels = np.arange(1000).reshape((100, 10)), [randint(1, 5) for _ in range(100)]
+        input_data, labels = np.arange(1000).reshape((100, 10)), [randint(0, 4) for _ in range(100)]
         dp = ContentBasedPreprocessing()
         input_train, input_test, labels_training, labels_testing = dp.create_train_test_data(input_data=input_data,
                                                                                              labels=labels)
@@ -295,7 +295,7 @@ class TestClassifiers(unittest.TestCase):
         classifier.get_results(true_labels, predicted_labels, kind="test")
         self.assertEqual(6, len(classifier.test_metrics.keys()))
         classifier.write_test_results_to_file("output", "testing")
-        self.assertEqual("knn", classifier.model_name)
+        self.assertEqual(ContentBasedModels.knn.value, classifier.model_name)
 
     def test_rf_flow(self):
         """
@@ -324,11 +324,11 @@ class TestClassifiers(unittest.TestCase):
         classifier.get_results(true_labels, predicted_labels, kind="test")
         self.assertEqual(6, len(classifier.test_metrics.keys()))
         classifier.write_test_results_to_file("output", "testing")
-        self.assertEqual("rf", classifier.model_name)
+        self.assertEqual(ContentBasedModels.rf.value, classifier.model_name)
 
     def test_dnn_flow(self):
         """
-        Random Forest classification testing
+        Deep Neural Network classification testing
 
         Examined test cases:
 
@@ -353,4 +353,4 @@ class TestClassifiers(unittest.TestCase):
         classifier.get_results(true_labels, predicted_labels, kind="test")
         self.assertEqual(6, len(classifier.test_metrics.keys()))
         classifier.write_test_results_to_file("output", "testing")
-        self.assertEqual("dnn", classifier.model_name)
+        self.assertEqual(ContentBasedModels.dnn.value, classifier.model_name)

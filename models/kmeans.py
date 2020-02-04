@@ -2,6 +2,7 @@ import numpy as np
 from scipy.stats.stats import pearsonr
 from sklearn.cluster import KMeans
 
+from enums import CollaborativeModels
 from models.clustering import CollaborativeClustering
 
 
@@ -11,7 +12,7 @@ class Kmeans(CollaborativeClustering):
     """
 
     def __init__(self):
-        self.model_name = "kmeans"
+        self.model_name = CollaborativeModels.kmeans.value
         self.metrics = {}
         self.model = None
 

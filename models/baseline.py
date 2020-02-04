@@ -1,5 +1,7 @@
-from models.classifiers import ContentBasedClassifier
 import numpy as np
+
+from enums import ContentBasedModels, MetricKind
+from models.classifiers import ContentBasedClassifier
 
 
 class Naive(ContentBasedClassifier):
@@ -15,7 +17,7 @@ class Naive(ContentBasedClassifier):
     training_label_distribution = None
 
     def __init__(self):
-        self.model_name = "naive"
+        self.model_name = ContentBasedModels.naive.value
 
     def train(self, properties, input_data, labels):
         """
@@ -30,7 +32,7 @@ class Naive(ContentBasedClassifier):
         self.training_label_distribution = labels
         self.models.append(self.training_label_distribution)
 
-    def test(self, test_data, true_labels, kind="validation"):
+    def test(self, test_data, true_labels, kind=MetricKind.validation.value):
         """
         Method to test the Majority classifier
 
@@ -43,7 +45,7 @@ class Naive(ContentBasedClassifier):
             confusion_matrix: the confusion matrix of the testing
         """
         # generate a sample of predictions, by sampling from the training label distribution
-        tld = self.models[-1] if kind == "validation" else self.best_model
+        tld = self.models[-1] if kind == MetricKind.validation.value else self.best_model
         predicted_labels = np.random.choice(tld, len(test_data))
         return true_labels, predicted_labels
 
@@ -60,7 +62,7 @@ class Random(ContentBasedClassifier):
     model_name = ""
 
     def __init__(self):
-        self.model_name = "random"
+        self.model_name = ContentBasedModels.random.value
 
     def train(self, properties, input_data, labels):
         """
@@ -74,7 +76,7 @@ class Random(ContentBasedClassifier):
         labelset = np.unique(labels)
         self.models.append(labelset)
 
-    def test(self, test_data, true_labels, kind="validation"):
+    def test(self, test_data, true_labels, kind=MetricKind.validation.value):
         """
         Method to test the random classifier
 
@@ -86,6 +88,6 @@ class Random(ContentBasedClassifier):
         Returns
             confusion_matrix: the confusion matrix of the testing
         """
-        tld = self.models[-1] if kind == "validation" else self.best_model
+        tld = self.models[-1] if kind == MetricKind.validation.value else self.best_model
         predicted_labels = np.asarray([np.random.choice(tld) for _ in true_labels])
         return true_labels, predicted_labels

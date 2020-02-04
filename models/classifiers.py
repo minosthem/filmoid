@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score
 
 import utils
+from enums import MetricNames, MetricKind
 from utils import logger
 
 
@@ -17,7 +18,7 @@ class Classifier:
     def train(self, properties, input_data, labels):
         pass
 
-    def test(self, test_data, true_labels, kind="validation"):
+    def test(self, test_data, true_labels, kind=MetricKind.validation.value):
         pass
 
 
@@ -36,10 +37,10 @@ class ContentBasedClassifier(Classifier):
     def train(self, properties, input_data, labels):
         pass
 
-    def test(self, test_data, true_labels, kind="validation"):
+    def test(self, test_data, true_labels, kind=MetricKind.validation.value):
         pass
 
-    def get_results(self, true_labels, predicted_labels, kind="validation"):
+    def get_results(self, true_labels, predicted_labels, kind=MetricKind.validation.value):
         """
         Based on whether the predictions are from the validation or test set, the function populates the
         respective class field with the evaluation metrics.
@@ -49,21 +50,22 @@ class ContentBasedClassifier(Classifier):
             predicted_labels (ndarray): the labels predicted by the model
             kind (str): indicates whether we refer to the validation or test set
         """
-        if kind == "validation":
+        if kind == MetricKind.validation.value:
             self.fold_metrics.append(
-                {"macro_precision": precision_score(true_labels, predicted_labels, average="macro"),
-                 "micro_precision": precision_score(true_labels, predicted_labels, average="micro"),
-                 "macro_recall": recall_score(true_labels, predicted_labels, average="macro"),
-                 "micro_recall": recall_score(true_labels, predicted_labels, average="micro"),
-                 "macro_f": f1_score(true_labels, predicted_labels, average="macro"),
-                 "micro_f": f1_score(true_labels, predicted_labels, average="micro")})
-        elif kind == "test":
-            self.test_metrics = {"macro_precision": precision_score(true_labels, predicted_labels, average="macro"),
-                                 "micro_precision": precision_score(true_labels, predicted_labels, average="micro"),
-                                 "macro_recall": recall_score(true_labels, predicted_labels, average="macro"),
-                                 "micro_recall": recall_score(true_labels, predicted_labels, average="micro"),
-                                 "macro_f": f1_score(true_labels, predicted_labels, average="macro"),
-                                 "micro_f": f1_score(true_labels, predicted_labels, average="micro")}
+                {MetricNames.macro_precision.value: precision_score(true_labels, predicted_labels, average="macro"),
+                 MetricNames.micro_precision.value: precision_score(true_labels, predicted_labels, average="micro"),
+                 MetricNames.macro_recall.value: recall_score(true_labels, predicted_labels, average="macro"),
+                 MetricNames.micro_recall.value: recall_score(true_labels, predicted_labels, average="micro"),
+                 MetricNames.macro_f.value: f1_score(true_labels, predicted_labels, average="macro"),
+                 MetricNames.micro_f.value: f1_score(true_labels, predicted_labels, average="micro")})
+        elif kind == MetricKind.test.value:
+            self.test_metrics = {
+                MetricNames.macro_precision.value: precision_score(true_labels, predicted_labels, average="macro"),
+                MetricNames.micro_precision.value: precision_score(true_labels, predicted_labels, average="micro"),
+                MetricNames.macro_recall.value: recall_score(true_labels, predicted_labels, average="macro"),
+                MetricNames.micro_recall.value: recall_score(true_labels, predicted_labels, average="micro"),
+                MetricNames.macro_f.value: f1_score(true_labels, predicted_labels, average="macro"),
+                MetricNames.micro_f.value: f1_score(true_labels, predicted_labels, average="micro")}
 
     def write_fold_results_to_file(self, output_folder, results_folder, fold_num):
         """
@@ -122,7 +124,10 @@ class ContentBasedClassifier(Classifier):
             output_folder (str): the name of the output folder defined in the configuration yaml file
             results_folder (str): the name of the folder where the results of the current execution will be stored
         """
-        for metric_name in utils.metric_names:
+        metric_names = [MetricNames.macro_precision.value, MetricNames.micro_precision.value,
+                        MetricNames.macro_recall.value, MetricNames.micro_recall.value, MetricNames.macro_f.value,
+                        MetricNames.micro_f.value]
+        for metric_name in metric_names:
             metric_list = []
             for fold_metric in self.fold_metrics:
                 metric_list.append(fold_metric[metric_name])

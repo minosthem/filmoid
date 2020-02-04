@@ -8,6 +8,7 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
 import utils
+from enums import PreprocessKind, Classification, AggregationStrategy
 from preprocessing.data_preprocessing import DataPreprocessing
 from utils import logger
 
@@ -22,7 +23,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
     input_data = None
     ratings = None
 
-    def preprocess(self, properties, datasets, kind="train"):
+    def preprocess(self, properties, datasets, kind=PreprocessKind.train.value):
         """
             Checks if the input and the rating file exist and loads them from the output folder. Otherwise, takes the
             rating, movies and tags datasets and converts them to dataframes and also loads the glove file. It iterates
@@ -55,7 +56,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
             logger.info("Loaded ratings of shape {}".format(self.ratings.shape))
         else:
             os.makedirs(output_folder, exist_ok=True)
-            ratings_df = datasets["ratings"] if kind == "train" else datasets["test_recommendation"]
+            ratings_df = datasets["ratings"] if kind == PreprocessKind.train.value else datasets["test_recommendation"]
             movies_df = datasets["movies"]
             tags_df = datasets["tags"]
             glove_df = utils.load_glove_file(properties)
@@ -85,7 +86,8 @@ class ContentBasedPreprocessing(DataPreprocessing):
             logger.info("Standardize input vectors")
             self.input_data = preprocessing.scale(self.input_data)
             logger.info("Save input vectors to file")
-            input_filename = input_data_pickle_filename if kind == "train" else test_dataset_pickle_filename
+            input_filename = input_data_pickle_filename if kind == PreprocessKind.train.value else \
+                test_dataset_pickle_filename
             utils.write_to_pickle(obj=self.input_data, directory=output_folder, filename=input_filename)
             utils.write_to_pickle(obj=self.ratings, directory=output_folder, filename=ratings_pickle_filename)
 
@@ -121,9 +123,9 @@ class ContentBasedPreprocessing(DataPreprocessing):
         embeddings = np.concatenate(embeddings, axis=0)
 
         # aggregate all word vectors to a single vector
-        if properties["aggregation"] == "avg":
+        if properties["aggregation"] == AggregationStrategy.average.value:
             embeddings = np.mean(embeddings, axis=0)
-        elif properties["aggregation"] == "max":
+        elif properties["aggregation"] == AggregationStrategy.max.value:
             embeddings = np.max(embeddings, axis=0)
 
         # expand dimension to a 1 x <dim> vector
@@ -174,7 +176,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
         Returns
             int: 0 or 1 for binary classification, 1-5 numbers for multi-class classification
         """
-        if properties["classification"] == "binary":
+        if properties["classification"] == Classification.binary.value:
             return 0 if rating > 3 else 1
         else:
             return round(rating)

@@ -3,16 +3,17 @@ import time
 import numpy as np
 
 import utils
-from utils import logger
+from enums import ContentBasedModels, Methods, CollaborativeModels
+from enums import MetricKind
 from models.baseline import Naive, Random
 from models.dnn_classifier import DeepNN
+from models.kmeans import Kmeans
 from models.knn_classifier import KNN
 from models.rf_classifier import RandomForest
-from models.clustering import CollaborativeClustering
-from models.kmeans import Kmeans
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
+from utils import logger
 
 
 def init_content_based_model(model_name):
@@ -25,20 +26,20 @@ def init_content_based_model(model_name):
     Returns
         Classifier: a classifier object
     """
-    if model_name == "knn":
+    if model_name == ContentBasedModels.knn.value:
         return KNN()
-    elif model_name == "rf":
+    elif model_name == ContentBasedModels.rf.value:
         return RandomForest()
-    elif model_name == "dnn":
+    elif model_name == ContentBasedModels.dnn.value:
         return DeepNN()
-    elif model_name == "naive":
+    elif model_name == ContentBasedModels.naive.value:
         return Naive()
-    elif model_name == "random":
+    elif model_name == ContentBasedModels.random.value:
         return Random()
 
 
 def init_collaborative_model(model_name):
-    if model_name == "kmeans":
+    if model_name == CollaborativeModels.kmeans.value:
         return Kmeans()
 
 
@@ -103,8 +104,8 @@ def run_content_based(properties, csvs):
         classifier.get_fold_avg_result(output_folder=properties["output_folder"], results_folder=results_folder)
         logger.info("Best classifier with metric {} for model {}".format(properties["metric_best_model"], model))
         classifier.find_best_model(properties)
-        true_labels, predicted_labels = classifier.test(input_test, ratings_test, kind="test")
-        classifier.get_results(true_labels, predicted_labels, kind="test")
+        true_labels, predicted_labels = classifier.test(input_test, ratings_test, kind=MetricKind.test.value)
+        classifier.get_results(true_labels, predicted_labels, kind=MetricKind.test.value)
         classifier.write_test_results_to_file(properties["output_folder"], results_folder)
     print("Done!")
 
@@ -144,9 +145,9 @@ def main():
     dp = DataPreprocessing()
     dp.read_csv(file_names)
     csvs = dp.datasets
-    if "collaborative" in properties["methods"]:
+    if Methods.collaborative.value in properties["methods"]:
         run_collaborative(properties, csvs)
-    if "content-based" in properties["methods"]:
+    if Methods.content_based.value in properties["methods"]:
         run_content_based(properties, csvs)
 
 

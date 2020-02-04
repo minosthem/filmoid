@@ -12,17 +12,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import yaml
 
+from enums import MetricCaptions, Datasets
 from preprocessing.data_preprocessing import DataPreprocessing
 
-
-properties_folder = join(os.getcwd(), "properties")
-example_properties_file = join(properties_folder, "example_properties.yaml")
-properties_file = join(properties_folder, "properties.yaml")
-ml_latest_small_folder = "ml-latest-small"
-ml_latest = "ml-latest"
 log_filename = 'logs_%s' % datetime.now().strftime('%Y%m%d-%H%M%S')
-metric_names = ["macro_precision", "micro_precision", "macro_recall", "micro_recall", "macro_f", "micro_f"]
-captions = ["macro-prec", "micro-prec", "macro-recall", "micro-recall", "macro-f", "micro-f"]
 current_dir = os.getcwd()
 
 
@@ -134,6 +127,9 @@ def load_properties():
     Returns:
         dict: the properties dictionary
     """
+    properties_folder = join(os.getcwd(), "properties")
+    example_properties_file = join(properties_folder, "example_properties.yaml")
+    properties_file = join(properties_folder, "properties.yaml")
     file = properties_file if exists(properties_file) else example_properties_file
     with open(file, 'r') as f:
         properties = yaml.safe_load(f)
@@ -175,8 +171,8 @@ def get_filenames(prop):
     files = {}
     datasets_folder = prop["datasets_folder"]
     base_path = join(os.getcwd(), datasets_folder)
-    dataset_path = join(base_path, ml_latest_small_folder) if prop["dataset"] == "small" \
-        else join(base_path, ml_latest)
+    dataset_path = join(base_path, Datasets.ml_latest_small.value) if prop["dataset"] == Datasets.small.value \
+        else join(base_path, Datasets.ml_latest.value)
     for file in prop["filenames"]:
         filename = file + prop["dataset-file-extention"]
         files[file] = join(dataset_path, filename)
@@ -272,6 +268,8 @@ def visualize(df, output_folder, results_folder, folder_name, filename):
         folder_name (str): the fold name or avg or test folder
         filename (str): the name of the figure
     """
+    captions = [MetricCaptions.macro_prec.value, MetricCaptions.micro_prec.value, MetricCaptions.macro_recall.value,
+                MetricCaptions.micro_recall.value, MetricCaptions.macro_f.value, MetricCaptions.micro_f.value]
     df.pivot("classifier", "metric", "result").plot(kind='bar', width=0.3)
     # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.xticks(rotation="horizontal")
@@ -311,11 +309,8 @@ def generate_recommendation_dataset():
                 logger.info("Adding row with user id {} and movie id {}".format(user_id, movie_id))
                 test_df.loc[count] = [user_id, movie_id, None, datetime.now()]
                 count += 1
-    dataset_folder = ml_latest if properties["dataset"] == "latest" else ml_latest_small_folder
+    dataset_folder = Datasets.ml_latest.value if properties["dataset"] == Datasets.latest.value else \
+        Datasets.ml_latest_small.value
     path_to_dataset = join(os.getcwd(), properties["datasets_folder"], dataset_folder)
     file_path = join(path_to_dataset, "test_recommendation.csv")
     test_df.to_csv(file_path, sep=",")
-
-
-if __name__ == '__main__':
-    generate_recommendation_dataset()

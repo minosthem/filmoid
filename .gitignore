@@ -11,3 +11,4 @@ resources/
 docs/build
 public
 docs/_build
+/output/

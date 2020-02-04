@@ -1,5 +1,7 @@
 import pandas as pd
 
+from enums import PreprocessKind
+
 
 class DataPreprocessing:
     """
@@ -19,7 +21,7 @@ class DataPreprocessing:
         for name, file in filenames.items():
             self.datasets[name] = pd.read_csv(file)
 
-    def preprocess(self, properties, datasets, kind="train"):
+    def preprocess(self, properties, datasets, kind=PreprocessKind.train.value):
         pass
 
     def create_train_test_data(self, input_data, labels):

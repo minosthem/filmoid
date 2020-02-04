@@ -3,6 +3,7 @@ import os
 import numpy as np
 
 import utils
+from enums import PreprocessKind
 from preprocessing.data_preprocessing import DataPreprocessing
 from utils import logger
 
@@ -16,7 +17,7 @@ class CollaborativePreprocessing(DataPreprocessing):
     user_ids = None
     movie_ids = None
 
-    def preprocess(self, properties, datasets, kind="train"):
+    def preprocess(self, properties, datasets, kind=PreprocessKind.train.value):
         """
         Initially, checks if the ratings list exists in the output folder and if this is the case it loads it.
         Otherwise, it takes from the ratings dataset the ratings of the users, the name of the movies from the movies
@@ -42,7 +43,7 @@ class CollaborativePreprocessing(DataPreprocessing):
             logger.info("Loaded user ratings of shape {}".format(self.users_ratings.shape))
         else:
             os.makedirs(output_folder, exist_ok=True)
-            ratings_df = datasets["ratings"] if kind == "train" else datasets["test_recommendation"]
+            ratings_df = datasets["ratings"] if kind == PreprocessKind.train.value else datasets["test_recommendation"]
             movies_df = datasets["movies"]
             self.users_ratings = []
             self.user_ids = []
@@ -68,7 +69,8 @@ class CollaborativePreprocessing(DataPreprocessing):
             self.users_ratings = np.array(self.users_ratings)
             self.user_ids = np.asarray(self.user_ids)
             self.movie_ids = np.asarray(self.movie_ids)
-            input_filename = users_ratings_pickle_filename if kind == "train" else test_dataset_pickle_filename
+            input_filename = users_ratings_pickle_filename if kind == PreprocessKind.train.value else \
+                test_dataset_pickle_filename
             utils.write_to_pickle(self.users_ratings, output_folder, input_filename)
             utils.write_to_pickle(self.user_ids, output_folder, users_ids_pickle_filename)
             utils.write_to_pickle(self.movie_ids, output_folder, movie_ids_pickle_filename)
