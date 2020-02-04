@@ -115,12 +115,13 @@ class Kmeans(CollaborativeClustering):
         rows, cols = predictions.shape
         for row in range(0, rows):
             predictions[row, :].sort()
-        for idx, user_id in user_ids:
+        for idx, user_id in enumerate(np.array(user_ids).tolist()):
             user = User(user_id, idx)
             user.user_ratings = user_ratings[idx]
             user.user_similarities = predictions[idx, 0]
             for row in range(0, rows):
-                if predictions[row, 0] == user.user_similarities:
+                # checks if the user belongs to the same cluster as the target user
+                if predictions[row, 0] == user.user_similarities and user.user_id != user_ids[row]:
                     other_user = User(user_ids[row], row)
                     other_user.user_ratings = user_ratings[row]
                     user.similar_users.append(other_user)
