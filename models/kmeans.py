@@ -41,17 +41,18 @@ class Kmeans(CollaborativeClustering):
             user_rating = user_ratings[user.user_idx, :]
             similarities = []
             for other_user in user.similar_users:
-                other_user_ratings = user_ratings[other_user[1], :]
+                other_user_ratings = other_user.user_ratings
                 similarity = pearsonr(user_rating, other_user_ratings)
                 similarities.append(similarity)
             # sort list from min to max - pearsonr returns p-value
             num_similar_users = properties["kmeans"]["n_similar"]
             similar_users = []
             for i in range(num_similar_users):
-                min_idx = similarities.index(min(similarities))
-                other_user = user.similar_users[min_idx]
-                similar_users.append(other_user)
-                similarities[min_idx] = 100000000
+                if i < len(similarities):
+                    min_idx = similarities.index(min(similarities))
+                    other_user = user.similar_users[min_idx]
+                    similar_users.append(other_user)
+                    similarities[min_idx] = 100000000
             # TODO predict ratings
 
     @staticmethod
@@ -66,7 +67,9 @@ class Kmeans(CollaborativeClustering):
             user.user_similarities = predictions[idx, 0]
             for row in range(0, rows):
                 if predictions[row, 0] == user.user_similarities:
-                    user.similar_users.append((user_ids[row], row))
+                    other_user = User(user_ids[row], row)
+                    other_user.user_ratings = user_ratings[row]
+                    user.similar_users.append(other_user)
             users.append(user)
         return users
 
