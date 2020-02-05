@@ -1,8 +1,7 @@
 app/properties/properties.yaml
 app/properties/test_properties.yaml
 .idea/
-logs/
-__pycache__/
+app/__pycache__/
 app/models/__pycache__/
 app/preprocessing/__pycache__/
 app/output/
@@ -11,5 +10,5 @@ app/Datasets/
 app/resources/
 docs/build
 public
-docs/_build
+app/docs/_build
 /app/output/
