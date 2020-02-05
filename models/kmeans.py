@@ -113,17 +113,26 @@ class Kmeans(CollaborativeClustering):
         """
         users = []
         rows, cols = predictions.shape
-        for row in range(0, rows):
-            predictions[row, :].sort()
-        for idx, user_id in enumerate(np.array(user_ids).tolist()):
+        for idx, user_id in enumerate(list(user_ids)):
             user = User(user_id, idx)
             user.user_ratings = user_ratings[idx]
-            user.user_similarities = predictions[idx, 0]
+            user_similarities = list(predictions[idx, :])
+            min_idx = user_similarities.index(min(user_similarities))
+            user.user_cluster_idx = min_idx
+            user.similarities = user_similarities
             for row in range(0, rows):
                 # checks if the user belongs to the same cluster as the target user
-                if predictions[row, 0] == user.user_similarities and user.user_id != user_ids[row]:
+                # get the current user similarities
+                other_user_similarities = list(predictions[row, :])
+                # find the closest cluster
+                other_user_min = other_user_similarities.index(min(other_user_similarities))
+                # check if the closest cluster is the same as the target user's closest cluster
+                # check if current and target users are different
+                if other_user_min == user.user_cluster_idx and user.user_id != user_ids[row]:
                     other_user = User(user_ids[row], row)
+                    other_user.user_cluster_idx = other_user_min
                     other_user.user_ratings = user_ratings[row]
+                    other_user.similarities = other_user_similarities
                     user.similar_users.append(other_user)
             users.append(user)
         return users
@@ -137,11 +146,12 @@ class User:
     user_idx = -1
     similar_users = []
     user_ratings = []
-    user_similarities = []
+    similarities = []
+    user_cluster_idx = -1
 
     def __init__(self, user_id, user_idx):
         self.user_id = user_id
         self.user_idx = user_idx
         self.similar_users = []
         self.user_ratings = []
-        self.user_similarities = []
+        self.user_cluster_idx = -1
