@@ -4,7 +4,7 @@ output_folder: "output"
 datasets_folder: "Datasets"
 resources_folder: "resources"
 dataset: "small" # possible values: small, latest
-filenames: ["links", "movies", "ratings", "tags", "test_recommendation"]
+filenames: ["links", "movies", "ratings", "tags"]
 dataset-file-extention: ".csv"
 methods: ["content-based"]
 models:
