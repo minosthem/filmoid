@@ -2,10 +2,9 @@ import os
 
 import numpy as np
 
-import utils
-from enums import PreprocessKind
+from utils import utils
+from utils.enums import PreprocessKind
 from preprocessing.data_preprocessing import DataPreprocessing
-from utils import logger
 
 
 class CollaborativePreprocessing(DataPreprocessing):
@@ -22,7 +21,7 @@ class CollaborativePreprocessing(DataPreprocessing):
     user_ids = None
     movie_ids = None
 
-    def preprocess(self, properties, datasets, kind=PreprocessKind.train.value):
+    def preprocess(self, properties, datasets, logger, kind=PreprocessKind.train.value):
         """
         Initially, checks if the ratings list exists in the output folder and if this is the case it loads it.
         Otherwise, it takes from the ratings dataset the ratings of the users, the name of the movies from the movies

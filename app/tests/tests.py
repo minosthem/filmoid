@@ -1,19 +1,18 @@
-import os
 import unittest
 from os.path import join, exists
 from random import randint
-import yaml
 
 import numpy as np
 import pandas as pd
+import yaml
 
-import utils
-from enums import ContentBasedModels
-from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
-from preprocessing.data_preprocessing import DataPreprocessing
+from models.dnn_classifier import DeepNN
 from models.knn_classifier import KNN
 from models.rf_classifier import RandomForest
-from models.dnn_classifier import DeepNN
+from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
+from preprocessing.data_preprocessing import DataPreprocessing
+from utils import utils
+from utils.enums import ContentBasedModels
 
 
 def load_test_properties():
@@ -23,8 +22,8 @@ def load_test_properties():
     Returns
         dict: the loaded properties
     """
-    example_test_properties = join(os.getcwd(), "properties", "example_test_properties.yaml")
-    test_properties = join(os.getcwd(), "properties", "test_properties.yaml")
+    example_test_properties = join(utils.app_dir, "properties", "example_test_properties.yaml")
+    test_properties = join(utils.app_dir, "properties", "test_properties.yaml")
     test_properties_path = test_properties if exists(test_properties) else example_test_properties
     with open(test_properties_path, "r") as f:
         return yaml.safe_load(f)
@@ -72,8 +71,9 @@ class TestUtilMethods(unittest.TestCase):
 
         Examined test case: just checks that the DataFrame is not empty
         """
-        properties = {"resources_folder": "resources", "embeddings_file": "glove.6B.50d.txt"}
-        df = utils.load_glove_file(properties)
+        properties = {"output_folder": "output", "resources_folder": "resources", "embeddings_file": "glove.6B.50d.txt"}
+        logger = utils.config_logger(properties)
+        df = utils.load_glove_file(properties, logger)
         self.assertTrue(not df.empty)
 
 
@@ -93,10 +93,10 @@ class TestDataPreProcessing(unittest.TestCase):
         1. The returned dictionary contains 4 key-value pairs
         2. No dataframe is empty
         """
-        properties = {"datasets_folder": "Datasets", "dataset": "ml-dev",
+        properties = {"output_folder": "output", "datasets_folder": "Datasets", "dataset": "ml-dev",
                       "filenames": ["links", "movies", "ratings", "tags"], "dataset-file-extention": ".csv"}
         files = {}
-        folder_path = join(os.getcwd(), properties["datasets_folder"], properties["dataset"])
+        folder_path = join(utils.app_dir, properties["datasets_folder"], properties["dataset"])
         for file in properties["filenames"]:
             filename = file + properties["dataset-file-extention"]
             files[file] = join(folder_path, filename)

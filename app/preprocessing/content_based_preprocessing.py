@@ -7,10 +7,9 @@ from sklearn import preprocessing
 from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
-import utils
-from enums import PreprocessKind, Classification, AggregationStrategy
+from utils import utils
+from utils.enums import PreprocessKind, Classification, AggregationStrategy
 from preprocessing.data_preprocessing import DataPreprocessing
-from utils import logger
 
 
 class ContentBasedPreprocessing(DataPreprocessing):
@@ -31,7 +30,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
     input_data = None
     ratings = None
 
-    def preprocess(self, properties, datasets, kind=PreprocessKind.train.value):
+    def preprocess(self, properties, datasets, logger, kind=PreprocessKind.train.value):
         """
             Checks if the input and the rating file exist and loads them from the output folder. Otherwise, takes the
             rating, movies and tags datasets and converts them to dataframes and also loads the glove file. It iterates
@@ -44,6 +43,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
             Args:
                 properties(dict): properties loaded from yaml file. Used so as to get the output folder
                 datasets (dict): contains the dataframes of all the movielens csvs
+                logger (Logger): the logger to print messages
                 kind (str): if set to train the ratings.csv is used for input vectors otherwise the generated
                 test_recommendation.csv is used
         """
@@ -69,7 +69,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
             ratings_df = datasets["ratings"] if kind == PreprocessKind.train.value else datasets["test_recommendation"]
             movies_df = datasets["movies"]
             tags_df = datasets["tags"]
-            glove_df = utils.load_glove_file(properties)
+            glove_df = utils.load_glove_file(properties=properties, logger=logger)
             logger.info("Generating input vectors")
             self.input_data = []
             self.ratings = []
@@ -87,7 +87,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
                 movie_vector = np.insert(movie_vector, 0, user_id, axis=1)
                 self.input_data.append(movie_vector)
                 self.ratings.append(rating)
-                utils.print_progress(self.ratings)
+                utils.print_progress(self.ratings, logger=logger)
 
             self.ratings = np.asarray(self.ratings)
             self.input_data = np.concatenate(self.input_data)

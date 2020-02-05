@@ -1,6 +1,6 @@
 import numpy as np
 
-from enums import ContentBasedModels, MetricKind
+from utils.enums import ContentBasedModels, MetricKind
 from models.classifiers import ContentBasedClassifier
 
 

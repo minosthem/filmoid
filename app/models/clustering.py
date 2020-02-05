@@ -58,7 +58,7 @@ class CollaborativeClustering(Clustering):
         """
         raise NotImplementedError
 
-    def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids):
+    def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids, logger):
         """
         Method should be override by the children classes. Used to execute the training, test and predictions for
         the selected model.

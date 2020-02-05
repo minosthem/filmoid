@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats.stats import pearsonr
 from sklearn.cluster import KMeans
 
-from enums import CollaborativeModels
+from utils.enums import CollaborativeModels
 from models.clustering import CollaborativeClustering
 
 
@@ -62,7 +62,7 @@ class Kmeans(CollaborativeClustering):
         predictions = 1 - cluster_distances / np.max(cluster_distances)
         return predictions
 
-    def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids):
+    def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids, logger):
         """
         Calculates the similarity between a target user and the users belonging to the most similar cluster to the
         target user using the pearson correlation coefficient similarity measure. Then it keeps track of the n most

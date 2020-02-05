@@ -2,9 +2,9 @@ import time
 
 import numpy as np
 
-import utils
-from enums import ContentBasedModels, Methods, CollaborativeModels
-from enums import MetricKind
+from utils import utils
+from utils.enums import ContentBasedModels, Methods, CollaborativeModels
+from utils.enums import MetricKind
 from models.baseline import Naive, Random
 from models.dnn_classifier import DeepNN
 from models.kmeans import Kmeans
@@ -13,7 +13,6 @@ from models.rf_classifier import RandomForest
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
-from utils import logger
 
 
 def init_content_based_model(model_name):
@@ -52,7 +51,7 @@ def init_collaborative_model(model_name):
         return Kmeans()
 
 
-def run_collaborative(properties, csvs):
+def run_collaborative(properties, csvs, logger):
     """
     It processes the data to obtain the input vectors for the collaborative method and then uses the input data to
     create the model for the collaborative method.
@@ -64,18 +63,18 @@ def run_collaborative(properties, csvs):
     """
     dp = CollaborativePreprocessing()
     logger.info("Creating input vectors for collaborative method")
-    dp.preprocess(properties=properties, datasets=csvs)
+    dp.preprocess(properties=properties, datasets=csvs, logger=logger)
     input_data = dp.users_ratings
     user_ids = dp.user_ids
     movie_ids = dp.movie_ids
     for model_name in properties["models"]["collaborative"]:
         clustering = init_collaborative_model(model_name)
         clustering.exec_collaborative_method(properties=properties, user_ratings=input_data, user_ids=user_ids,
-                                             movie_ids=movie_ids)
+                                             movie_ids=movie_ids, logger=logger)
     # TODO
 
 
-def run_content_based(properties, csvs):
+def run_content_based(properties, csvs, logger):
     """
     It processes the data to obtain the input vectors for the content-based methods and then uses them to create the
     models. It splits the data into train and test datasets, uses k-fold cross-validation and finally, run the models
@@ -88,7 +87,7 @@ def run_content_based(properties, csvs):
     """
     dp = ContentBasedPreprocessing()
     logger.info("Creating input vectors for content-based method")
-    dp.preprocess(properties, csvs)
+    dp.preprocess(properties=properties, datasets=csvs, logger=logger)
     input_data = dp.input_data
     ratings = dp.ratings
     logger.info("Split train and test datasets")
@@ -104,7 +103,7 @@ def run_content_based(properties, csvs):
         tic = time.time()
         classifier = init_content_based_model(model)
         classifier.run_cross_validation(classifier, properties, input_train, ratings_train,
-                                        folds, results_folder)
+                                        folds, results_folder, logger)
         logger.info("Time needed for classifier {} for train/test is {}".format(model, utils.elapsed_str(tic)))
         classifiers[model] = classifier
     logger.info("Calculating average for macro/micro precision, recall and F-measure")
@@ -141,11 +140,12 @@ def main():
     of the micro/macro metrics.
     """
     # load properties
-    logger.info("Loading properties")
     properties = utils.load_properties()
+    logger = utils.config_logger(properties)
+    logger.info("Configuration file is loaded")
     if properties["setup_folders"]:
         logger.info("Set up folders is true. Glove vectors and datasets will be downloaded")
-        utils.setup_folders(properties)
+        utils.setup_folders(properties=properties, logger=logger)
     # get dataset filenames to read
     logger.info("Collect the dataset filenames")
     file_names = utils.get_filenames(properties)
@@ -155,9 +155,9 @@ def main():
     dp.read_csv(file_names)
     csvs = dp.datasets
     if Methods.collaborative.value in properties["methods"]:
-        run_collaborative(properties, csvs)
+        run_collaborative(properties=properties, csvs=csvs, logger=logger)
     if Methods.content_based.value in properties["methods"]:
-        run_content_based(properties, csvs)
+        run_content_based(properties=properties, csvs=csvs, logger=logger)
 
 
 if __name__ == '__main__':

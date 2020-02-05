@@ -1,6 +1,6 @@
 from sklearn.neighbors import KNeighborsClassifier
 
-from enums import MetricKind, ContentBasedModels
+from utils.enums import MetricKind, ContentBasedModels
 from models.classifiers import ContentBasedClassifier
 
 

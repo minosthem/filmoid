@@ -4,5 +4,5 @@ Utility functions
 .. toctree::
         enums
 
-.. automodule:: utils
+.. automodule:: utils.utils
    :members:

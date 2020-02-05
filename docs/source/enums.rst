@@ -4,5 +4,5 @@ Enumeration classes in filmoid
 .. toctree::
    :caption: Enumeration classes in filmoid
 
-.. automodule:: enums
+.. automodule:: utils.enums
    :members:

@@ -1,6 +1,6 @@
 from sklearn.ensemble import RandomForestClassifier
 
-from enums import MetricKind, ContentBasedModels
+from utils.enums import MetricKind, ContentBasedModels
 from models.classifiers import ContentBasedClassifier
 
 

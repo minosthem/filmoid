@@ -1,6 +1,6 @@
 import pandas as pd
 
-from enums import PreprocessKind
+from utils.enums import PreprocessKind
 
 
 class DataPreprocessing:
@@ -21,13 +21,14 @@ class DataPreprocessing:
         for name, file in filenames.items():
             self.datasets[name] = pd.read_csv(file)
 
-    def preprocess(self, properties, datasets, kind=PreprocessKind.train.value):
+    def preprocess(self, properties, datasets, logger, kind=PreprocessKind.train.value):
         """
         Method that should be override by the children classes. Implements the preprocessing step of the method.
 
         Args
             properties (dict): the loaded configuration file
             datasets (dict): the DataFrames with the links, movies, tags and ratings
+            logger (Logger): the logger to print messages
             kind (str): values can be either train or recommend - input dataset for ratings will be different
 
         Returns

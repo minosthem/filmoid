@@ -4,9 +4,8 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score
 
-import utils
-from enums import MetricNames, MetricKind
-from utils import logger
+from utils import utils
+from utils.enums import MetricNames, MetricKind
 
 
 class Classifier:
@@ -98,7 +97,7 @@ class ContentBasedClassifier(Classifier):
             results_folder (str): the name of the folder where the results of the current execution will be stored
             fold_num (int): the number of the current fold
         """
-        results_folder_path = join(utils.current_dir, output_folder, results_folder)
+        results_folder_path = join(utils.app_dir, output_folder, results_folder)
         if not exists(results_folder_path):
             mkdir(results_folder_path)
         fold_path = join(results_folder_path, "fold_{}".format(fold_num))
@@ -124,7 +123,7 @@ class ContentBasedClassifier(Classifier):
             output_folder (str): the name of the output folder defined in the configuration yaml file
             results_folder (str): the name of the folder where the results of the current execution will be stored
         """
-        results_folder_path = join(output_folder, results_folder)
+        results_folder_path = join(utils.app_dir, output_folder, results_folder)
         fold_path = join(results_folder_path, "test_results")
         if not exists(fold_path):
             mkdir(fold_path)
@@ -154,7 +153,7 @@ class ContentBasedClassifier(Classifier):
             for fold_metric in self.fold_metrics:
                 metric_list.append(fold_metric[metric_name])
             self.avg_metrics[metric_name] = sum(metric_list) / len(metric_list)
-        results_folder_path = join(output_folder, results_folder)
+        results_folder_path = join(utils.app_dir, output_folder, results_folder)
         avg_folder = join(results_folder_path, "fold_avg")
         if not exists(avg_folder):
             mkdir(avg_folder)
@@ -187,13 +186,13 @@ class ContentBasedClassifier(Classifier):
                 max_value = value
                 max_idx = idx
         self.best_model = self.models[max_idx]
-        best_models_folder = join(properties["output_folder"], "best_models")
+        best_models_folder = join(utils.app_dir, properties["output_folder"], "best_models")
         if not exists(best_models_folder):
             mkdir(best_models_folder)
         best_model_pickle = "best_model_{}_{}.pickle".format(self.model_name, properties["dataset"])
         utils.write_to_pickle(self.best_model, best_models_folder, best_model_pickle)
 
-    def run_cross_validation(self, classifier, properties, input_data, labels, fold_idx, results_folder):
+    def run_cross_validation(self, classifier, properties, input_data, labels, fold_idx, results_folder, logger):
         """
         Checks which classifier is selected and then takes the input data and labels which are divided into k folds.
         Each fold contains a tuple with the train and test indices. For every fold the model is trained and the
