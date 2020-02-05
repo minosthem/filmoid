@@ -117,20 +117,22 @@ class Kmeans(CollaborativeClustering):
             user = User(user_id, idx)
             user.user_ratings = user_ratings[idx]
             user_similarities = list(predictions[idx, :])
-            min_idx = user_similarities.index(min(user_similarities))
-            user.user_cluster_idx = min_idx
+            max_idx = user_similarities.index(max(user_similarities))
+            user.user_cluster_idx = max_idx
             user.similarities = user_similarities
             for row in range(0, rows):
+                # check if current and target users are different
+                if user.user_id == user_ids[row]:
+                    continue
                 # checks if the user belongs to the same cluster as the target user
                 # get the current user similarities
                 other_user_similarities = list(predictions[row, :])
                 # find the closest cluster
-                other_user_min = other_user_similarities.index(min(other_user_similarities))
+                other_user_max = other_user_similarities.index(max(other_user_similarities))
                 # check if the closest cluster is the same as the target user's closest cluster
-                # check if current and target users are different
-                if other_user_min == user.user_cluster_idx and user.user_id != user_ids[row]:
+                if other_user_max == user.user_cluster_idx:
                     other_user = User(user_ids[row], row)
-                    other_user.user_cluster_idx = other_user_min
+                    other_user.user_cluster_idx = other_user_max
                     other_user.user_ratings = user_ratings[row]
                     other_user.similarities = other_user_similarities
                     user.similar_users.append(other_user)

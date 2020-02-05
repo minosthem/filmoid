@@ -1,6 +1,6 @@
 import os
 import unittest
-from os.path import join
+from os.path import join, exists
 from random import randint
 import yaml
 
@@ -17,7 +17,9 @@ from models.dnn_classifier import DeepNN
 
 
 def load_test_properties():
-    test_properties_path = join(os.getcwd(), "properties", "test_properties.yaml")
+    example_test_properties = join(os.getcwd(), "properties", "example_test_properties.yaml")
+    test_properties = join(os.getcwd(), "properties", "test_properties.yaml")
+    test_properties_path = test_properties if exists(test_properties) else example_test_properties
     with open(test_properties_path, "r") as f:
         return yaml.safe_load(f)
 
