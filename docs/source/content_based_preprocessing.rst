@@ -6,3 +6,6 @@ Data preprocessing for Content-Based method
 
 .. automodule:: preprocessing.content_based_preprocessing
    :members:
+   :private-members:
+   :inherited-members:
+   :special-members:
