@@ -1,5 +1,5 @@
 import zipfile
-from os import getcwd, mkdir, chdir, remove
+from os import getcwd, mkdir, remove
 from os.path import join, exists
 
 import wget
@@ -25,9 +25,9 @@ def create_missing_directories(output_folder, resources_folder, datasets_folder)
 
 def download_embeddings_file(resources_folder, embeddings_file_url):
     # download embeddings file
-    chdir(resources_folder)
+    resources_folder = join(getcwd(), resources_folder)
     print("Download specified embeddings file")
-    embeddings_zip_file = wget.download(embeddings_file_url)
+    embeddings_zip_file = wget.download(embeddings_file_url, out=resources_folder)
     path_to_embeddings_file = join(resources_folder, embeddings_zip_file)
     with zipfile.ZipFile(path_to_embeddings_file, 'r') as zip_ref:
         zip_ref.extractall(resources_folder)
@@ -36,10 +36,11 @@ def download_embeddings_file(resources_folder, embeddings_file_url):
 
 # download datasets
 def download_datasets(datasets_folder):
-    chdir(datasets_folder)
     print("Download MovieLens datasets")
-    small_dataset = wget.download("http://files.grouplens.org/datasets/movielens/ml-latest-small.zip")
-    large_dataset = wget.download("http://files.grouplens.org/datasets/movielens/ml-latest.zip")
+    datasets_folder = join(getcwd(), datasets_folder)
+    small_dataset = wget.download("http://files.grouplens.org/datasets/movielens/ml-latest-small.zip",
+                                  out=datasets_folder)
+    large_dataset = wget.download("http://files.grouplens.org/datasets/movielens/ml-latest.zip", out=datasets_folder)
     path_to_small_dataset = join(datasets_folder, small_dataset)
     path_to_large_dataset = join(datasets_folder, large_dataset)
 
