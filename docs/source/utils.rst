@@ -2,7 +2,7 @@ Utility functions
 =================
 
 .. toctree::
-    :caption: Utility functions
+        enums
 
 .. automodule:: utils
    :members:
