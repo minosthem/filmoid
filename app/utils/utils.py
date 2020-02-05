@@ -19,7 +19,7 @@ from utils.enums import MetricCaptions, Datasets
 
 log_filename = 'logs_%s' % datetime.now().strftime('%Y%m%d-%H%M%S')
 # app_dir = abspath(join(getcwd(), pardir))
-app_dir = join(getcwd(), "app")
+app_dir = getcwd() if getcwd().endswith("app") else join(getcwd(), "app")
 
 
 def config_logger(properties):
