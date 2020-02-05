@@ -5,11 +5,14 @@ import pickle
 import subprocess
 import sys
 import time
+import zipfile
 from datetime import datetime
+from os import mkdir, chdir, remove
 from os.path import join, exists
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import wget
 import yaml
 
 from enums import MetricCaptions, Datasets
@@ -70,28 +73,73 @@ def setup_folders(properties):
     Args:
         properties (dict): dictionary containing all the loaded properties from the respective yaml file
     """
-    os.environ["OUTPUT_FOLDER"] = properties["output_folder"]
-    os.environ["DATASETS_FOLDER"] = properties["datasets_folder"]
-    os.environ["RESOURCES_FOLDER"] = properties["resources_folder"]
-    embeddings_file = properties["embeddings_zip_file"]
-    os.environ["EMBEDDINGS_ZIP_FILE"] = embeddings_file
-    os.environ["EMBEDDINGS_FILE_URL"] = properties["embeddings_file_url"]
-    process = None
-    if properties["os"] == "linux":
-        file_path = join(os.getcwd(), "setup", "setup.sh")
-        process = subprocess.Popen("bash {}".format(file_path), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                   shell=True)
-    elif properties["os"] == "windows":
-        file_path = join(os.getcwd(), "setup", "setup.bat")
-        process = subprocess.Popen(file_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-    process.wait()
-    output, error = process.stdout, process.stderr
-    if process:
-        if output:
-            logger.info("Folders setup finished successfully!")
-        if error:
-            logger.info("Folders setup failed because: {}".format(error))
-            exit(-1)
+    if properties["os"] == "python":
+        create_missing_directories(properties["output_folder"], properties["resources_folder"],
+                                   properties["datasets_folder"])
+        download_embeddings_file(properties["resources_folder"], properties["embeddings_file_url"])
+        download_datasets(properties["datasets_folder"])
+    else:
+        os.environ["OUTPUT_FOLDER"] = properties["output_folder"]
+        os.environ["DATASETS_FOLDER"] = properties["datasets_folder"]
+        os.environ["RESOURCES_FOLDER"] = properties["resources_folder"]
+        os.environ["EMBEDDINGS_ZIP_FILE"] = properties["embeddings_zip_file"]
+        os.environ["EMBEDDINGS_FILE_URL"] = properties["embeddings_file_url"]
+        process = None
+        if properties["os"] == "linux":
+            file_path = join(os.getcwd(), "setup", "setup.sh")
+            process = subprocess.Popen("bash {}".format(file_path), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                       shell=True)
+        elif properties["os"] == "windows":
+            file_path = join(os.getcwd(), "setup", "setup.bat")
+            process = subprocess.Popen(file_path, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        process.wait()
+        output, error = process.stdout, process.stderr
+        if process:
+            if output:
+                logger.info("Folders setup finished successfully!")
+            if error:
+                logger.info("Folders setup failed because: {}".format(error))
+                exit(-1)
+
+
+def create_missing_directories(output_folder, resources_folder, datasets_folder):
+    print("Create missing directories")
+    if not exists(output_folder):
+        mkdir(output_folder)
+    if not exists(resources_folder):
+        mkdir(resources_folder)
+    if not exists(datasets_folder):
+        mkdir(datasets_folder)
+
+
+def download_embeddings_file(resources_folder, embeddings_file_url):
+    # download embeddings file
+    chdir(resources_folder)
+    print("Download specified embeddings file")
+    embeddings_zip_file = wget.download(embeddings_file_url)
+    path_to_embeddings_file = join(resources_folder, embeddings_zip_file)
+    with zipfile.ZipFile(path_to_embeddings_file, 'r') as zip_ref:
+        zip_ref.extractall(resources_folder)
+    remove(path_to_embeddings_file)
+
+
+# download datasets
+def download_datasets(datasets_folder):
+    chdir(datasets_folder)
+    print("Download MovieLens datasets")
+    small_dataset = wget.download("http://files.grouplens.org/datasets/movielens/ml-latest-small.zip")
+    large_dataset = wget.download("http://files.grouplens.org/datasets/movielens/ml-latest.zip")
+    path_to_small_dataset = join(datasets_folder, small_dataset)
+    path_to_large_dataset = join(datasets_folder, large_dataset)
+
+    with zipfile.ZipFile(path_to_small_dataset, 'r') as zip_ref:
+        zip_ref.extractall(datasets_folder)
+
+    with zipfile.ZipFile(path_to_large_dataset, 'r') as zip_ref:
+        zip_ref.extractall(datasets_folder)
+
+    remove(path_to_small_dataset)
+    remove(path_to_large_dataset)
 
 
 def elapsed_str(previous_tic, up_to=None):

@@ -1,4 +1,4 @@
-os: "linux" # possible values: linux, windows
+os: "linux" # possible values: linux, windows, python
 setup_folders: False # boolean (True or False)
 output_folder: "output"
 datasets_folder: "Datasets"
