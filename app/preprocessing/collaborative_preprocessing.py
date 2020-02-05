@@ -72,7 +72,7 @@ class CollaborativePreprocessing(DataPreprocessing):
                             user_vector.append(0.0)
                     user_vector = np.array(user_vector)
                     self.users_ratings.append(user_vector)
-                utils.print_progress(self.users_ratings)
+                utils.print_progress(self.users_ratings, logger=logger)
             logger.info("Writing input vectors into pickle file")
             self.users_ratings = np.array(self.users_ratings)
             self.user_ids = np.asarray(self.user_ids)
