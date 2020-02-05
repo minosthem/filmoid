@@ -14,6 +14,14 @@ from utils import logger
 
 
 class ContentBasedPreprocessing(DataPreprocessing):
+    """
+    Class that extends the DataPreprocessing class. Used for the content based method in recommendation systems.
+    Overrides the preprocess method to generate the input vectors, i.e. a vector containing user and movie information.
+    For the users, the only information is their id, so the first dimension of the input vectors is the user id. For
+    the movies, the information used is the title, the genres and the tags given by the specific user. All those text
+    are concatenated into a single string and its words are replaced by word embeddings. As labels, the specific rating
+    is used (0 or 1 for binary classification - 5 classes for multi-class classification).
+    """
     input_data_pickle = "input_data.pickle"
     ratings_pickle = "ratings.pickle"
     test_dataset_pickle = "test_recommendation.pickle"

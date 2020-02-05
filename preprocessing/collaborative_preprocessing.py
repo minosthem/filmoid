@@ -9,6 +9,11 @@ from utils import logger
 
 
 class CollaborativePreprocessing(DataPreprocessing):
+    """
+    Class that extends the DataPreprocessing class. Used for the collaborative method in recommendation systems.
+    Overrides the preprocess method to generate the input vectors (user ratings for all the movies - if a rating
+    is missing zero value is used), the labels (user ids) and the indices of the input vectors i.e. the movie ids.
+    """
     users_ratings_pickle = "users_ratings.pickle"
     users_ids_pickle = "user_ids.pickle"
     movie_ids_pickle = "movie_ids.pickle"

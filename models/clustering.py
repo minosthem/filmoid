@@ -21,13 +21,55 @@ class CollaborativeClustering(Clustering):
     model_name = ""
 
     def train(self, properties, input_data):
-        pass
+        """
+        Method to be implemented by the children classes. Used to train a model.
+
+        Args
+            properties (dict): the loaded configuration file
+            input_data (ndarray): the input vectors for the training
+
+        Returns
+            NotImplementedError: raises an exception if the child class has not implemented the method
+        """
+        raise NotImplementedError
 
     def test(self, test_data):
-        pass
+        """
+        Method to be implemented by the children classes. Used to test a model.
+
+        Args
+            test_data (ndarray): the test set
+
+        Returns
+            NotImplementedError: raises an exception if the method is not implemented by the children classes
+        """
+        raise NotImplementedError
 
     def fit_transform(self, properties, input_data):
-        pass
+        """
+        Method should be implemented by the children classes. Used to both train and test a model with the dataset.
+
+        Args
+            properties (dict): the loaded configuration file
+            input_data (ndarray): the input vectors for the training
+
+        Returns
+            NotImplementedError: raises an exception if the method is not implemented by the children classes
+        """
+        raise NotImplementedError
 
     def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids):
-        pass
+        """
+        Method should be override by the children classes. Used to execute the training, test and predictions for
+        the selected model.
+
+        Args
+            properties (dict): the loaded configuration file
+            user_ratings (ndarray): the input vectors for the training
+            user_ids (ndarray): the "label" of each input vector
+            movie_ids (ndarray): the indices related to a movie for each vector
+
+       Returns
+            NotImplementedError: raises an exception if the method is not implemented by the children classes
+        """
+        raise NotImplementedError

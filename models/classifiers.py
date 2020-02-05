@@ -35,10 +35,32 @@ class ContentBasedClassifier(Classifier):
     model_name = ""
 
     def train(self, properties, input_data, labels):
-        pass
+        """
+        Method needs to be implemented by children classes. Used to train a model.
+
+        Args
+            properties (dict): the loaded configuration file
+            input_data (ndarray): the input vectors for the training
+            labels (ndarray): the labels of the input vectors
+
+        Returns
+            NotImplementedError: raises an exception if the child class has not implemented the method
+        """
+        raise NotImplementedError
 
     def test(self, test_data, true_labels, kind=MetricKind.validation.value):
-        pass
+        """
+        Methods needs to be implemented by the children classes. Used to validate/test a model.
+
+        Args
+            test_data (ndarray): input vectors for testing
+            true_labels (ndarray): the labels for the validation
+            kind (str): uses different model based on the kind (validation or test). For test uses the best model
+
+        Returns
+            NotImplementedError: raises an exception if the child class has not implemented the method
+        """
+        raise NotImplementedError
 
     def get_results(self, true_labels, predicted_labels, kind=MetricKind.validation.value):
         """
