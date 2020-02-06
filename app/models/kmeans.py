@@ -84,17 +84,21 @@ class Kmeans(CollaborativeClustering):
             similarities = []
             for other_user in user.similar_users:
                 other_user_ratings = other_user.user_ratings
-                similarity = pearsonr(user_rating, other_user_ratings)
-                similarities.append(similarity)
+                user_same_ratings, other_user_same_ratings, same_movie_ids = self.__find_same_ratings(
+                    movie_ids=movie_ids, user_ratings=user_rating, other_user_ratings=other_user_ratings)
+                similarity = pearsonr(user_same_ratings, other_user_same_ratings)
+                if similarity[0] < 0:
+                    continue
+                similarities.append(similarity[0])
             # sort list from min to max - pearsonr returns p-value
             num_similar_users = properties["kmeans"]["n_similar"]
             similar_users = []
             for i in range(num_similar_users):
                 if i < len(similarities):
-                    min_idx = similarities.index(min(similarities))
-                    other_user = user.similar_users[min_idx]
+                    max_idx = similarities.index(max(similarities))
+                    other_user = user.similar_users[max_idx]
                     similar_users.append(other_user)
-                    similarities[min_idx] = 100000000
+                    similarities[max_idx] = -100000000
             # TODO predict ratings
 
     @staticmethod
@@ -138,6 +142,18 @@ class Kmeans(CollaborativeClustering):
                     user.similar_users.append(other_user)
             users.append(user)
         return users
+
+    @staticmethod
+    def __find_same_ratings(movie_ids, user_ratings, other_user_ratings):
+        user_same_ratings = []
+        other_user_same_ratings = []
+        same_movie_ids = []
+        for idx, movie_id in enumerate(movie_ids):
+            if user_ratings[idx] > 0 and other_user_ratings[idx] > 0:
+                user_same_ratings.append(user_ratings[idx])
+                other_user_same_ratings.append(other_user_ratings[idx])
+                same_movie_ids.append(movie_id)
+        return user_same_ratings, other_user_same_ratings, same_movie_ids
 
 
 class User:
