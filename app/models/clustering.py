@@ -1,3 +1,6 @@
+from utils.enums import Classification
+
+
 class Clustering:
     """
     Generic class that models clustering methods. Clustering is used in the collaborative method of recommendation
@@ -72,4 +75,8 @@ class CollaborativeClustering(Clustering):
        Returns
             NotImplementedError: raises an exception if the method is not implemented by the children classes
         """
+        raise NotImplementedError
+
+    @staticmethod
+    def calc_results(properties, users, classification=Classification.binary.value):
         raise NotImplementedError

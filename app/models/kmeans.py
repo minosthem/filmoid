@@ -1,8 +1,13 @@
+from os.path import join, exists
+from os import mkdir
 import numpy as np
+import pandas as pd
 from scipy.stats.stats import pearsonr
 from sklearn.cluster import KMeans
+from sklearn.metrics import precision_score, recall_score, f1_score
 
-from utils.enums import CollaborativeModels
+from utils import utils
+from utils.enums import CollaborativeModels, Classification, MetricNames
 from models.clustering import CollaborativeClustering
 
 
@@ -62,6 +67,46 @@ class Kmeans(CollaborativeClustering):
         predictions = 1 - cluster_distances / np.max(cluster_distances)
         return predictions
 
+    @staticmethod
+    def calc_results(properties, users, classification=Classification.binary.value):
+        macro_precisions = []
+        micro_precisions = []
+        macro_recalls = []
+        micro_recalls = []
+        macro_fs = []
+        micro_fs = []
+        for user in users:
+            if classification == Classification.binary.value:
+                user.true_rated[user.true_rated <= 3] = 1
+                user.true_rated[user.true_rated > 3] = 0
+                user.predicted_rated[user.predicted_rated <= 3] = 1
+                user.predicted_rated[user.predicted_rated > 3] = 0
+            else:
+                user.true_rated = np.around(user.true_rated, decimals=0)
+                user.predicted_rated = np.around(user.predicted_rated, decimals=0)
+            macro_precisions.append(precision_score(user.true_rated, user.predicted_rated, average="macro"))
+            micro_precisions.append(precision_score(user.true_rated, user.predicted_rated, average="micro"))
+            macro_recalls.append(recall_score(user.true_rated, user.predicted_rated, average="macro"))
+            micro_recalls.append(recall_score(user.true_rated, user.predicted_rated, average="micro"))
+            macro_fs.append(f1_score(user.true_rated, user.predicted_rated, average="macro"))
+            micro_fs.append(f1_score(user.true_rated, user.predicted_rated, average="micro"))
+        avg_macro_precision = sum(macro_precisions) / len(macro_precisions)
+        avg_micro_precision = sum(micro_precisions) / len(micro_precisions)
+        avg_macro_recall = sum(macro_recalls) / len(macro_recalls)
+        avg_micro_recall = sum(micro_recalls) / len(micro_recalls)
+        avg_macro_f = sum(macro_fs) / len(macro_fs)
+        avg_micro_f = sum(macro_fs) / len(micro_fs)
+        df = pd.DataFrame(columns=["classifier", "metric", "result_kind", "result"])
+        df.loc[0] = ["kmeans", MetricNames.macro_precision.value, "validation", avg_macro_precision]
+        df.loc[1] = ["kmeans", MetricNames.micro_precision.value, "validation", avg_micro_precision]
+        df.loc[2] = ["kmeans", MetricNames.macro_recall.value, "validation", avg_macro_recall]
+        df.loc[3] = ["kmeans", MetricNames.micro_recall.value, "validation", avg_micro_recall]
+        df.loc[4] = ["kmeans", MetricNames.macro_f.value, "validation", avg_macro_f]
+        df.loc[5] = ["kmeans", MetricNames.macro_f.value, "validation", avg_micro_f]
+        path = join(utils.app_dir, properties["output_folder"], "results_kmeans_{}".format(properties["dataset"]))
+        filename = "Metric_Results.csv"
+        df.to_csv(join(path, filename), sep=",")
+
     def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids, logger):
         """
         Calculates the similarity between a target user and the users belonging to the most similar cluster to the
@@ -77,15 +122,23 @@ class Kmeans(CollaborativeClustering):
         Returns
             A list with the predicted ratings for every user
         """
+        if not exists(
+                join(utils.app_dir, properties["output_folder"], "results_kmeans_{}".format(properties["dataset"]))):
+            mkdir(join(utils.app_dir, properties["output_folder"], "results_kmeans_{}".format(properties["dataset"])))
         predictions = self.fit_transform(properties=properties, input_data=user_ratings)
         users = self._find_similar_users(user_ids=user_ids, user_ratings=user_ratings, predictions=predictions)
         for user in users:
+            logger.info("Calculating predictions for user with id {}".format(user.user_id))
             user_rating = user_ratings[user.user_idx, :]
+            user.average_rating = self.__get_mean_positive_ratings(user_rating)
             similarities = []
+            logger.info("Calculate pearson similarity with similar users")
             for other_user in user.similar_users:
+                logger.debug("Pearson similarity with other user with id {}".format(other_user.user_id))
                 other_user_ratings = other_user.user_ratings
                 user_same_ratings, other_user_same_ratings, same_movie_ids = self.__find_same_ratings(
                     movie_ids=movie_ids, user_ratings=user_rating, other_user_ratings=other_user_ratings)
+                other_user.average_user = self.__get_mean_positive_ratings(other_user.user_ratings)
                 similarity = pearsonr(user_same_ratings, other_user_same_ratings)
                 if similarity[0] < 0:
                     continue
@@ -93,13 +146,45 @@ class Kmeans(CollaborativeClustering):
             # sort list from min to max - pearsonr returns p-value
             num_similar_users = properties["kmeans"]["n_similar"]
             similar_users = []
+            similarities_final = []
             for i in range(num_similar_users):
                 if i < len(similarities):
                     max_idx = similarities.index(max(similarities))
+                    similarities_final.append(similarities[max_idx])
                     other_user = user.similar_users[max_idx]
                     similar_users.append(other_user)
                     similarities[max_idx] = -100000000
-            # TODO predict ratings
+            for movie_idx, movie_id in enumerate(movie_ids):
+                user_values = []
+                for user_idx, other_user in enumerate(similar_users):
+                    similarity = similarities_final[user_idx]
+                    avg_other_user = other_user.average_user
+                    other_user_rating = other_user.user_ratings[movie_idx]
+                    value = (other_user_rating - avg_other_user) * similarity
+                    user_values.append(value)
+                sum_values = sum(user_values) / abs(sum(similarities_final))
+                user.movie_predictions.append(user.average_rating + sum_values)
+            user.user_ratings = np.asarray(user.user_ratings)
+            user.movie_predictions = np.asarray(user.movie_predictions)
+            indices = user.user_ratings > 0
+            user.true_rated = user.user_ratings[indices]
+            user.predicted_rated = user.movie_predictions[indices]
+            self.__write_user_csv(properties, user, movie_ids)
+        utils.write_to_pickle(users, properties["output_folder"],
+                              "collaborative_user_predictions_{}.pickle".format(properties["dataset"]))
+        return users
+
+    @staticmethod
+    def __write_user_csv(properties, user, movie_ids):
+        path = join(utils.app_dir, properties["output_folder"], "results_kmeans_{}".format(properties["dataset"]))
+        filename = "Predictions_{}.csv".format(user.user_id)
+        df = pd.DataFrame(columns=["movie_id", "rating", "prediction"])
+        for movie_idx, movie_id in enumerate(movie_ids):
+            rating = user.user_ratings[movie_idx]
+            prediction = user.movie_predictions[movie_idx]
+            df.loc[movie_idx] = [movie_id, rating, prediction]
+        file_path = join(path, filename)
+        df.to_csv(file_path, sep=',')
 
     @staticmethod
     def _find_similar_users(user_ids, user_ratings, predictions):
@@ -141,6 +226,7 @@ class Kmeans(CollaborativeClustering):
                     other_user.similarities = other_user_similarities
                     user.similar_users.append(other_user)
             users.append(user)
+
         return users
 
     @staticmethod
@@ -155,6 +241,12 @@ class Kmeans(CollaborativeClustering):
                 same_movie_ids.append(movie_id)
         return user_same_ratings, other_user_same_ratings, same_movie_ids
 
+    @staticmethod
+    def __get_mean_positive_ratings(ratings):
+        positives = ratings > 0
+        if positives.any():
+            return ratings[positives].mean()
+
 
 class User:
     """
@@ -164,8 +256,12 @@ class User:
     user_idx = -1
     similar_users = []
     user_ratings = []
+    true_rated = []
     similarities = []
     user_cluster_idx = -1
+    average_rating = 0.0
+    movie_predictions = []
+    predicted_rated = []
 
     def __init__(self, user_id, user_idx):
         self.user_id = user_id
