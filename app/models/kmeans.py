@@ -69,6 +69,15 @@ class Kmeans(CollaborativeClustering):
 
     @staticmethod
     def calc_results(properties, users, classification=Classification.binary.value):
+        """
+        Calculates the average value of the evaluation metrics of the users' predicted ratings and writes the results
+        in a csv file.
+
+        Args
+            properties (dict): Output folder, dataset
+            users: A list with the predicted ratings for every user
+            classification (str): A variable of the class classification
+        """
         macro_precisions = []
         micro_precisions = []
         macro_recalls = []
@@ -176,6 +185,14 @@ class Kmeans(CollaborativeClustering):
 
     @staticmethod
     def __write_user_csv(properties, user, movie_ids):
+        """
+        Writes in a csv file the real ratings and the predicted ratings on movies for a particular user.
+
+        Args
+            properties (dict): Output folder, dataset
+            user (object): An object of the class user
+            movie_ids (ndarray): A list with the movie ids
+        """
         path = join(utils.app_dir, properties["output_folder"], "results_kmeans_{}".format(properties["dataset"]))
         filename = "Predictions_{}.csv".format(user.user_id)
         df = pd.DataFrame(columns=["movie_id", "rating", "prediction"])
@@ -231,6 +248,17 @@ class Kmeans(CollaborativeClustering):
 
     @staticmethod
     def __find_same_ratings(movie_ids, user_ratings, other_user_ratings):
+        """
+        Find the ratings of two users on the same movies.
+        Args
+            movie_ids (ndarray): The movie ids
+            user_ratings (ndarray): The ratings of the target user
+            other_user_ratings (ndarray): The ratings of a similar user to the target user
+
+        Returns
+            Three lists one with the ratings of the target and one with the ratings of the similar user and one with
+            the ids of movies that both of them rated
+        """
         user_same_ratings = []
         other_user_same_ratings = []
         same_movie_ids = []
@@ -243,6 +271,15 @@ class Kmeans(CollaborativeClustering):
 
     @staticmethod
     def __get_mean_positive_ratings(ratings):
+        """
+        From a list of ratings find those with positive value and calculate their mean.
+
+        Args
+            ratings (ndarray): A list of ratings
+
+        Returns
+             The mean of the positive ratings
+        """
         positives = ratings > 0
         if positives.any():
             return ratings[positives].mean()
