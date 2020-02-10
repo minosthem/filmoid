@@ -322,7 +322,9 @@ def visualize(df, output_folder, results_folder, folder_name, filename):
     # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.xticks(rotation="horizontal")
     plt.legend(captions)
-    plt.savefig(join(app_dir, output_folder, results_folder, folder_name, filename))
+    path = join(app_dir, output_folder, results_folder, folder_name) if folder_name else \
+        join(app_dir, output_folder, results_folder)
+    plt.savefig(join(path, filename))
     # plt.show()
 
 

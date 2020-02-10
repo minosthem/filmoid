@@ -77,8 +77,7 @@ class CollaborativeClustering(Clustering):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def calc_results(properties, users, classification=Classification.binary.value):
+    def calc_results(self, properties, users, logger, classification=Classification.binary.value):
         """
         Method should be override by the children classes. Used to calculate the average value of the evaluation metrics
         of the users' predicted ratings.

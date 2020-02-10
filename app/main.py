@@ -3,7 +3,7 @@ import time
 import numpy as np
 from os.path import join, exists
 from utils import utils
-from utils.enums import ContentBasedModels, Methods, CollaborativeModels
+from utils.enums import ContentBasedModels, Methods, CollaborativeModels, Classification
 from utils.enums import MetricKind
 from models.baseline import Naive, Random
 from models.dnn_classifier import DeepNN
@@ -77,7 +77,9 @@ def run_collaborative(properties, csvs, logger):
             users = clustering.exec_collaborative_method(properties=properties, user_ratings=input_data,
                                                          user_ids=user_ids,
                                                          movie_ids=movie_ids, logger=logger)
-
+        class_method = Classification.binary.value if properties["classification"] == "binary" else \
+            Classification.multi.value
+        clustering.calc_results(properties=properties, users=users, logger=logger, classification=class_method)
 
 
 def run_content_based(properties, csvs, logger):
