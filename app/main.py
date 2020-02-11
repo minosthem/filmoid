@@ -2,6 +2,7 @@ import time
 
 import numpy as np
 from os.path import join, exists
+from os import mkdir
 from utils import utils
 from utils.enums import ContentBasedModels, Methods, CollaborativeModels, Classification
 from utils.enums import MetricKind
@@ -69,6 +70,11 @@ def run_collaborative(properties, csvs, logger):
     movie_ids = dp.movie_ids
     for model_name in properties["models"]["collaborative"]:
         clustering = init_collaborative_model(model_name)
+        if not exists(
+                join(utils.app_dir, properties["output_folder"],
+                     "results_{}_{}".format(model_name, properties["dataset"]))):
+            mkdir(join(utils.app_dir, properties["output_folder"],
+                       "results_{}_{}".format(model_name, properties["dataset"])))
         if exists(join(utils.app_dir, properties["output_folder"],
                        "collaborative_user_predictions_{}.pickle".format(properties["dataset"]))):
             users = utils.load_from_pickle(properties["output_folder"],

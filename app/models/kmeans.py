@@ -148,11 +148,6 @@ class Kmeans(CollaborativeClustering):
         Returns
             A list with the predicted ratings for every user
         """
-        if not exists(
-                join(utils.app_dir, properties["output_folder"],
-                     "results_{}_{}".format(self.model_name, properties["dataset"]))):
-            mkdir(join(utils.app_dir, properties["output_folder"],
-                       "results_{}_{}".format(self.model_name, properties["dataset"])))
         predictions = self.fit_transform(properties=properties, input_data=user_ratings)
         users = self._find_similar_users(user_ids=user_ids, user_ratings=user_ratings, predictions=predictions)
         for user in users:
