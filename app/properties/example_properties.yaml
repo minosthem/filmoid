@@ -1,4 +1,4 @@
-os: "linux" # possible values: linux, windows, python
+os: "linux" # possible values: linux, windows
 setup_folders: False # boolean (True or False)
 output_folder: "output"
 datasets_folder: "Datasets"
@@ -20,10 +20,10 @@ metric_best_model: "micro_f" # Possible values: "macro-precision", "micro-precis
 knn:
   neighbors: 20 # KNN neighbors
 rf:
-  estimators: 500
+  estimators: 200
   max_depth: 10
 dnn:
-  hidden_layers: [[200, "relu", 0.5], [200, "relu", 0.5], [200, "relu", 0.5] , ["softmax"]] # first number is hidden units, second one is the activation function and third one is the dropout
+  hidden_layers: [[1000, "relu", 0.5], [1000, "relu", 0.5], ["softmax"]] # first number is hidden units, second one is the activation function and third one is the dropout
   sgd:
     lr: 0.01
     decay: 0.000001
@@ -31,10 +31,10 @@ dnn:
     nesterov: True
   loss: "categorical_crossentropy" # possible values are binary_crossentropy and categorical_crossentropy
   metrics: ["accuracy"]
-  epochs: 10
+  epochs: 100
   batch_size: 500
 kmeans:
   clusters: 10
   n_init: 20
   max_iter: 500
-  n_similar: 5
+  n_similar: 10
