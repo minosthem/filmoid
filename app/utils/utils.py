@@ -11,6 +11,7 @@ from os.path import join, exists
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import wget
 import yaml
 
@@ -363,26 +364,5 @@ def generate_recommendation_dataset(properties, logger):
     path_to_dataset = join(app_dir, properties["datasets_folder"], dataset_folder)
     file_path = join(path_to_dataset, "test_recommendation.csv")
     test_df.to_csv(file_path, sep=",")
-
-
-def create_dummy_variables(propoerties):
-    file_names = get_filenames(propoerties)
-    # read datasets
-    dp = DataPreprocessing()
-    dp.read_csv(file_names)
-    csvs = dp.datasets
-    ratings = csvs["ratings"]
-    count = []
-    for _, row in ratings.iterrows():
-        user_id = row["userId"]
-        if user_id not in count:
-            count.append(user_id)
-    num_users = len(count)
-
-
-
-
-
-
 
 

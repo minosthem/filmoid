@@ -70,6 +70,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
             movies_df = datasets["movies"]
             tags_df = datasets["tags"]
             glove_df = utils.load_glove_file(properties=properties, logger=logger)
+            users_dict_dummy = self.__create_dummy_variables(ratings=ratings_df)
             logger.info("Generating input vectors")
             self.input_data = []
             self.ratings = []
@@ -84,7 +85,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
                 movie_vector = self._text_to_glove(properties, glove_df, movie_text)
                 if movie_vector.size == 0:
                     continue
-                movie_vector = np.insert(movie_vector, 0, user_id, axis=1)
+                movie_vector = np.concatenate((users_dict_dummy[user_id], movie_vector), axis=1)
                 self.input_data.append(movie_vector)
                 self.ratings.append(rating)
                 utils.print_progress(self.ratings, logger=logger)
@@ -221,3 +222,19 @@ class ContentBasedPreprocessing(DataPreprocessing):
         """
         kf = KFold(n_splits=properties["cross-validation"], shuffle=True, random_state=666)
         return kf.split(input_data)
+
+    @staticmethod
+    def __create_dummy_variables(ratings):
+        count = []
+        for _, row in ratings.iterrows():
+            user_id = row["userId"]
+            if user_id not in count:
+                count.append(user_id)
+        num_users = len(count)
+        users = {}
+        for idx, user_id in enumerate(count):
+            user = np.zeros(num_users)
+            user[idx] = 1
+            user = np.reshape(user, (1, num_users))
+            users[user_id] = user
+        return users
