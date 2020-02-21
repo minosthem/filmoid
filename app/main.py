@@ -8,7 +8,7 @@ from utils.enums import ContentBasedModels, Methods, CollaborativeModels, Classi
 from utils.enums import MetricKind
 from models.baseline import Naive, Random
 from models.dnn_classifier import DeepNN
-from models.clustering import CollaborativeClustering
+from models.clustering import CollaborativeMethod
 from models.knn_classifier import KNN
 from models.rf_classifier import RandomForest
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
@@ -55,7 +55,7 @@ def run_collaborative(properties, csvs, logger):
     user_ids = dp.user_ids
     movie_ids = dp.movie_ids
     for model_name in properties["models"]["collaborative"]:
-        clustering = CollaborativeClustering()
+        clustering = CollaborativeMethod()
         if not exists(
                 join(utils.app_dir, properties["output_folder"],
                      "results_{}_{}".format(model_name, properties["dataset"]))):

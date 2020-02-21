@@ -12,20 +12,7 @@ from utils.enums import Classification
 from utils.enums import MetricNames, MetricKind, CollaborativeModels
 
 
-class Clustering:
-    """
-    Generic class that models clustering methods. Clustering is used in the collaborative method of recommendation
-    systems.
-    """
-
-    def train(self, properties, input_data):
-        pass
-
-    def test(self, test_data):
-        pass
-
-
-class CollaborativeClustering(Clustering):
+class CollaborativeMethod:
     """
     Class to be extended by collaborative models (e.g. kmeans). Methods train and test should be implemented by the
     sub-classes.
@@ -33,44 +20,6 @@ class CollaborativeClustering(Clustering):
 
     metrics = {}
     model_name = ""
-
-    def train(self, properties, input_data):
-        """
-        Method to be implemented by the children classes. Used to train a model.
-
-        Args
-            properties (dict): the loaded configuration file
-            input_data (ndarray): the input vectors for the training
-
-        Returns
-            NotImplementedError: raises an exception if the child class has not implemented the method
-        """
-        raise NotImplementedError
-
-    def test(self, test_data):
-        """
-        Method to be implemented by the children classes. Used to test a model.
-
-        Args
-            test_data (ndarray): the test set
-
-        Returns
-            NotImplementedError: raises an exception if the method is not implemented by the children classes
-        """
-        raise NotImplementedError
-
-    def fit_transform(self, properties, input_data):
-        """
-        Method should be implemented by the children classes. Used to both train and test a model with the dataset.
-
-        Args
-            properties (dict): the loaded configuration file
-            input_data (ndarray): the input vectors for the training
-
-        Returns
-            NotImplementedError: raises an exception if the method is not implemented by the children classes
-        """
-        raise NotImplementedError
 
     def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids, logger):
         """
@@ -245,29 +194,3 @@ class CollaborativeClustering(Clustering):
             df.loc[movie_idx] = [movie_id, rating, prediction]
         file_path = join(path, filename)
         df.to_csv(file_path, sep=',')
-
-
-class User:
-    """
-    Class that represents users.
-    """
-    user_id = -1
-    user_idx = -1
-    similar_users = []
-    user_ratings = []
-    true_rated = []
-    similarities = []
-    user_cluster_idx = -1
-    average_rating = 0.0
-    movie_predictions = []
-    predicted_rated = []
-
-    def __init__(self, user_id, user_idx):
-        self.user_id = user_id
-        self.user_idx = user_idx
-        self.similar_users = []
-        self.user_ratings = []
-        self.user_cluster_idx = -1
-        self.average_rating = 0.0
-        self.movie_predictions = []
-        self.predicted_rated = []

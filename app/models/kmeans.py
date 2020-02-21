@@ -1,11 +1,11 @@
 import numpy as np
 from sklearn.cluster import KMeans
 
-from models.clustering import CollaborativeClustering, User
+from models.models import User
 from utils.enums import CollaborativeModels
 
 
-class Kmeans(CollaborativeClustering):
+class Kmeans:
     """
     Class that represents KMeans clustering. Uses kmeans form scikit-learn library.
     """
@@ -80,8 +80,8 @@ class Kmeans(CollaborativeClustering):
         for idx, user_id in enumerate(list(user_ids)):
             user = User(user_id, idx)
             user.user_ratings = user_ratings[idx]
-            user_similarities = list(predictions[idx, :])
-            max_idx = user_similarities.index(max(user_similarities))
+            user_similarities = predictions[idx, :].tolist()
+            max_idx = np.argmax(user_similarities)
             user.user_cluster_idx = max_idx
             user.similarities = user_similarities
             for row in range(0, rows):

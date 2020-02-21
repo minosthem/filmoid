@@ -1,6 +1,6 @@
 from scipy.stats.stats import pearsonr
 
-from models.clustering import User
+from models.models import User
 from utils.enums import CollaborativeModels
 
 
