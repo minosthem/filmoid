@@ -12,3 +12,4 @@ docs/build
 public
 app/docs/_build
 /app/output/
+/app/utils/__pycache__/*.pyc

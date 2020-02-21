@@ -8,7 +8,7 @@ from utils.enums import ContentBasedModels, Methods, CollaborativeModels, Classi
 from utils.enums import MetricKind
 from models.baseline import Naive, Random
 from models.dnn_classifier import DeepNN
-from models.kmeans import Kmeans
+from models.clustering import CollaborativeClustering
 from models.knn_classifier import KNN
 from models.rf_classifier import RandomForest
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
@@ -38,20 +38,6 @@ def init_content_based_model(model_name):
         return Random()
 
 
-def init_collaborative_model(model_name):
-    """
-    Function that initializes a classifier object based on a given name. Stores the given name in a field of the object.
-
-    Args
-        classifier_name (str): the name of the model
-
-    Returns
-        Classifier: a classifier object
-    """
-    if model_name == CollaborativeModels.kmeans.value:
-        return Kmeans()
-
-
 def run_collaborative(properties, csvs, logger):
     """
     It processes the data to obtain the input vectors for the collaborative method and then uses the input data to
@@ -69,7 +55,7 @@ def run_collaborative(properties, csvs, logger):
     user_ids = dp.user_ids
     movie_ids = dp.movie_ids
     for model_name in properties["models"]["collaborative"]:
-        clustering = init_collaborative_model(model_name)
+        clustering = CollaborativeClustering()
         if not exists(
                 join(utils.app_dir, properties["output_folder"],
                      "results_{}_{}".format(model_name, properties["dataset"]))):
