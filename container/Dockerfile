@@ -14,5 +14,5 @@ WORKDIR ${HOME}
 COPY entrypoint.sh ${HOME}
 COPY env_prep.py ${HOME}
 
-CMD bash entrypoint.sh && tail -f /dev/null
-#CMD tail -f /dev/null
+# CMD bash entrypoint.sh && tail -f /dev/null
+CMD tail -f /dev/null
