@@ -42,7 +42,7 @@ class CollaborativeMethod:
             predictions = kmeans.fit_transform(properties=properties, input_data=user_ratings)
             users = kmeans.find_similar_users(user_ids=user_ids, user_ratings=user_ratings, predictions=predictions)
         else:
-            users = pearson.find_similar_users(user_ids=user_ids, user_ratings=user_ratings)
+            users = pearson.init_users(user_ids=user_ids, user_ratings=user_ratings)
         for user in users:
             logger.info("Calculating predictions for user with id {}".format(user.user_id))
             user_rating = user_ratings[user.user_idx, :]

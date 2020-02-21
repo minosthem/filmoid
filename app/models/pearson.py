@@ -12,7 +12,7 @@ class Pearson:
         self.model = None
 
     @staticmethod
-    def find_similar_users(user_ids, user_ratings):
+    def init_users(user_ids, user_ratings):
         users = []
         for idx, user_id in enumerate(list(user_ids)):
             user = User(user_id, idx)
@@ -67,7 +67,7 @@ class Pearson:
                 logger.debug("Most similar user: {}".format(other_user))
                 logger.debug("Max similarity: {}".format(absolute_similarity_list[max_idx]))
                 similar_users.append(other_user)
-                absolute_similarity_list[max_idx] = -100000000
+                absolute_similarity_list[max_idx] = 0
 
     @staticmethod
     def find_same_ratings(movie_ids, user_ratings, other_user_ratings):
