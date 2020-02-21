@@ -6,3 +6,5 @@ Clustering with KMeans
 
 .. automodule:: models.kmeans
    :members:
+   :private-members:
+   :special-members:
