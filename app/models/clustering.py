@@ -46,7 +46,7 @@ class CollaborativeMethod:
         for user in users:
             logger.info("Calculating predictions for user with id {}".format(user.user_id))
             user_rating = user_ratings[user.user_idx, :]
-            user.average_rating = self.__get_mean_positive_ratings(user_rating)
+            user.average_rating = self.get_mean_positive_ratings(user_rating)
             logger.info("User with id {} has average rating {}".format(user.user_id, user.average_rating))
             similarities, absolute_similarity_list = pearson.get_user_similarities(logger=logger, user=user,
                                                                                    user_rating=user_rating,
@@ -92,7 +92,7 @@ class CollaborativeMethod:
         user.true_rated = np.asarray(user.true_rated)
         user.predicted_rated = np.asarray(user.predicted_rated)
         logger.debug("Save user predictions to csv file")
-        self.__write_user_csv(properties, user, movie_ids)
+        self.write_user_csv(properties, user, movie_ids)
 
     def calc_results(self, properties, users, logger, classification=Classification.binary.value):
         """
@@ -161,7 +161,7 @@ class CollaborativeMethod:
                         filename="Plot_collaborative_{}_{}.png".format(self.model_name, properties["dataset"]))
 
     @staticmethod
-    def __get_mean_positive_ratings(ratings):
+    def get_mean_positive_ratings(ratings):
         """
         From a list of ratings find those with positive value and calculate their mean.
 
@@ -175,7 +175,7 @@ class CollaborativeMethod:
         if positives.any():
             return ratings[positives].mean()
 
-    def __write_user_csv(self, properties, user, movie_ids):
+    def write_user_csv(self, properties, user, movie_ids):
         """
         Writes in a csv file the real ratings and the predicted ratings on movies for a particular user.
 

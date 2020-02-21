@@ -36,9 +36,9 @@ class Pearson:
         for other_user in user.similar_users:
             logger.debug("Pearson similarity with other user with id {}".format(other_user.user_id))
             other_user_ratings = other_user.user_ratings
-            user_same_ratings, other_user_same_ratings, same_movie_ids = self.__find_same_ratings(
+            user_same_ratings, other_user_same_ratings, same_movie_ids = self.find_same_ratings(
                 movie_ids=movie_ids, user_ratings=user_rating, other_user_ratings=other_user_ratings)
-            other_user.average_user = self.__get_mean_positive_ratings(other_user.user_ratings)
+            other_user.average_user = self.get_mean_positive_ratings(other_user.user_ratings)
             if len(same_movie_ids) >= 2:
                 similarity = pearsonr(user_same_ratings, other_user_same_ratings)
             else:
@@ -70,7 +70,7 @@ class Pearson:
                 absolute_similarity_list[max_idx] = -100000000
 
     @staticmethod
-    def __find_same_ratings(movie_ids, user_ratings, other_user_ratings):
+    def find_same_ratings(movie_ids, user_ratings, other_user_ratings):
         """
         Find the ratings of two users on the same movies.
         Args
@@ -93,7 +93,7 @@ class Pearson:
         return user_same_ratings, other_user_same_ratings, same_movie_ids
 
     @staticmethod
-    def __get_mean_positive_ratings(ratings):
+    def get_mean_positive_ratings(ratings):
         """
         From a list of ratings find those with positive value and calculate their mean.
 
