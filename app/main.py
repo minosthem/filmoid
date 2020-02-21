@@ -1,19 +1,20 @@
 import time
+from os import mkdir
+from os.path import join, exists
 
 import numpy as np
-from os.path import join, exists
-from os import mkdir
-from utils import utils
-from utils.enums import ContentBasedModels, Methods, CollaborativeModels, Classification
-from utils.enums import MetricKind
+
 from models.baseline import Naive, Random
-from models.dnn_classifier import DeepNN
 from models.clustering import CollaborativeMethod
+from models.dnn_classifier import DeepNN
 from models.knn_classifier import KNN
 from models.rf_classifier import RandomForest
 from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
+from utils import utils
+from utils.enums import ContentBasedModels, Methods, Classification
+from utils.enums import MetricKind
 
 
 def init_content_based_model(model_name):
