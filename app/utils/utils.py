@@ -11,7 +11,6 @@ from os.path import join, exists
 
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 import wget
 import yaml
 
@@ -364,5 +363,3 @@ def generate_recommendation_dataset(properties, logger):
     path_to_dataset = join(app_dir, properties["datasets_folder"], dataset_folder)
     file_path = join(path_to_dataset, "test_recommendation.csv")
     test_df.to_csv(file_path, sep=",")
-
-

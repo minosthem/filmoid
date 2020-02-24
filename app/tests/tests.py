@@ -1,5 +1,6 @@
 import unittest
-from os.path import join, exists
+from os.path import join, exists, abspath
+from os import getcwd, pardir
 from random import randint
 
 import numpy as np
@@ -22,6 +23,10 @@ def load_test_properties():
     Returns
         dict: the loaded properties
     """
+    if not exists(utils.app_dir):
+        utils.app_dir = abspath(join(getcwd(), pardir))
+        if not utils.app_dir.endswith("app"):
+            utils.app_dir = join(utils.app_dir, "app")
     example_test_properties = join(utils.app_dir, "properties", "example_test_properties.yaml")
     test_properties = join(utils.app_dir, "properties", "test_properties.yaml")
     test_properties_path = test_properties if exists(test_properties) else example_test_properties
@@ -93,7 +98,7 @@ class TestDataPreProcessing(unittest.TestCase):
         1. The returned dictionary contains 4 key-value pairs
         2. No dataframe is empty
         """
-        properties = {"output_folder": "output", "datasets_folder": "Datasets", "dataset": "ml-dev",
+        properties = {"output_folder": "output", "datasets_folder": "Datasets", "dataset": "ml-latest-small",
                       "filenames": ["links", "movies", "ratings", "tags"], "dataset-file-extention": ".csv"}
         files = {}
         folder_path = join(utils.app_dir, properties["datasets_folder"], properties["dataset"])
