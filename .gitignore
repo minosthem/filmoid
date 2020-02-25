@@ -3,6 +3,7 @@ app/properties/test_properties.yaml
 .idea/
 app/__pycache__/
 app/models/__pycache__/
+app/tests/__pycache__/
 app/preprocessing/__pycache__/
 app/output/
 app/output_backup/
