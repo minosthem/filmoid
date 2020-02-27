@@ -14,3 +14,4 @@ public
 app/docs/_build
 /app/output/
 /app/utils/__pycache__/*.pyc
+app/tests/__pycache__/
