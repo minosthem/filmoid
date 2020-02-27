@@ -19,7 +19,7 @@ class CollaborativeMethod:
     """
 
     metrics = {}
-    model_name = ""
+    model_name = CollaborativeModels.pearson.value
 
     def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids, logger):
         """
@@ -66,6 +66,19 @@ class CollaborativeMethod:
 
     def get_user_predictions(self, logger, movie_ids, similar_users, similarities_final, similarities_final_absolute,
                              user, properties):
+        """
+        Calculates the prediction ratings of every user for evey movie based on similar users. Then, keeps track of the
+        true and predicted ratings of the users and writes them into a csv file.
+
+        Args
+            logger (Logger): handles the logs and prints
+            movie_ids (list): the list of movies' ids
+            similar_users (list): the list of similar users to a target user
+            similarities_final (list): the list with the similarity coefficients of similar users
+            similarities_final_absolute (list): the list with the absolute similarity coefficients of similar users
+            user (User): a user object
+            properties (dict): output folder, dataset
+        """
         logger.info("Calculate user predictions for all movies")
         user.movie_predictions = []
         for movie_idx, movie_id in enumerate(movie_ids):

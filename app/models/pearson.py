@@ -1,18 +1,30 @@
-from scipy.stats.stats import pearsonr
 import math
+
+from scipy.stats.stats import pearsonr
+
 from models.models import User
 from utils.enums import CollaborativeModels
-import numpy as np
+
 
 class Pearson:
 
     def __init__(self):
-        self.model_name = CollaborativeModels.kmeans.value
+        self.model_name = CollaborativeModels.pearson.value
         self.metrics = {}
         self.model = None
 
     @staticmethod
     def init_users(user_ids, user_ratings):
+        """
+        Creates user ratings vectors of similar users.
+
+        Args
+            users_ids (list): the list of users' ids
+            user_ratings (nd array): the vector with the user ratings
+
+        Returns
+            list: a list containing the ratings of similar users to a target user
+        """
         users = []
         for idx, user_id in enumerate(list(user_ids)):
             user = User(user_id, idx)
@@ -28,6 +40,20 @@ class Pearson:
             return users
 
     def get_user_similarities(self, logger, user, user_rating, movie_ids):
+        """
+        Calculates the similarity coefficients of similar users to a target user.
+
+        Args
+            logger (Logger): handles the logs and prints
+            user (User): a user object
+            user_rating (nd array): the vector with user ratings
+            movie_ids (list): the list with the movies ids
+
+        Returns
+            similarities (list): a list with the similarities coefficients of similar users to a target user
+            absolute_similarity_list (list): a list with the absolute similarities coefficients of similar users to a
+                                            target user
+        """
         similarities = []
         absolute_similarity_list = []
         logger.info("Calculate pearson similarity with similar users")
@@ -55,6 +81,23 @@ class Pearson:
 
     @staticmethod
     def get_pearson_most_similar(properties, logger, similarities, absolute_similarity_list, user):
+        """
+        Find the most similar users to a target user based on the similarity coefficients.
+
+        Args
+            properties (dict): number of similar users
+            logger (Logger): handles the logs and prints
+            similarities (list): a list with the similarities coefficients of similar users to a target user
+            absolute_similarity_list (list): a list with the absolute similarities coefficients of similar users to a
+                                            target user
+            user (User): a user object
+
+        Returns
+            similar_users (list): a list with similar users
+            similarities_final_absolute (list): a list with the absolute similarity coefficients of the similar users
+                                                to a target user
+            similarities_final (list): a list with the similarity coefficients of the similar users to a target user
+        """
         # sort list from min to max - pearsonr returns p-value
         num_similar_users = properties["kmeans"]["n_similar"]
 
