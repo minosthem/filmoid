@@ -220,7 +220,7 @@ def get_filenames(prop):
     datasets_folder = prop["datasets_folder"]
     base_path = join(app_dir, datasets_folder)
     dataset_path = join(base_path, Datasets.ml_latest_small.value) if prop["dataset"] == Datasets.small.value \
-        else join(base_path, Datasets.ml_dev.value)
+        else join(base_path, Datasets.ml_latest.value)
     for file in prop["filenames"]:
         filename = file + prop["dataset-file-extention"]
         files[file] = join(dataset_path, filename)
