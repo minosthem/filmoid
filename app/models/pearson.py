@@ -37,7 +37,7 @@ class Pearson:
                 other_user.user_ratings = user_ratings[other_idx]
                 user.similar_users.append(other_user)
             users.append(user)
-            return users
+        return users
 
     def get_user_similarities(self, logger, user, user_rating, movie_ids):
         """
