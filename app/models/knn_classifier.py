@@ -45,7 +45,7 @@ class KNN(ContentBasedClassifier):
             kind (str): validation or test
 
         Returns
-            confusion_matrix: the confusion matrix of the testing
+            tuple: true and predicted labels as nd arrays
         """
         predicted_labels = self.models[-1].predict(test_data) if kind == MetricKind.validation.value else \
             self.best_model.predict(test_data)

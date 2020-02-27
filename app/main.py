@@ -3,6 +3,7 @@ from os import mkdir
 from os.path import join, exists
 
 import numpy as np
+import pandas as pd
 
 from models.baseline import Naive, Random
 from models.clustering import CollaborativeMethod
@@ -13,8 +14,7 @@ from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
 from utils import utils
-from utils.enums import ContentBasedModels, Methods, Classification
-from utils.enums import MetricKind
+from utils.enums import ContentBasedModels, Methods, Classification, PreprocessKind, Datasets, MetricKind
 
 
 def init_content_based_model(model_name):
@@ -119,6 +119,40 @@ def run_content_based(properties, csvs, logger):
     print("Done!")
 
 
+def run_test(properties, csvs, logger):
+    """
+    TODO description
+
+    Args
+        properties (dict):
+        csvs (dict):
+        logger (Logger):
+    """
+    # preprocess with test recommendation csv
+    dp = ContentBasedPreprocessing()
+    logger.info("Creating input vectors for content-based method")
+    csvs["test_recommendation"]["rating"] = 0.0
+    dp.preprocess(properties=properties, datasets=csvs, logger=logger, kind=PreprocessKind.recommend.value)
+    input_data = dp.input_data
+    ratings = dp.ratings
+    for model in properties["models"]["content-based"]:
+        classifier = init_content_based_model(model)
+        directory = join("output", "best_models")
+        filename = "{}.pickle".format(model)
+        classifier.best_model = utils.load_from_pickle(directory=directory, file=filename)
+        true_labels, predicted_labels = classifier.test(input_data, ratings, kind=MetricKind.test.value)
+        dataset_folder = Datasets.ml_latest_small.value if properties["dataset"] == Datasets.small.value \
+            else Datasets.ml_latest.value
+        test_csv_path = join(utils.app_dir, properties["datasets_folder"], dataset_folder, "test_recommendation.csv")
+        df = pd.read_csv(test_csv_path)
+        df["rating"] = predicted_labels.tolist()
+        results_dir = join(utils.app_dir, properties["output_folder"], "test_results")
+        if not exists(results_dir):
+            mkdir(results_dir)
+        new_csv = join(results_dir, "test_recommendation_{}.csv".format(model))
+        df.to_csv(new_csv, sep=",")
+
+
 def main():
     """
     Main function is the starting point of the program. Properties from the yaml are loaded in order to be used as
@@ -158,7 +192,10 @@ def main():
     if Methods.collaborative.value in properties["methods"]:
         run_collaborative(properties=properties, csvs=csvs, logger=logger)
     if Methods.content_based.value in properties["methods"]:
-        run_content_based(properties=properties, csvs=csvs, logger=logger)
+        if properties["execution_kind"] == "normal":
+            run_content_based(properties=properties, csvs=csvs, logger=logger)
+        else:
+            run_test(properties=properties, csvs=csvs, logger=logger)
 
 
 if __name__ == '__main__':

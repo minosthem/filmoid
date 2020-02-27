@@ -26,6 +26,7 @@ are already downloaded inside the Datasets and resources directories, set this p
 * dataset: the dataset to be used in the experiments. Currently the possible values are small and latest
 * filenames: the csv names which you should provide as follows: ["links", "movies", "ratings", "tags"]
 * dataset-file-extention: the file extension of the dataset files. You should provide it: ".csv"
+* execution_kind: execute normal flow (with content-based) or test the recommendation system. Possible values: normal, test
 * methods: the recommendation policies which are: ["collaborative", "content-based"]
 * models:
     * collaborative: the classifier to be used. ["k-means"]

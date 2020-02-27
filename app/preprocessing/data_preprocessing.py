@@ -21,6 +21,7 @@ class DataPreprocessing:
         for name, file in filenames.items():
             self.datasets[name] = pd.read_csv(file)
             if name == "ratings":
+                # shuffle
                 self.datasets[name].sample(frac=1).reset_index(drop=True)
 
     def preprocess(self, properties, datasets, logger, kind=PreprocessKind.train.value):
