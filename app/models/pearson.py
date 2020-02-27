@@ -1,8 +1,8 @@
 from scipy.stats.stats import pearsonr
-
+import math
 from models.models import User
 from utils.enums import CollaborativeModels
-
+import numpy as np
 
 class Pearson:
 
@@ -45,8 +45,12 @@ class Pearson:
                 similarity = (0, 0)
             logger.debug("User with id {} and user with id {} have similarity {} and in absulute value {}".
                          format(user.user_id, other_user.user_id, similarity[0], abs(similarity[0])))
-            similarities.append(similarity[0])
-            absolute_similarity_list.append(abs(similarity[0]))
+            if math.isnan(similarity[0]):
+                similarities.append(0)
+                absolute_similarity_list.append(0)
+            else:
+                similarities.append(similarity[0])
+                absolute_similarity_list.append(abs(similarity[0]))
         return similarities, absolute_similarity_list
 
     @staticmethod
@@ -68,6 +72,7 @@ class Pearson:
                 logger.debug("Max similarity: {}".format(absolute_similarity_list[max_idx]))
                 similar_users.append(other_user)
                 absolute_similarity_list[max_idx] = 0
+        return similar_users, similarities_final_absolute, similarities_final
 
     @staticmethod
     def find_same_ratings(movie_ids, user_ratings, other_user_ratings):

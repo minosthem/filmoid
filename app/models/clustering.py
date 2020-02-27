@@ -51,12 +51,14 @@ class CollaborativeMethod:
             similarities, absolute_similarity_list = pearson.get_user_similarities(logger=logger, user=user,
                                                                                    user_rating=user_rating,
                                                                                    movie_ids=movie_ids)
-            similar_users, similarities_final_absolute, similarities_final = pearson.get_pearson_most_similar(
-                properties=properties, logger=logger, similarities=similarities,
-                absolute_similarity_list=absolute_similarity_list, user=user)
-            self.get_user_predictions(logger=logger, movie_ids=movie_ids, similar_users=similar_users,
-                                      similarities_final=similarities_final, user=user,
-                                      similarities_final_absolute=similarities_final_absolute, properties=properties)
+            if similarities and absolute_similarity_list:
+                similar_users, similarities_final_absolute, similarities_final = pearson.get_pearson_most_similar(
+                    properties=properties, logger=logger, similarities=similarities,
+                    absolute_similarity_list=absolute_similarity_list, user=user)
+                self.get_user_predictions(logger=logger, movie_ids=movie_ids, similar_users=similar_users,
+                                          similarities_final=similarities_final, user=user,
+                                          similarities_final_absolute=similarities_final_absolute,
+                                          properties=properties)
         logger.info("Save all results to pickle file")
         utils.write_to_pickle(users, properties["output_folder"],
                               "collaborative_user_predictions_{}.pickle".format(properties["dataset"]))
