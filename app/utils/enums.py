@@ -24,6 +24,7 @@ class CollaborativeModels(Enum):
     """
     Models implemented using the collaborative technique for recommendation systems
     """
+    collaborative = "collaborative"
     kmeans = "kmeans"
     pearson = "pearson"
 

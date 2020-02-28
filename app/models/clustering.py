@@ -19,7 +19,7 @@ class CollaborativeMethod:
     """
 
     metrics = {}
-    model_name = CollaborativeModels.pearson.value
+    model_name = CollaborativeModels.collaborative.value
 
     def exec_collaborative_method(self, properties, user_ratings, user_ids, movie_ids, logger):
         """

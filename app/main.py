@@ -1,4 +1,3 @@
-import smtplib
 import time
 from os import mkdir
 from os.path import join, exists
@@ -15,7 +14,8 @@ from preprocessing.collaborative_preprocessing import CollaborativePreprocessing
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
 from utils import utils
-from utils.enums import ContentBasedModels, Methods, Classification, PreprocessKind, Datasets, MetricKind
+from utils.enums import ContentBasedModels, Methods, Classification, PreprocessKind, Datasets, MetricKind, \
+    CollaborativeModels
 
 
 def init_content_based_model(model_name):
@@ -57,12 +57,13 @@ def run_collaborative(properties, csvs, logger):
     user_ids = dp.user_ids
     movie_ids = dp.movie_ids
     for model_name in properties["models"]["collaborative"]:
+        folder_name = CollaborativeModels.collaborative.value
         clustering = CollaborativeMethod()
         if not exists(
                 join(utils.app_dir, properties["output_folder"],
-                     "results_{}_{}".format(model_name, properties["dataset"]))):
+                     "results_{}_{}".format(folder_name, properties["dataset"]))):
             mkdir(join(utils.app_dir, properties["output_folder"],
-                       "results_{}_{}".format(model_name, properties["dataset"])))
+                       "results_{}_{}".format(folder_name, properties["dataset"])))
         if exists(join(utils.app_dir, properties["output_folder"],
                        "collaborative_user_predictions_{}.pickle".format(properties["dataset"]))):
             users = utils.load_from_pickle(properties["output_folder"],

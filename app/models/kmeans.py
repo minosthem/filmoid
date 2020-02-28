@@ -11,7 +11,7 @@ class Kmeans:
     """
 
     def __init__(self):
-        self.model_name = CollaborativeModels.kmeans.value
+        self.model_name = CollaborativeModels.collaborative.value
         self.metrics = {}
         self.model = None
 
