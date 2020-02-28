@@ -47,6 +47,7 @@ will be selected for the testset. The possible values are: "macro-precision", "m
     * batch_size: configuration parameter of the batch size
 * kmeans: configuration of the scikit-learn kmeans clustering model. Parameters are the number of clusters, the n_init, the max_iter.
 Additionally, the n_similar should be provided in order to select the number of similar users after the Pearson correlation
+* email: configuration to send notification email once execution is finished. Provide the email and password **only** in the properties.yaml which is ignored in the git history.
 
 ## Project execution
 
