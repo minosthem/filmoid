@@ -383,7 +383,7 @@ def send_email(properties, logger):
     to = [gmail_user]
     subject = "Filmoid - Finished execution"
 
-    log_file = join(app_dir, properties["output_folder"], "logs", log_filename)
+    log_file = join(app_dir, properties["output_folder"], "logs", "{}.log".format(log_filename))
     with open(log_file, 'r') as myfile:
         body = myfile.read()
 
