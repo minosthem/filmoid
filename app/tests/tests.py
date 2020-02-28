@@ -81,6 +81,12 @@ class TestUtilMethods(unittest.TestCase):
         df = utils.load_glove_file(properties, logger)
         self.assertTrue(not df.empty)
 
+    def test_send_email(self):
+        properties = load_test_properties()
+        logger = utils.config_logger(properties=properties)
+        result = utils.send_email(properties=properties, logger=logger)
+        self.assertEqual(result, "success")
+
 
 class TestDataPreProcessing(unittest.TestCase):
     """

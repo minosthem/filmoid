@@ -39,3 +39,6 @@ kmeans:
   n_init: 20
   max_iter: 500
   n_similar: 5
+email:
+  user: "user@gmail.com"
+  password: "12343"

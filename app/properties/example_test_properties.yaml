@@ -34,3 +34,6 @@ dnn:
   metrics: ["accuracy"]
   epochs: 10
   batch_size: 2
+email:
+  user: "user@gmail.com"
+  password: "12343"

@@ -1,3 +1,4 @@
+import smtplib
 import csv
 import logging
 import pickle
@@ -325,6 +326,7 @@ def visualize(df, output_folder, results_folder, folder_name, filename):
     path = join(app_dir, output_folder, results_folder, folder_name) if folder_name else \
         join(app_dir, output_folder, results_folder)
     plt.savefig(join(path, filename))
+    plt.close('all')
     # plt.show()
 
 
@@ -363,3 +365,45 @@ def generate_recommendation_dataset(properties, logger):
     path_to_dataset = join(app_dir, properties["datasets_folder"], dataset_folder)
     file_path = join(path_to_dataset, "test_recommendation.csv")
     test_df.to_csv(file_path, sep=",")
+
+
+def send_email(properties, logger):
+    """
+    Function to send a notification email that execution has finished
+
+    Args
+        properties (dict): the loaded configuration file
+        logger (Logger): a Logger object to print info/error messages
+    """
+    logger.info("Sending notification email")
+    gmail_user = properties["email"]["user"]
+    gmail_password = properties["email"]["password"]
+
+    sent_from = gmail_user
+    to = [gmail_user]
+    subject = "Filmoid - Finished execution"
+
+    log_file = join(app_dir, properties["output_folder"], "logs", log_filename)
+    with open(log_file, 'r') as myfile:
+        body = myfile.read()
+
+    email_text = """\
+    From: %s
+    To: %s
+    Subject: %s
+
+    %s
+    """ % (sent_from, ", ".join(to), subject, body)
+
+    try:
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(gmail_user, gmail_password)
+        server.sendmail(sent_from, to, email_text)
+        server.close()
+        logger.info("Email sent!")
+        return "success"
+    except (FileNotFoundError, Exception) as e:
+        logger.error("Something went wrong! Could not send email: {}".format(e))
+        'Something went wrong...'
+        return "failure"

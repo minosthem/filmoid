@@ -1,3 +1,4 @@
+import smtplib
 import time
 from os import mkdir
 from os.path import join, exists
@@ -121,14 +122,16 @@ def run_content_based(properties, csvs, logger):
 
 def run_test(properties, csvs, logger):
     """
-    TODO description
+    Method to run the recommendation system using the best produced models for content-based method.
+    Uses the test_recommendation.csv file where no rating is available. 
 
     Args
-        properties (dict):
-        csvs (dict):
-        logger (Logger):
+        properties (dict): the loaded configuration file
+        csvs (dict): the DataFrames from the input csv files
+        logger (Logger): a Logger object to print info/error messages
     """
     # preprocess with test recommendation csv
+    logger.info("Testing the recommendation system")
     dp = ContentBasedPreprocessing()
     logger.info("Creating input vectors for content-based method")
     csvs["test_recommendation"]["rating"] = 0.0
@@ -136,9 +139,10 @@ def run_test(properties, csvs, logger):
     input_data = dp.input_data
     ratings = dp.ratings
     for model in properties["models"]["content-based"]:
+        logger.info("Testing model: {}".format(model))
         classifier = init_content_based_model(model)
         directory = join("output", "best_models")
-        filename = "{}.pickle".format(model)
+        filename = "best_model_{}_{}.pickle".format(model, properties["dataset"])
         classifier.best_model = utils.load_from_pickle(directory=directory, file=filename)
         true_labels, predicted_labels = classifier.test(input_data, ratings, kind=MetricKind.test.value)
         dataset_folder = Datasets.ml_latest_small.value if properties["dataset"] == Datasets.small.value \
@@ -147,6 +151,7 @@ def run_test(properties, csvs, logger):
         df = pd.read_csv(test_csv_path)
         df["rating"] = predicted_labels.tolist()
         results_dir = join(utils.app_dir, properties["output_folder"], "test_results")
+        logger.info("Writing results to file")
         if not exists(results_dir):
             mkdir(results_dir)
         new_csv = join(results_dir, "test_recommendation_{}.csv".format(model))
@@ -196,6 +201,7 @@ def main():
             run_content_based(properties=properties, csvs=csvs, logger=logger)
         else:
             run_test(properties=properties, csvs=csvs, logger=logger)
+    utils.send_email(properties=properties, logger=logger)
 
 
 if __name__ == '__main__':
