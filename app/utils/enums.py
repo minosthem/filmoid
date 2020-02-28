@@ -96,3 +96,11 @@ class AggregationStrategy(Enum):
     """
     average = "avg"
     max = "max"
+
+
+class ResultStatus(Enum):
+    """
+    The status of a results. Possible values: success / failure
+    """
+    success = "success"
+    failure = "failure"

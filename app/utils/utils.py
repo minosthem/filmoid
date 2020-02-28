@@ -16,7 +16,7 @@ import wget
 import yaml
 
 from preprocessing.data_preprocessing import DataPreprocessing
-from utils.enums import MetricCaptions, Datasets
+from utils.enums import MetricCaptions, Datasets, ResultStatus
 
 log_filename = 'logs_%s' % datetime.now().strftime('%Y%m%d-%H%M%S')
 # app_dir = abspath(join(getcwd(), pardir))
@@ -402,8 +402,8 @@ def send_email(properties, logger):
         server.sendmail(sent_from, to, email_text)
         server.close()
         logger.info("Email sent!")
-        return "success"
+        return ResultStatus.success.value
     except (FileNotFoundError, Exception) as e:
         logger.error("Something went wrong! Could not send email: {}".format(e))
         'Something went wrong...'
-        return "failure"
+        return ResultStatus.failure.value

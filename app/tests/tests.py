@@ -1,6 +1,6 @@
 import unittest
-from os.path import join, exists, abspath
 from os import getcwd, pardir
+from os.path import join, exists, abspath
 from random import randint
 
 import numpy as np
@@ -13,7 +13,7 @@ from models.rf_classifier import RandomForest
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
 from utils import utils
-from utils.enums import ContentBasedModels
+from utils.enums import ContentBasedModels, ResultStatus
 
 
 def load_test_properties():
@@ -85,7 +85,7 @@ class TestUtilMethods(unittest.TestCase):
         properties = load_test_properties()
         logger = utils.config_logger(properties=properties)
         result = utils.send_email(properties=properties, logger=logger)
-        self.assertEqual(result, "success")
+        self.assertEqual(result, ResultStatus.success.value)
 
 
 class TestDataPreProcessing(unittest.TestCase):
