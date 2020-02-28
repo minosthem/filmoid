@@ -58,7 +58,7 @@ class Pearson:
         absolute_similarity_list = []
         logger.info("Calculate pearson similarity with similar users")
         if not user.similar_users:
-            return
+            return similarities, absolute_similarity_list
         for other_user in user.similar_users:
             logger.debug("Pearson similarity with other user with id {}".format(other_user.user_id))
             other_user_ratings = other_user.user_ratings
