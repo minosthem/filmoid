@@ -24,9 +24,11 @@ class DeepNN(ContentBasedClassifier):
     test_metrics = {}
     best_model = None
     model_name = ""
+    classification = ""
 
     def __init__(self):
         self.model_name = ContentBasedModels.dnn.value
+        self.classification = Classification.binary.value
 
     def train(self, properties, input_data, labels):
         """
@@ -40,7 +42,10 @@ class DeepNN(ContentBasedClassifier):
         input_dim = input_data.shape[1]
         dnn = self._build_model(properties, input_dim)
         self.models.append(dnn)
+        self.classification = properties["classification"]
         num_classes = 2 if properties["classification"] == Classification.binary.value else 5
+        if self.classification == Classification.multi.value:
+            labels = self.change_labels(labels=labels)
         labels = keras.utils.to_categorical(labels, num_classes=num_classes)
         dnn.fit(input_data, labels, epochs=properties["dnn"]["epochs"], batch_size=properties["dnn"]["batch_size"],
                 verbose=True, callbacks=self._get_training_callbacks(properties))
@@ -62,6 +67,8 @@ class DeepNN(ContentBasedClassifier):
             self.best_model.predict(test_data)
         for i in range(result.shape[0]):
             predicted_labels.append(np.argmax(result[i]))
+        if self.classification == Classification.multi.value:
+            predicted_labels = self.change_labels(predicted_labels).tolist()
         return true_labels, predicted_labels
 
     @staticmethod
@@ -134,3 +141,11 @@ class DeepNN(ContentBasedClassifier):
         ]
 
         return callbacks_list
+
+    @staticmethod
+    def change_labels(labels):
+        new_labels = []
+        for label in labels:
+            label = label - 1
+            new_labels.append(label)
+        return np.asarray(new_labels)
