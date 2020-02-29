@@ -64,7 +64,6 @@ class ContentBasedPreprocessing(DataPreprocessing):
             logger.info("Loaded inputs of shape {}".format(self.input_data.shape))
             logger.info("Loaded ratings of shape {}".format(self.ratings.shape))
         else:
-            os.makedirs(output_folder, exist_ok=True)
             ratings_df = datasets["ratings"] if kind == PreprocessKind.train.value else datasets["test_recommendation"]
             movies_df = datasets["movies"]
             tags_df = datasets["tags"]
