@@ -8,7 +8,7 @@ from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
 from utils import utils
-from utils.enums import PreprocessKind, Classification, AggregationStrategy
+from utils.enums import PreprocessKind, Classification, AggregationStrategy, ExecutionKind
 from preprocessing.data_preprocessing import DataPreprocessing
 
 
@@ -55,8 +55,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
         test_dataset_pickle_filename = self.test_dataset_pickle + "_{}_{}".format(properties["dataset"],
                                                                                   properties["classification"])
 
-        if utils.check_file_exists(output_folder, input_data_pickle_filename) and \
-                utils.check_file_exists(output_folder, ratings_pickle_filename):
+        if self.check_pickle_files_exist(properties=properties):
             logger.info("Content-based input data already exist and will be loaded from pickle file")
             input_filename = input_data_pickle_filename if kind == PreprocessKind.train.value else \
                 test_dataset_pickle_filename
@@ -245,3 +244,26 @@ class ContentBasedPreprocessing(DataPreprocessing):
             user = np.reshape(user, (1, num_users))
             users[user_id] = user
         return users
+
+    def check_pickle_files_exist(self, properties):
+        output_folder = properties["output_folder"]
+        input_data = self.input_data_pickle + "_{}_{}".format(properties["dataset"],
+                                                              properties["classification"])
+        ratings = self.ratings_pickle + "_{}_{}".format(properties["dataset"],
+                                                        properties["classification"])
+        test = self.test_dataset_pickle + "_{}_{}".format(properties["dataset"],
+                                                          properties["classification"])
+        if properties["execution_kind"] == ExecutionKind.normal.value:
+            self.check_normal_execution_files_exist(output_folder=output_folder, input_data=input_data, ratings=ratings)
+        elif properties["execution_kind"] == ExecutionKind.test.value:
+            self.check_test_execution_files_exist(output_folder=output_folder, test=test, ratings=ratings)
+        else:
+            return False
+
+    @staticmethod
+    def check_normal_execution_files_exist(output_folder, input_data, ratings):
+        return utils.check_file_exists(output_folder, input_data) and utils.check_file_exists(output_folder, ratings)
+
+    @staticmethod
+    def check_test_execution_files_exist(output_folder, test, ratings):
+        return utils.check_file_exists(output_folder, test) and utils.check_file_exists(output_folder, ratings)

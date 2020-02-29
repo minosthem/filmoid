@@ -105,3 +105,8 @@ class ResultStatus(Enum):
     """
     success = "success"
     failure = "failure"
+
+
+class ExecutionKind(Enum):
+    normal = "normal"
+    test = "test"

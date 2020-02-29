@@ -19,7 +19,10 @@ class DataPreprocessing:
             filenames (dict): the path to the dataset csv files
         """
         for name, file in filenames.items():
-            self.datasets[name] = pd.read_csv(file)
+            if name == "test_recommendation":
+                self.datasets[name] = pd.read_csv(file, index_col=0)
+            else:
+                self.datasets[name] = pd.read_csv(file)
             if name == "ratings":
                 # shuffle
                 self.datasets[name].sample(frac=1).reset_index(drop=True)

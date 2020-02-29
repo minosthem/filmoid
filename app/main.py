@@ -136,7 +136,9 @@ def run_test(properties, csvs, logger):
     logger.info("Testing the recommendation system")
     dp = ContentBasedPreprocessing()
     logger.info("Creating input vectors for content-based method")
-    csvs["test_recommendation"]["rating"] = 0.0
+    test_recommendation_df = csvs["test_recommendation"]
+    test_recommendation_df.loc[:, "rating"] = 0.0
+    csvs["test_recommendation"] = test_recommendation_df
     dp.preprocess(properties=properties, datasets=csvs, logger=logger, kind=PreprocessKind.recommend.value)
     input_data = dp.input_data
     ratings = dp.ratings
