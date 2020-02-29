@@ -57,6 +57,7 @@ def run_collaborative(properties, csvs, logger):
     user_ids = dp.user_ids
     movie_ids = dp.movie_ids
     for model_name in properties["models"]["collaborative"]:
+        logger.debug("Running model: {}".format(model_name))
         folder_name = CollaborativeModels.collaborative.value
         clustering = CollaborativeMethod()
         if not exists(

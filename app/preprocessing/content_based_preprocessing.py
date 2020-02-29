@@ -194,7 +194,10 @@ class ContentBasedPreprocessing(DataPreprocessing):
         if properties["classification"] == Classification.binary.value:
             return 0 if rating > 3 else 1
         else:
-            return round(rating)
+            rating = round(rating)
+            if rating < 1:
+                rating = 1
+            return rating
 
     def create_train_test_data(self, input_data, labels):
         """

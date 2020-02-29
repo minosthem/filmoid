@@ -13,7 +13,7 @@ from models.rf_classifier import RandomForest
 from preprocessing.content_based_preprocessing import ContentBasedPreprocessing
 from preprocessing.data_preprocessing import DataPreprocessing
 from utils import utils
-from utils.enums import ContentBasedModels, ResultStatus
+from utils.enums import ContentBasedModels, ResultStatus, Classification
 
 
 def load_test_properties():
@@ -191,6 +191,7 @@ class TestDataPreProcessing(unittest.TestCase):
 
         Examined test case: the returned list of words is the same as the expected list of words
         """
+        logger = utils.config_logger(properties=load_test_properties())
         movies_df = pd.DataFrame(data=[[1, "Toy Story (1995)", "Adventure|Animation|Children|Comedy|Fantasy"]],
                                  columns=["movieId", "title", "genres"])
         tags_df = pd.DataFrame(data=[[1, 1, "funny"]], columns=["userId", "movieId", "tag"])
@@ -198,7 +199,7 @@ class TestDataPreProcessing(unittest.TestCase):
         user_id = 1
         data_preprocess = ContentBasedPreprocessing()
         text = data_preprocess._preprocess_text(movies_df=movies_df, tags_df=tags_df, movie_id=movie_id,
-                                                user_id=user_id)
+                                                user_id=user_id, logger=logger)
         expected_text = ["Toy", "Story", "Adventure", "Animation", "Children", "Comedy", "Fantasy", "funny"]
         self.assertEqual(text, expected_text)
 
@@ -373,3 +374,20 @@ class TestClassifiers(unittest.TestCase):
         self.assertEqual(6, len(classifier.test_metrics.keys()))
         classifier.write_test_results_to_file("output", "testing")
         self.assertEqual(ContentBasedModels.dnn.value, classifier.model_name)
+
+
+def count_instances_per_class(properties):
+    classification = properties["classification"]
+    output_folder = properties["output_folder"]
+    dataset = properties["dataset"]
+    ratings = utils.load_from_pickle(output_folder, "ratings.pickle_{}_{}".format(dataset, classification))
+    if classification == Classification.binary.value:
+        print("Get instances per class for binary classification")
+        ratings_like = ratings[ratings == 0]
+        ratings_dislike = ratings[ratings == 1]
+        print("Like ratings: {}".format(ratings_like.shape))
+        print("Dislike ratings: {}".format(ratings_dislike.shape))
+    elif classification == Classification.multi.value:
+        for i in range(1, 6):
+            class_ratings = ratings[ratings == i]
+            print("Ratings for class {} are {}".format(i, class_ratings.shape))

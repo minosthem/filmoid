@@ -1,7 +1,7 @@
-import smtplib
 import csv
 import logging
 import pickle
+import smtplib
 import subprocess
 import sys
 import time
