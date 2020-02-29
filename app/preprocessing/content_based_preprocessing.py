@@ -1,4 +1,3 @@
-import os
 import re
 import string
 
@@ -7,9 +6,9 @@ from sklearn import preprocessing
 from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
+from preprocessing.data_preprocessing import DataPreprocessing
 from utils import utils
 from utils.enums import PreprocessKind, Classification, AggregationStrategy, ExecutionKind
-from preprocessing.data_preprocessing import DataPreprocessing
 
 
 class ContentBasedPreprocessing(DataPreprocessing):
