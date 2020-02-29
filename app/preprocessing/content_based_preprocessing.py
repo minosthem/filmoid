@@ -78,10 +78,12 @@ class ContentBasedPreprocessing(DataPreprocessing):
                 user_id, movie_id, rating, _ = row
                 movie_id = int(movie_id)
                 user_id = int(user_id)
+                logger.debug("Preprocessing userid {} and movieid {} with rating {}".format(user_id, movie_id, rating))
                 # preprocess
                 rating = self._preprocess_rating(properties, rating)
-                movie_text = self._preprocess_text(movies_df, tags_df, movie_id, user_id)
-
+                logger.debug("Preprocessed rating: {}".format(rating))
+                movie_text = self._preprocess_text(movies_df, tags_df, movie_id, user_id, logger)
+                logger.debug("Preprocessed text: {}".format(" ".join(movie_text)))
                 movie_vector = self._text_to_glove(properties, glove_df, movie_text)
                 if movie_vector.size == 0:
                     continue
@@ -142,7 +144,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
         # expand dimension to a 1 x <dim> vector
         return np.expand_dims(embeddings, 0)
 
-    def _preprocess_text(self, movies_df, tags_df, movie_id, user_id):
+    def _preprocess_text(self, movies_df, tags_df, movie_id, user_id, logger):
         """
         It keeps the movie id from the movies dataset and also the tags of a particular user for the specific movie.
         Then, it creates a string containing the movie title and movie genre which are taken from the movies dataset as
@@ -158,6 +160,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
         Returns
             list: the preprocessed text containing the title, genre and tags for the movie split into words
         """
+        logger.debug("Preprocessing text for movie id {}".format(movie_id))
         m = movies_df[movies_df["movieId"] == movie_id]
         tags = tags_df[(tags_df["userId"] == user_id) & (tags_df["movieId"] == movie_id)]
         movie_title = m.iloc[0]["title"]
@@ -169,6 +172,7 @@ class ContentBasedPreprocessing(DataPreprocessing):
                 movie_text = movie_text + " " + row
         # preprocessing title, genres, tags ==> remove symbols, numbers
         # remove digits and punctuation
+        logger.debug("Raw movie text: {}".format(movie_text))
         movie_text = movie_text.translate(self.punct_digit_to_space).strip()
         # merge multiple spaces
         movie_text = re.sub("[ ]+", " ", movie_text)
