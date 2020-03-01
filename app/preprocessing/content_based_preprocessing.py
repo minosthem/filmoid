@@ -252,9 +252,10 @@ class ContentBasedPreprocessing(DataPreprocessing):
         test = self.test_dataset_pickle + "_{}_{}".format(properties["dataset"],
                                                           properties["classification"])
         if properties["execution_kind"] == ExecutionKind.normal.value:
-            self.check_normal_execution_files_exist(output_folder=output_folder, input_data=input_data, ratings=ratings)
+            return self.check_normal_execution_files_exist(output_folder=output_folder, input_data=input_data,
+                                                           ratings=ratings)
         elif properties["execution_kind"] == ExecutionKind.test.value:
-            self.check_test_execution_files_exist(output_folder=output_folder, test=test, ratings=ratings)
+            return self.check_test_execution_files_exist(output_folder=output_folder, test=test, ratings=ratings)
         else:
             return False
 

@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score
 
 from utils import utils
-from utils.enums import MetricNames, MetricKind
+from utils.enums import MetricNames, MetricKind, Classification
 
 
 class Classifier:
@@ -213,6 +213,23 @@ class ContentBasedClassifier(Classifier):
             input_train, input_test = input_data[train_index], input_data[test_index]
             labels_train, labels_test = labels[train_index], labels[test_index]
             classifier.train(properties=properties, input_data=input_train, labels=labels_train)
-            true_labels, predicted_labels = classifier.test(test_data=input_test, true_labels=labels_test)
+            true_labels, predictions = classifier.test(test_data=input_test, true_labels=labels_test)
+            predicted_labels, probabilities = self.get_predicted_labels_and_probabilities(properties=properties,
+                                                                                          predictions=predictions)
             self.get_results(true_labels, predicted_labels)
             self.write_fold_results_to_file(properties["output_folder"], results_folder, idx)
+
+    @staticmethod
+    def get_predicted_labels_and_probabilities(properties, predictions):
+        predicted_labels = []
+        probabilities = []
+        predictions = list(predictions)
+        for idx, prediction in enumerate(predictions):
+            prediction = list(prediction)
+            max_prediction = max(prediction)
+            max_idx = prediction.index(max(prediction))
+            if properties["classification"] == Classification.multi.value:
+                max_idx = max_idx + 1
+            predicted_labels.append(max_idx)
+            probabilities.append(max_prediction)
+        return predicted_labels, probabilities

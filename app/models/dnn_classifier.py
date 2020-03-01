@@ -62,14 +62,9 @@ class DeepNN(ContentBasedClassifier):
         Returns
             confusion_matrix: the confusion matrix of the testing
         """
-        predicted_labels = []
         result = self.models[-1].predict(test_data) if kind == MetricKind.validation.value else \
             self.best_model.predict(test_data)
-        for i in range(result.shape[0]):
-            predicted_labels.append(np.argmax(result[i]))
-        if self.classification == Classification.multi.value:
-            predicted_labels = self.change_labels(predicted_labels).tolist()
-        return true_labels, predicted_labels
+        return true_labels, result
 
     @staticmethod
     def _build_model(properties, input_dim):

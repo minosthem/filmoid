@@ -116,7 +116,9 @@ def run_content_based(properties, csvs, logger):
         classifier.get_fold_avg_result(output_folder=properties["output_folder"], results_folder=results_folder)
         logger.info("Best classifier with metric {} for model {}".format(properties["metric_best_model"], model))
         classifier.find_best_model(properties)
-        true_labels, predicted_labels = classifier.test(input_test, ratings_test, kind=MetricKind.test.value)
+        true_labels, predictions = classifier.test(input_test, ratings_test, kind=MetricKind.test.value)
+        predicted_labels, probabilities = classifier.get_predicted_labels_and_probabilities(properties=properties,
+                                                                                            predictions=predictions)
         classifier.get_results(true_labels, predicted_labels, kind=MetricKind.test.value)
         classifier.write_test_results_to_file(properties["output_folder"], results_folder)
     print("Done!")
@@ -148,12 +150,15 @@ def run_test(properties, csvs, logger):
         directory = join("output", "best_models")
         filename = "best_model_{}_{}.pickle".format(model, properties["dataset"])
         classifier.best_model = utils.load_from_pickle(directory=directory, file=filename)
-        true_labels, predicted_labels = classifier.test(input_data, ratings, kind=MetricKind.test.value)
+        true_labels, predictions = classifier.test(input_data, ratings, kind=MetricKind.test.value)
+        predicted_labels, probabilities = classifier.get_predicted_labels_and_probabilities(properties=properties,
+                                                                                            predictions=predictions)
         dataset_folder = Datasets.ml_latest_small.value if properties["dataset"] == Datasets.small.value \
             else Datasets.ml_latest.value
         test_csv_path = join(utils.app_dir, properties["datasets_folder"], dataset_folder, "test_recommendation.csv")
         df = pd.read_csv(test_csv_path)
-        df["rating"] = predicted_labels.tolist()
+        df["rating"] = predicted_labels
+        df.insert(loc=4, column='probability', value=probabilities)
         results_dir = join(utils.app_dir, properties["output_folder"], "test_results")
         logger.info("Writing results to file")
         if not exists(results_dir):

@@ -46,6 +46,6 @@ class RandomForest(ContentBasedClassifier):
         Returns
             confusion_matrix: the confusion matrix of the testing
         """
-        predicted_labels = self.models[-1].predict(test_data) if kind == MetricKind.validation.value else \
-            self.best_model.predict(test_data)
+        predicted_labels = self.models[-1].predict_proba(test_data) if kind == MetricKind.validation.value else \
+            self.best_model.predict_proba(test_data)
         return true_labels, predicted_labels
