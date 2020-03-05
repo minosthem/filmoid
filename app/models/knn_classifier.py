@@ -45,7 +45,7 @@ class KNN(ContentBasedClassifier):
             kind (str): validation or test
 
         Returns
-            tuple: true and predicted labels as nd arrays
+            tuple: true and probabilities of predicted labels as nd arrays
         """
         predictions = self.models[-1].predict_proba(test_data) if kind == MetricKind.validation.value else \
             self.best_model.predict_proba(test_data)

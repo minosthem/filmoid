@@ -221,6 +221,18 @@ class ContentBasedClassifier(Classifier):
 
     @staticmethod
     def get_predicted_labels_and_probabilities(properties, predictions):
+        """
+        Finds the predicted labels for the movies and the corresponding probabilities of belonging to a class.
+
+        Args
+
+            properties (dict): classification
+            predictions (tuple): the tuple created from the predict_proba function that returns a tuple with a
+                                probability of belonging to a class
+
+        Returns
+            A list with the predicted labels and a list with their corresponding probabilities
+        """
         predicted_labels = []
         probabilities = []
         predictions = list(predictions)

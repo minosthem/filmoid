@@ -44,7 +44,7 @@ class RandomForest(ContentBasedClassifier):
             kind (str): validation or test
 
         Returns
-            confusion_matrix: the confusion matrix of the testing
+            tuple: true and probabilities of predicted labels as nd arrays
         """
         predicted_labels = self.models[-1].predict_proba(test_data) if kind == MetricKind.validation.value else \
             self.best_model.predict_proba(test_data)

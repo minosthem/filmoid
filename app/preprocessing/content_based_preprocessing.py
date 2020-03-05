@@ -229,6 +229,15 @@ class ContentBasedPreprocessing(DataPreprocessing):
 
     @staticmethod
     def __create_dummy_variables(ratings):
+        """
+        Creates one-hot vectors for every user from the user list.
+        Args
+
+            ratings (ndarray): the rating list of every user
+
+        Returns
+            The one-hot user vectors
+        """
         count = []
         for _, row in ratings.iterrows():
             user_id = row["userId"]
