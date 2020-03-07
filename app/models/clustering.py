@@ -205,7 +205,9 @@ class CollaborativeMethod:
         df = pd.DataFrame(columns=["movie_id", "rating", "prediction"])
         for movie_idx, movie_id in enumerate(movie_ids):
             rating = user.user_ratings[movie_idx]
+            # rating = 0 if rating > 3 else 1
             prediction = user.movie_predictions[movie_idx]
+            # prediction = 0 if prediction > 3 else 1
             df.loc[movie_idx] = [movie_id, rating, prediction]
         file_path = join(path, filename)
         df.to_csv(file_path, sep=',')
