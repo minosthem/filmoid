@@ -160,7 +160,7 @@ def qualitative_collaborative(properties, logger, directory):
                 genres = movie_line.iloc[0]["genres"].split("|")
                 for genre in genres:
                     if genre not in true_movies_genres.keys():
-                        true_movies_genres[genre] = 1
+                        true_movies_genres[genre] = 0
                     true_movies_genres[genre] += 1
             user_predictions_df.sort_values('prediction')
             recommend_movies = list(user_predictions_df['movieId'])
@@ -229,7 +229,7 @@ def qualitative_content_based(properties, logger, directory):
                 genres = movie_line.iloc[0]["genres"].split("|")
                 for genre in genres:
                     if genre not in true_movies_genres.keys():
-                        true_movies_genres[genre] = 1
+                        true_movies_genres[genre] = 0
                     true_movies_genres[genre] += 1
             user_predictions_df.sort_values('probability')
             recommend_movies = list(user_predictions_df['movieId'])
