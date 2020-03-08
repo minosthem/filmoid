@@ -163,7 +163,7 @@ def qualitative_collaborative(properties, logger, directory):
                         true_movies_genres[genre] = 0
                     true_movies_genres[genre] += 1
             user_predictions_df.sort_values('prediction')
-            recommend_movies = list(user_predictions_df['movieId'])
+            recommend_movies = list(user_predictions_df['movie_id'])
             if len(recommend_movies) > properties["qualitative"]["top_num"]:
                 recommend_movies = recommend_movies[:9]
             accept = []
@@ -182,15 +182,14 @@ def qualitative_collaborative(properties, logger, directory):
                 accepted_movies = " ".join(str(x) for x in accept) if accept else ""
                 logger.debug("User with id {} has accepted movies: {}".format(userid, accepted_movies))
                 logger.debug("Accuracy for user with id {} is {}".format(userid, users_accuracies[userid]))
-            model_sum = 0
-            model_count = 0
-            for k, v in users_accuracies.items():
-                # v is the list of grades for student k
-                model_sum += v
-                model_count += 1
-            model_avg_accuracy = model_sum / model_count
-            logger.info("Model's {} accuracy: {}".format(model, model_avg_accuracy))
-
+        model_sum = 0
+        model_count = 0
+        for k, v in users_accuracies.items():
+            # v is the list of grades for student k
+            model_sum += v
+            model_count += 1
+        model_avg_accuracy = model_sum / model_count
+        logger.info("Model's {} accuracy: {}".format(model, model_avg_accuracy))
 
 
 def qualitative_content_based(properties, logger, directory):
