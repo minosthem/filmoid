@@ -1,6 +1,24 @@
-image: python:3.7
+test1:
+  image: docker:latest
+  services:
+  - docker:dind
+
+  variables:
+    RELEASE_IMAGE: registry.gitlab.com/msc-business-analytics/filmoid:latest
+
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN gitlab.com
+
+  stage: build
+  script:
+  - docker build --pull -t $RELEASE_IMAGE .
+  - docker push $RELEASE_IMAGE
+
+  only:
+    - master
 
 test:
+  image: python:3.7
   stage: test
   script:
   - pip install -r requirements.txt
@@ -11,6 +29,7 @@ test:
   - master
 
 pages:
+  image: python:3.7
   stage: deploy
   script:
   - pip install -r requirements.txt
