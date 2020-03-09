@@ -16,7 +16,7 @@ import wget
 import yaml
 
 from preprocessing.data_preprocessing import DataPreprocessing
-from utils.enums import MetricCaptions, Datasets, ResultStatus
+from utils.enums import Datasets, ResultStatus
 
 log_filename = 'logs_%s' % datetime.now().strftime('%Y%m%d-%H%M%S')
 # app_dir = abspath(join(getcwd(), pardir))
@@ -305,7 +305,7 @@ def load_from_pickle(directory, file):
         return pickle.load(f)
 
 
-def visualize(df, output_folder, results_folder, folder_name, filename):
+def visualize(df, output_folder, results_folder, folder_name, filename, captions):
     """
     Method to visualize the results of a classifier for a specific fold, avg folds or test
     Saves the plot into the specified folder and filename.
@@ -317,11 +317,11 @@ def visualize(df, output_folder, results_folder, folder_name, filename):
         folder_name (str): the fold name or avg or test folder
         filename (str): the name of the figure
     """
-    captions = [MetricCaptions.macro_prec.value, MetricCaptions.micro_prec.value, MetricCaptions.macro_recall.value,
-                MetricCaptions.micro_recall.value, MetricCaptions.macro_f.value, MetricCaptions.micro_f.value]
     df.pivot("classifier", "metric", "result").plot(kind='bar', width=0.3)
     # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.xticks(rotation="horizontal")
+    plt.yticks(rotation="vertical")
+    plt.ylabel("Micro F-Measure")
     plt.legend(captions)
     path = join(app_dir, output_folder, results_folder, folder_name) if folder_name else \
         join(app_dir, output_folder, results_folder)
