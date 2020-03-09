@@ -355,10 +355,9 @@ def main():
     if Methods.collaborative.value in properties["methods"]:
         run_collaborative(properties=properties, csvs=csvs, logger=logger)
     if Methods.content_based.value in properties["methods"]:
-        if properties["execution_kind"] == "normal":
-            run_content_based(properties=properties, csvs=csvs, logger=logger)
-        else:
-            run_test(properties=properties, csvs=csvs, logger=logger)
+        run_content_based(properties=properties, csvs=csvs, logger=logger)
+    if properties["execution_kind"] == "test":
+        run_test(properties=properties, csvs=csvs, logger=logger)
     utils.send_email(properties=properties, logger=logger)
 
 
