@@ -316,6 +316,7 @@ def visualize(df, output_folder, results_folder, folder_name, filename, captions
         results_folder (str): the name of the folder of the current execution
         folder_name (str): the fold name or avg or test folder
         filename (str): the name of the figure
+        captions (list): a list with the captions of the plot's bars
     """
     df.pivot("classifier", "metric", "result").plot(kind='bar', width=0.3)
     # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
