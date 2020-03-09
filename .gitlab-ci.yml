@@ -7,7 +7,7 @@ test1:
     RELEASE_IMAGE: registry.gitlab.com/msc-business-analytics/filmoid:latest
 
   before_script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN gitlab.com
+    - docker login -u minosthem -p hY_JnAEYeW3YjiVBi8Qz gitlab.com
 
   stage: build
   script:
