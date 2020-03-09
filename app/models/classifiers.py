@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score
 
 from utils import utils
-from utils.enums import MetricNames, MetricKind, Classification
+from utils.enums import MetricCaptions, MetricNames, MetricKind, Classification
 
 
 class Classifier:
@@ -32,6 +32,8 @@ class ContentBasedClassifier(Classifier):
     test_metrics = {}
     best_model = None
     model_name = ""
+    captions = [MetricCaptions.macro_prec.value, MetricCaptions.micro_prec.value, MetricCaptions.macro_recall.value,
+                MetricCaptions.micro_recall.value, MetricCaptions.macro_f.value, MetricCaptions.micro_f.value]
 
     def train(self, properties, input_data, labels):
         """
@@ -112,8 +114,9 @@ class ContentBasedClassifier(Classifier):
         filename = "Results_{}.csv".format(self.model_name)
         file_path = join(fold_path, filename)
         df.to_csv(file_path, sep=',')
+
         utils.visualize(df, output_folder, results_folder, "fold_{}".format(fold_num),
-                        "Plot_fold_{}_{}.png".format(fold_num, self.model_name))
+                        "Plot_fold_{}_{}.png".format(fold_num, self.model_name), captions=self.captions)
 
     def write_test_results_to_file(self, output_folder, results_folder):
         """
@@ -135,7 +138,7 @@ class ContentBasedClassifier(Classifier):
         file_path = join(fold_path, "Results_test_{}.csv".format(self.model_name))
         df.to_csv(file_path, sep=",")
         utils.visualize(df, output_folder, results_folder, "test_results",
-                        "Plot_test_{}.png".format(self.model_name))
+                        "Plot_test_{}.png".format(self.model_name), captions=self.captions)
 
     def get_fold_avg_result(self, output_folder, results_folder):
         """
@@ -165,7 +168,7 @@ class ContentBasedClassifier(Classifier):
             row += 1
         df.to_csv(csv_path, sep=",")
         utils.visualize(df, output_folder, results_folder, "fold_avg",
-                        "Plot_avg_{}.png".format(self.model_name))
+                        "Plot_avg_{}.png".format(self.model_name), captions=self.captions)
 
     def find_best_model(self, properties):
         """
