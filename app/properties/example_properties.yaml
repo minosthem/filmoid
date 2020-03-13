@@ -7,10 +7,10 @@ dataset: "small" # possible values: small, latest
 filenames: ["links", "movies", "ratings", "tags", "test_recommendation"]
 dataset-file-extention: ".csv"
 execution_kind: "normal" # possible values: normal, test
-methods: ["collaborative"]
+methods: ["content-based"]
 models:
   collaborative: ["pearson"]
-  content-based: ["knn", "rf", "dnn"]
+  content-based: ["rf"]
 embeddings_file: "glove.6B.50d.txt"
 embeddings_zip_file: "glove.6B.zip"
 embeddings_file_url: "http://nlp.stanford.edu/data/glove.6B.zip"
@@ -21,7 +21,7 @@ metric_best_model: "micro_f" # Possible values: "macro-precision", "micro-precis
 knn:
   neighbors: 30 # KNN neighbors
 rf:
-  estimators: 500
+  estimators: 1000
   max_depth: 10
 dnn:
   hidden_layers: [[1000, "relu", 0.5], [500, "relu", 0.5], ["softmax"]] # first number is hidden units, second one is the activation function and third one is the dropout
