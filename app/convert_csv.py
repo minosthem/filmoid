@@ -52,7 +52,7 @@ def visualize_grouped_bar_chart(folder_path, models):
                 microfs.append(get_micro_f(filename=join(path, file)))
             elif file.startswith("Exp2"):
                 microfs.append(get_micro_f(filename=join(path, file)))
-            else:
+            elif file.startswith("Exp3"):
                 microfs.append(get_micro_f(filename=join(path, file)))
         total_df.loc[row] = [model, microfs[0], microfs[1], microfs[2]]
         row += 1
