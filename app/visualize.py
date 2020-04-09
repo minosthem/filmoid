@@ -19,7 +19,7 @@ def visualize_classifier(properties, models):
     best_df = pd.read_csv(join(path, "Best_Results.csv"), index_col=0, header=0)
     captions = ["Micro F-Measure"]
     visualize(df=best_df, output_folder=properties["output_folder"], results_folder="results", folder_name=None,
-                    filename="microf_best.png", captions=captions)
+              filename="microf_best.png", captions=captions)
 
 
 def get_micro_f(filename):
