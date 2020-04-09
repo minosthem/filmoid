@@ -178,5 +178,5 @@ if __name__ == '__main__':
         models_list = program_properties["models"]["content-based"]
     else:
         models_list = program_properties["models"]["collaborative"]
-    # visualize_grouped_bar_chart(folder_path=folder, models=models_list)
+    visualize_grouped_bar_chart(folder_path=folder, models=models_list)
     visualize_classifier(properties=program_properties, models=models_list)
