@@ -45,12 +45,12 @@ class MetricCaptions(Enum):
     """
     Metric captions used in visualization
     """
-    macro_prec = "macro-prec"
-    micro_prec = "micro-prec"
-    macro_recall = "macro-recall"
-    micro_recall = "micro-recall"
-    macro_f = "macro-f"
-    micro_f = "micro-f"
+    macro_prec = "Macro Precision"
+    micro_prec = "Micro Precision"
+    macro_recall = "Macro Recall"
+    micro_recall = "Micro Recall"
+    macro_f = "Macro F-Measure"
+    micro_f = "Micro F-Measure"
 
 
 class Datasets(Enum):

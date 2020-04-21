@@ -9,8 +9,8 @@ dataset-file-extention: ".csv"
 execution_kind: "normal" # possible values: normal, test
 methods: ["content-based"]
 models:
-  collaborative: ["pearson"]
-  content-based: ["rf"]
+  collaborative: ["collaborative"]
+  content-based: ["knn", "rf", "dnn"]
 embeddings_file: "glove.6B.50d.txt"
 embeddings_zip_file: "glove.6B.zip"
 embeddings_file_url: "http://nlp.stanford.edu/data/glove.6B.zip"

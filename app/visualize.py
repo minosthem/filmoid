@@ -5,35 +5,50 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from utils import utils
-from utils.enums import MetricCaptions
+from utils.enums import MetricCaptions, MetricNames
 
 
-def visualize_classifier(properties, models):
+def visualize_classifier(properties, models, metric_name, metric_caption):
     path = join(utils.app_dir, properties["output_folder"], "results")
     captions = ["Experiment1", "Experiment2", "Experiment3"]
     for model in models:
         model_path = join(path, model)
         df = pd.read_csv(join(model_path, "Results.csv"), index_col=0, header=0)
         utils.visualize(df=df, output_folder=properties["output_folder"], results_folder="results", folder_name=model,
-                        filename="microf_{}.png".format(model), captions=captions)
-    best_df = pd.read_csv(join(path, "Best_Results.csv"), index_col=0, header=0)
-    captions = ["Micro F-Measure"]
+                        filename="{}_{}.png".format(metric_name, model), captions=captions)
+    best_df = pd.read_csv(join(path, "Best_Results_{}.csv".format(metric_name)), index_col=0, header=0)
+    captions = [metric_caption]
     visualize(df=best_df, output_folder=properties["output_folder"], results_folder="results", folder_name=None,
-              filename="microf_best.png", captions=captions)
+              filename="{}_best.png".format(metric_name), captions=captions)
 
 
-def get_micro_f(filename):
+def get_df(filename, position):
     df = pd.read_csv(filename, index_col=0, header=0)
-    return df.loc[5, "result"]
+    return df.loc[position, "result"]
 
 
-def visualize_grouped_bar_chart(folder_path, models):
+def get_position_metric(metric):
+    if metric == MetricNames.macro_precision.value:
+        return 0
+    elif metric == MetricNames.micro_precision.value:
+        return 1
+    elif metric == MetricNames.macro_recall.value:
+        return 2
+    elif metric == MetricNames.micro_recall.value:
+        return 3
+    elif metric == MetricNames.macro_f.value:
+        return 4
+    elif metric == MetricNames.micro_f.value:
+        return 5
+
+
+def visualize_grouped_bar_chart(folder_path, models, metric):
     total_df = pd.DataFrame(columns=["classifier", "Experiment1", "Experiment2", "Experiment3"])
     row = 0
     for model in models:
         path = join(folder_path, model)
         files = listdir(path)
-        microfs = []
+        metrics_exp = []
         for file in files:
             if file.startswith("Exp1"):
                 df = pd.read_csv(join(path, file), index_col=0, header=0)
@@ -42,7 +57,7 @@ def visualize_grouped_bar_chart(folder_path, models):
                             MetricCaptions.micro_recall.value, MetricCaptions.macro_f.value,
                             MetricCaptions.micro_f.value]
                 visualize(df, "output", "results", model, "metrics1.png", captions)
-                microfs.append(get_micro_f(filename=join(path, file)))
+                metrics_exp.append(get_df(filename=join(path, file), position=get_position_metric(metric)))
             elif file.startswith("Exp2"):
                 df = pd.read_csv(join(path, file), index_col=0, header=0)
                 captions = [MetricCaptions.macro_prec.value, MetricCaptions.micro_prec.value,
@@ -50,7 +65,7 @@ def visualize_grouped_bar_chart(folder_path, models):
                             MetricCaptions.micro_recall.value, MetricCaptions.macro_f.value,
                             MetricCaptions.micro_f.value]
                 visualize(df, "output", "results", model, "metrics2.png", captions)
-                microfs.append(get_micro_f(filename=join(path, file)))
+                metrics_exp.append(get_df(filename=join(path, file), position=get_position_metric(metric)))
             elif file.startswith("Exp3"):
                 df = pd.read_csv(join(path, file), index_col=0, header=0)
                 captions = [MetricCaptions.macro_prec.value, MetricCaptions.micro_prec.value,
@@ -58,20 +73,20 @@ def visualize_grouped_bar_chart(folder_path, models):
                             MetricCaptions.micro_recall.value, MetricCaptions.macro_f.value,
                             MetricCaptions.micro_f.value]
                 visualize(df, "output", "results", model, "metrics3.png", captions)
-                microfs.append(get_micro_f(filename=join(path, file)))
-        total_df.loc[row] = [model, microfs[0], microfs[1], microfs[2]]
+                metrics_exp.append(get_df(filename=join(path, file), position=get_position_metric(metric)))
+        total_df.loc[row] = [model, metrics_exp[0], metrics_exp[1], metrics_exp[2]]
         row += 1
         # plot(folder_path, total_df, model=model)
-    total_df.to_csv(join(folder_path, "Results.csv"), sep=",")
-    plot(folder_path, total_df)
+    total_df.to_csv(join(folder_path, "Results_{}.csv".format(metric)), sep=",")
+    plot(folder_path, total_df, metric)
     best_df = pd.DataFrame(columns=["classifier", "metric", "result"])
     row_counter = 0
     for index, row in total_df.iterrows():
-        classifier, micro1, micro2, micro3 = row
-        best = max([micro1, micro2, micro3])
-        best_df.loc[row_counter] = [classifier, "micro_f", best]
+        classifier, metric1, metric2, metric3 = row
+        best = max([metric1, metric2, metric3])
+        best_df.loc[row_counter] = [classifier, metric, best]
         row_counter += 1
-    best_df.to_csv(join(folder_path, "Best_Results.csv"), sep=",")
+    best_df.to_csv(join(folder_path, "Best_Results_{}.csv".format(metric)), sep=",")
 
 
 def visualize(df, output_folder, results_folder, folder_name, filename, captions):
@@ -91,7 +106,7 @@ def visualize(df, output_folder, results_folder, folder_name, filename, captions
     # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.xticks(rotation="horizontal")
     plt.yticks(rotation="vertical")
-    plt.ylabel("Micro F-Measure")
+    plt.ylabel(captions[0])
     plt.legend("")
     path = join(utils.app_dir, output_folder, results_folder, folder_name) if folder_name else \
         join(utils.app_dir, output_folder, results_folder)
@@ -100,7 +115,7 @@ def visualize(df, output_folder, results_folder, folder_name, filename, captions
     # plt.show()
 
 
-def plot(folder_path, total_df, model=None):
+def plot(folder_path, total_df, caption, model=None):
     # Setting the positions and width for the bars
     pos = list(range(len(total_df["Experiment1"])))
     width = 0.10
@@ -146,9 +161,9 @@ def plot(folder_path, total_df, model=None):
             # with label the third value in classifier
             label=total_df["classifier"][0])
     # Set the y axis label
-    ax.set_ylabel("Micro F-Measure")
+    ax.set_ylabel(caption)
     # Set the chart's title
-    ax.set_title("Micro F-Measure for all models & experiments")
+    ax.set_title("{}for all models & experiments".format(caption))
     # Set the position of the x ticks
     ax.set_xticks([p + 1.5 * width for p in pos])
     # Set the labels for the x ticks
@@ -162,7 +177,7 @@ def plot(folder_path, total_df, model=None):
     # Adding the legend and showing the plot
     plt.legend(["Experiment1", "Experiment2", "Experiment3"], loc='upper left')
     plt.grid()
-    filename = "total_plot_{}.png".format(model) if model else "total_plot.png"
+    filename = "total_plot_{}_{}.png".format(model, caption) if model else "total_plot.png"
     plt.savefig(join(folder_path, filename))
     plt.close('all')
     # plt.show()
@@ -178,5 +193,16 @@ if __name__ == '__main__':
         models_list = program_properties["models"]["content-based"]
     else:
         models_list = program_properties["models"]["collaborative"]
-    visualize_grouped_bar_chart(folder_path=folder, models=models_list)
-    visualize_classifier(properties=program_properties, models=models_list)
+
+    metrics = [MetricNames.macro_precision.value, MetricNames.micro_precision.value,
+               MetricNames.macro_recall.value,
+               MetricNames.micro_recall.value, MetricNames.macro_f.value,
+               MetricNames.micro_f.value]
+    caps = [MetricCaptions.macro_prec.value, MetricCaptions.micro_prec.value,
+            MetricCaptions.macro_recall.value,
+            MetricCaptions.micro_recall.value, MetricCaptions.macro_f.value,
+            MetricCaptions.micro_f.value]
+    for idx, metr in enumerate(metrics):
+        visualize_grouped_bar_chart(folder_path=folder, models=models_list, metric=metr)
+        visualize_classifier(properties=program_properties, models=models_list, metric_name=metr,
+                             metric_caption=caps[idx])
